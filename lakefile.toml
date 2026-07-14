@@ -1,0 +1,29 @@
+name = "DaveyThesis2024"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["DaveyThesis2024"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+# House-style mathlib linters that are false positives or impractical for this
+# dense, native_decide-backed formalization. The valuable linters (unusedVariables,
+# unusedSimpArgs, deprecated, unusedTactic, ...) remain enabled.
+#   nativeDecide  — native_decide is a deliberate, core verification technique here.
+#   longLine      — many proof terms/comments legitimately exceed 100 chars.
+#   flexible      — simp/simp_all used flexibly throughout; simp-only conversion is impractical.
+#   maxHeartbeats — heartbeat bumps are deliberate and locally justified.
+weak.linter.style.nativeDecide = false
+weak.linter.style.longLine = false
+weak.linter.flexible = false
+weak.linter.style.maxHeartbeats = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.28.0"
+
+[[lean_lib]]
+name = "DaveyThesis2024"

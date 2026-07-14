@@ -1,0 +1,35 @@
+# Lean build artefacts
+.lake/
+lake-packages/
+build/
+.cache/
+*.olean
+*.ilean
+*.trace
+
+# Rust build artefacts
+target/
+local-flags-certificates/.cargo/
+
+# Generated flag-algebra caches and SDP solver I/O (regenerable; see README)
+local-flags-certificates/data/
+local-flags-certificates/certificates/
+*.sdpa
+report.html
+
+# Search run outputs
+*_logs/
+*.log
+phase2_results.tsv
+local-flags-certificates/pentagon_search/hog/g6_cache/
+local-flags-certificates/pentagon_search/hog/*.tsv
+
+# Compiled C helper (rebuild: cc -O2 fast_check.c -o fast_check)
+local-flags-certificates/sec_search/fast_check
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store

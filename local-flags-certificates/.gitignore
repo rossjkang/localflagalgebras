@@ -1,0 +1,10 @@
+/target/
+**/*.rs.bk
+*#
+*~
+*.swp
+/*.sdpa
+/certificate
+/report.html
+target/
+data/

@@ -1,0 +1,11 @@
+component	contribution	description
+B1 (5∅ - F6)	4.0000000000	regularity B1: phi(F1)=1 ⟹ phi(F6)=5
+σ1	-6.0000000000	extension diff at σ_1 type
+σ2 (/4)	4.0000000000	extension diff at σ_2 type
+σ3	0.0000000000	extension diff at σ_3 type
+σ4	-0.5000000000	extension diff at σ_4 type
+σ5	0.0000000000	extension diff at σ_5 type
+linSum (6·B1+σ1+σ2/4+σ3+σ4+2σ5)	21.5000000000	ALL linear constraints
+cs0 (CS at σ6 = K_{1,2} BBR)	3.0000000000	PSD block 0 (σ_6)
+cs1 (CS at σ7 = K_{1,2} RBR)	0.5000000000	PSD block 1 (σ_7)
+target (30∅ - 2F9 - F37 - 2F55)	25.0000000000	objective

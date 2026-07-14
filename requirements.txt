@@ -1,0 +1,10 @@
+# Python dependencies for the exhaustive-search and SDP cross-check scripts
+# (pentagon_search/ and sec_search/). System tools also required, not installable
+# via pip: nauty (geng/genbg/genbgL) and the CSDP solver (csdp CLI).
+networkx
+python-sat
+numpy
+scipy
+cvxpy
+scs
+requests

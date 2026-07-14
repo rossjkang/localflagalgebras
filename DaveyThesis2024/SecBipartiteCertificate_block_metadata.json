@@ -1,0 +1,426 @@
+{
+  "module_name": "SecBipartiteCertificate",
+  "namespace": "Davey2024.SecBipartiteCertificate",
+  "num_blocks": 52,
+  "diag_count": 6709,
+  "lambda_denom": 100000000000,
+  "denom_Y": 1000000000000,
+  "blocks": [
+    {
+      "file_idx": 0,
+      "sdpa_idx": 2134,
+      "dim": 22,
+      "max_d_L_col_bits": 570,
+      "max_d_D_bits": 609,
+      "file_size_bytes": 123779
+    },
+    {
+      "file_idx": 1,
+      "sdpa_idx": 2135,
+      "dim": 22,
+      "max_d_L_col_bits": 566,
+      "max_d_D_bits": 604,
+      "file_size_bytes": 120174
+    },
+    {
+      "file_idx": 2,
+      "sdpa_idx": 2137,
+      "dim": 22,
+      "max_d_L_col_bits": 615,
+      "max_d_D_bits": 652,
+      "file_size_bytes": 128127
+    },
+    {
+      "file_idx": 3,
+      "sdpa_idx": 2138,
+      "dim": 22,
+      "max_d_L_col_bits": 579,
+      "max_d_D_bits": 618,
+      "file_size_bytes": 122016
+    },
+    {
+      "file_idx": 4,
+      "sdpa_idx": 2139,
+      "dim": 22,
+      "max_d_L_col_bits": 615,
+      "max_d_D_bits": 655,
+      "file_size_bytes": 127672
+    },
+    {
+      "file_idx": 5,
+      "sdpa_idx": 2140,
+      "dim": 22,
+      "max_d_L_col_bits": 578,
+      "max_d_D_bits": 618,
+      "file_size_bytes": 122699
+    },
+    {
+      "file_idx": 6,
+      "sdpa_idx": 2141,
+      "dim": 22,
+      "max_d_L_col_bits": 582,
+      "max_d_D_bits": 621,
+      "file_size_bytes": 124485
+    },
+    {
+      "file_idx": 7,
+      "sdpa_idx": 2142,
+      "dim": 22,
+      "max_d_L_col_bits": 561,
+      "max_d_D_bits": 600,
+      "file_size_bytes": 118601
+    },
+    {
+      "file_idx": 8,
+      "sdpa_idx": 2143,
+      "dim": 22,
+      "max_d_L_col_bits": 491,
+      "max_d_D_bits": 529,
+      "file_size_bytes": 102318
+    },
+    {
+      "file_idx": 9,
+      "sdpa_idx": 2144,
+      "dim": 22,
+      "max_d_L_col_bits": 583,
+      "max_d_D_bits": 624,
+      "file_size_bytes": 123606
+    },
+    {
+      "file_idx": 10,
+      "sdpa_idx": 2145,
+      "dim": 22,
+      "max_d_L_col_bits": 561,
+      "max_d_D_bits": 593,
+      "file_size_bytes": 119647
+    },
+    {
+      "file_idx": 11,
+      "sdpa_idx": 2146,
+      "dim": 22,
+      "max_d_L_col_bits": 487,
+      "max_d_D_bits": 531,
+      "file_size_bytes": 102098
+    },
+    {
+      "file_idx": 12,
+      "sdpa_idx": 2147,
+      "dim": 22,
+      "max_d_L_col_bits": 664,
+      "max_d_D_bits": 705,
+      "file_size_bytes": 138778
+    },
+    {
+      "file_idx": 13,
+      "sdpa_idx": 2148,
+      "dim": 22,
+      "max_d_L_col_bits": 664,
+      "max_d_D_bits": 705,
+      "file_size_bytes": 138374
+    },
+    {
+      "file_idx": 14,
+      "sdpa_idx": 2149,
+      "dim": 22,
+      "max_d_L_col_bits": 663,
+      "max_d_D_bits": 702,
+      "file_size_bytes": 137408
+    },
+    {
+      "file_idx": 15,
+      "sdpa_idx": 2150,
+      "dim": 22,
+      "max_d_L_col_bits": 656,
+      "max_d_D_bits": 696,
+      "file_size_bytes": 135860
+    },
+    {
+      "file_idx": 16,
+      "sdpa_idx": 2151,
+      "dim": 22,
+      "max_d_L_col_bits": 672,
+      "max_d_D_bits": 712,
+      "file_size_bytes": 138588
+    },
+    {
+      "file_idx": 17,
+      "sdpa_idx": 2152,
+      "dim": 22,
+      "max_d_L_col_bits": 667,
+      "max_d_D_bits": 705,
+      "file_size_bytes": 138212
+    },
+    {
+      "file_idx": 18,
+      "sdpa_idx": 2153,
+      "dim": 22,
+      "max_d_L_col_bits": 660,
+      "max_d_D_bits": 702,
+      "file_size_bytes": 136887
+    },
+    {
+      "file_idx": 19,
+      "sdpa_idx": 2154,
+      "dim": 22,
+      "max_d_L_col_bits": 652,
+      "max_d_D_bits": 692,
+      "file_size_bytes": 136215
+    },
+    {
+      "file_idx": 20,
+      "sdpa_idx": 2155,
+      "dim": 22,
+      "max_d_L_col_bits": 661,
+      "max_d_D_bits": 699,
+      "file_size_bytes": 136928
+    },
+    {
+      "file_idx": 21,
+      "sdpa_idx": 2156,
+      "dim": 22,
+      "max_d_L_col_bits": 641,
+      "max_d_D_bits": 679,
+      "file_size_bytes": 133716
+    },
+    {
+      "file_idx": 22,
+      "sdpa_idx": 2157,
+      "dim": 22,
+      "max_d_L_col_bits": 656,
+      "max_d_D_bits": 694,
+      "file_size_bytes": 135055
+    },
+    {
+      "file_idx": 23,
+      "sdpa_idx": 2158,
+      "dim": 22,
+      "max_d_L_col_bits": 661,
+      "max_d_D_bits": 700,
+      "file_size_bytes": 136893
+    },
+    {
+      "file_idx": 24,
+      "sdpa_idx": 2159,
+      "dim": 22,
+      "max_d_L_col_bits": 650,
+      "max_d_D_bits": 686,
+      "file_size_bytes": 133292
+    },
+    {
+      "file_idx": 25,
+      "sdpa_idx": 2160,
+      "dim": 22,
+      "max_d_L_col_bits": 656,
+      "max_d_D_bits": 696,
+      "file_size_bytes": 135332
+    },
+    {
+      "file_idx": 26,
+      "sdpa_idx": 2161,
+      "dim": 22,
+      "max_d_L_col_bits": 597,
+      "max_d_D_bits": 634,
+      "file_size_bytes": 129289
+    },
+    {
+      "file_idx": 27,
+      "sdpa_idx": 2162,
+      "dim": 22,
+      "max_d_L_col_bits": 596,
+      "max_d_D_bits": 632,
+      "file_size_bytes": 129937
+    },
+    {
+      "file_idx": 28,
+      "sdpa_idx": 2163,
+      "dim": 22,
+      "max_d_L_col_bits": 593,
+      "max_d_D_bits": 625,
+      "file_size_bytes": 127803
+    },
+    {
+      "file_idx": 29,
+      "sdpa_idx": 2164,
+      "dim": 22,
+      "max_d_L_col_bits": 597,
+      "max_d_D_bits": 633,
+      "file_size_bytes": 129336
+    },
+    {
+      "file_idx": 30,
+      "sdpa_idx": 2165,
+      "dim": 22,
+      "max_d_L_col_bits": 660,
+      "max_d_D_bits": 700,
+      "file_size_bytes": 136256
+    },
+    {
+      "file_idx": 31,
+      "sdpa_idx": 2166,
+      "dim": 22,
+      "max_d_L_col_bits": 650,
+      "max_d_D_bits": 686,
+      "file_size_bytes": 134124
+    },
+    {
+      "file_idx": 32,
+      "sdpa_idx": 2167,
+      "dim": 22,
+      "max_d_L_col_bits": 578,
+      "max_d_D_bits": 608,
+      "file_size_bytes": 125379
+    },
+    {
+      "file_idx": 33,
+      "sdpa_idx": 2168,
+      "dim": 22,
+      "max_d_L_col_bits": 660,
+      "max_d_D_bits": 697,
+      "file_size_bytes": 135881
+    },
+    {
+      "file_idx": 34,
+      "sdpa_idx": 2169,
+      "dim": 22,
+      "max_d_L_col_bits": 648,
+      "max_d_D_bits": 688,
+      "file_size_bytes": 133263
+    },
+    {
+      "file_idx": 35,
+      "sdpa_idx": 2170,
+      "dim": 22,
+      "max_d_L_col_bits": 574,
+      "max_d_D_bits": 599,
+      "file_size_bytes": 125062
+    },
+    {
+      "file_idx": 36,
+      "sdpa_idx": 2171,
+      "dim": 22,
+      "max_d_L_col_bits": 595,
+      "max_d_D_bits": 635,
+      "file_size_bytes": 128865
+    },
+    {
+      "file_idx": 37,
+      "sdpa_idx": 2172,
+      "dim": 22,
+      "max_d_L_col_bits": 596,
+      "max_d_D_bits": 635,
+      "file_size_bytes": 125327
+    },
+    {
+      "file_idx": 38,
+      "sdpa_idx": 2173,
+      "dim": 22,
+      "max_d_L_col_bits": 551,
+      "max_d_D_bits": 590,
+      "file_size_bytes": 116161
+    },
+    {
+      "file_idx": 39,
+      "sdpa_idx": 2174,
+      "dim": 22,
+      "max_d_L_col_bits": 543,
+      "max_d_D_bits": 582,
+      "file_size_bytes": 119240
+    },
+    {
+      "file_idx": 40,
+      "sdpa_idx": 2175,
+      "dim": 22,
+      "max_d_L_col_bits": 545,
+      "max_d_D_bits": 584,
+      "file_size_bytes": 119290
+    },
+    {
+      "file_idx": 41,
+      "sdpa_idx": 2176,
+      "dim": 22,
+      "max_d_L_col_bits": 549,
+      "max_d_D_bits": 590,
+      "file_size_bytes": 116464
+    },
+    {
+      "file_idx": 42,
+      "sdpa_idx": 2177,
+      "dim": 22,
+      "max_d_L_col_bits": 662,
+      "max_d_D_bits": 702,
+      "file_size_bytes": 136089
+    },
+    {
+      "file_idx": 43,
+      "sdpa_idx": 2178,
+      "dim": 22,
+      "max_d_L_col_bits": 659,
+      "max_d_D_bits": 700,
+      "file_size_bytes": 135852
+    },
+    {
+      "file_idx": 44,
+      "sdpa_idx": 2179,
+      "dim": 22,
+      "max_d_L_col_bits": 646,
+      "max_d_D_bits": 684,
+      "file_size_bytes": 132232
+    },
+    {
+      "file_idx": 45,
+      "sdpa_idx": 2180,
+      "dim": 22,
+      "max_d_L_col_bits": 644,
+      "max_d_D_bits": 684,
+      "file_size_bytes": 132207
+    },
+    {
+      "file_idx": 46,
+      "sdpa_idx": 2181,
+      "dim": 22,
+      "max_d_L_col_bits": 646,
+      "max_d_D_bits": 686,
+      "file_size_bytes": 133229
+    },
+    {
+      "file_idx": 47,
+      "sdpa_idx": 2182,
+      "dim": 22,
+      "max_d_L_col_bits": 645,
+      "max_d_D_bits": 686,
+      "file_size_bytes": 132564
+    },
+    {
+      "file_idx": 48,
+      "sdpa_idx": 2131,
+      "dim": 43,
+      "max_d_L_col_bits": 1235,
+      "max_d_D_bits": 1276,
+      "file_size_bytes": 903387
+    },
+    {
+      "file_idx": 49,
+      "sdpa_idx": 2132,
+      "dim": 43,
+      "max_d_L_col_bits": 1235,
+      "max_d_D_bits": 1272,
+      "file_size_bytes": 905509
+    },
+    {
+      "file_idx": 50,
+      "sdpa_idx": 2133,
+      "dim": 54,
+      "max_d_L_col_bits": 1434,
+      "max_d_D_bits": 1476,
+      "file_size_bytes": 1535641
+    },
+    {
+      "file_idx": 51,
+      "sdpa_idx": 2136,
+      "dim": 54,
+      "max_d_L_col_bits": 1429,
+      "max_d_D_bits": 1470,
+      "file_size_bytes": 1535309
+    }
+  ]
+}

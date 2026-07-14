@@ -1,0 +1,18 @@
+[package]
+name = "local-flags"
+version = "0.1.0"
+authors = ["Rémi de Verclos", "Eoin Davey"]
+edition = "2021"
+readme = "README.md"
+keywords = ["graph", "combinatorics", "optimization"]
+
+[dependencies]
+ndarray = "0.15"
+serde = "1.0"
+serde_derive = "1.0"
+canonical-form = "0.10.0"
+num = "0.4.1"
+sprs-ldl = "0.7.0"
+sprs = "0.11"
+flag-algebra = { path="./rust-flag-algebra" }
+itertools = "0.12.1"
