@@ -286,35 +286,7 @@ constant gap is only the `ι`-slack absorbed into the stated coefficient.
   `SecAsymBridgeF.lean`; §5.1–5.3). The p-free forms instead use the 4 bipartite
   axioms of Thm 1.2. No `native_decide`, no separate regularity axiom.
 
-### Theorem 1.4 — asymmetric strong clique number
-
-- **Math:** for bipartite G with sides A, B, `ω(L(G)²) ≤ Δ_A·Δ_B`.
-- **Lean:** `omega_lineGraphSq_le_mul_bipartite` (`BipartiteOmegaL2.lean:999`)
-  ```lean
-  theorem omega_lineGraphSq_le_mul_bipartite
-      (G : Flag emptyType) (S : Finset (Fin G.size))
-      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
-      cliqueNumber (lineGraphSqFlag G) ≤ maxDegreeOn G S * maxDegreeOn G Sᶜ
-  ```
-  (symmetric corollary `omega_lineGraphSq_le_sq_bipartite` (`:1020`): `≤ Δ²`).
-- **Defs used:** `cliqueNumber`, `lineGraphSqFlag`, `maxDegreeOn`.
-- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
-
-### Theorem 1.5 — asymmetric induced matching number
-
-- **Math:** for bipartite G, `|E(G)| ≤ ν_s(G)·Δ_A·Δ_B`, i.e. `ν_s(G) ≥ |E(G)|/(Δ_A·Δ_B)`.
-- **Lean:** `edges_le_nu_s_mul_mul_bipartite` (`InducedMatchingAsymmetric.lean:383`)
-  ```lean
-  theorem edges_le_nu_s_mul_mul_bipartite
-      (G : Flag emptyType) (S : Finset (Fin G.size))
-      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
-      (edgeFinset G).card ≤ inducedMatchingNumber G * maxDegreeOn G S * maxDegreeOn G Sᶜ
-  ```
-  (symmetric corollary `edges_le_nu_s_mul_sq_bipartite` (`:511`): `≤ ν_s·Δ²`).
-- **Defs used:** `edgeFinset`, `inducedMatchingNumber`, `maxDegreeOn`.
-- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
-
-### Theorem 1.6 — a.a.s. Brualdi–Quinn Massey (random bipartite)
+### Theorem 1.4 — a.a.s. Brualdi–Quinn Massey (random bipartite)
 
 - **Math:** for fixed p ∈ (0,1) and bounded aspect ratio `max(n_A,n_B) ≤ C·min(n_A,n_B)`,
   the random bipartite `G ∼ G(n_A,n_B,p)` satisfies `χ′ₛ(G) ≤ Δ_A(G)·Δ_B(G)`
@@ -335,6 +307,35 @@ constant gap is only the `ι`-slack absorbed into the stated coefficient.
 - **Axioms:** `propext, Classical.choice, Quot.sound` **+ 2 verbatim literature axioms** —
   `SecRandomBipartite.KimVu.kim_vu_concentration_verbatim` and
   `SecRandomBipartite.PippengerSpencer.pippenger_spencer_covering_verbatim` (§5.5).
+
+### Proposition 8.1(a) — asymmetric strong clique number
+
+- **Math:** for bipartite G with sides A, B, `ω(L(G)²) ≤ Δ_A·Δ_B`.
+- **Lean:** `omega_lineGraphSq_le_mul_bipartite` (`BipartiteOmegaL2.lean:999`)
+  ```lean
+  theorem omega_lineGraphSq_le_mul_bipartite
+      (G : Flag emptyType) (S : Finset (Fin G.size))
+      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
+      cliqueNumber (lineGraphSqFlag G) ≤ maxDegreeOn G S * maxDegreeOn G Sᶜ
+  ```
+  (symmetric corollary `omega_lineGraphSq_le_sq_bipartite` (`:1020`): `≤ Δ²`).
+- **Defs used:** `cliqueNumber`, `lineGraphSqFlag`, `maxDegreeOn`.
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
+
+### Proposition 8.1(b) — asymmetric induced matching number
+
+- **Math:** for bipartite G, `|E(G)| ≤ ν_s(G)·Δ_A·Δ_B`, i.e. `ν_s(G) ≥ |E(G)|/(Δ_A·Δ_B)`.
+- **Lean:** `edges_le_nu_s_mul_mul_bipartite` (`InducedMatchingAsymmetric.lean:383`)
+  ```lean
+  theorem edges_le_nu_s_mul_mul_bipartite
+      (G : Flag emptyType) (S : Finset (Fin G.size))
+      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
+      (edgeFinset G).card ≤ inducedMatchingNumber G * maxDegreeOn G S * maxDegreeOn G Sᶜ
+  ```
+  (symmetric corollary `edges_le_nu_s_mul_sq_bipartite` (`:511`): `≤ ν_s·Δ²`).
+- **Defs used:** `edgeFinset`, `inducedMatchingNumber`, `maxDegreeOn`.
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
+
 
 ---
 
@@ -453,9 +454,9 @@ semirandom-nibble infrastructure.
 | **2** · 1.1 general SEC | `strong_chromatic_index_bound[_thesis_tight]` | 4 (Hurley + 3 general `_F` cert) |
 | **2** · 1.2 bipartite SEC | `strong_chromatic_index_bipartite[_thesis_tight]` | 4 (Hurley + 3 bipartite `_F` cert) |
 | **2** · 1.3 asymmetric SEC | `strong_chromatic_index_asymmetric_bipartite[_thesis_tight]` | 4 (Hurley + 3 asymmetric `_F` cert for the per-p form; the p-free form reuses the bipartite axioms) |
-| **2** · 1.4 strong clique ω(L(G)²) | `omega_lineGraphSq_le_mul_bipartite` | none |
-| **2** · 1.5 induced matching ν_s | `edges_le_nu_s_mul_mul_bipartite` | none |
-| **2** · 1.6 a.a.s. Brualdi–Quinn Massey | `secRandomBipartite_aas` | 2 (Kim–Vu, Pippenger–Spencer, verbatim) |
+| **2** · 1.4 a.a.s. Brualdi–Quinn Massey | `secRandomBipartite_aas` | 2 (Kim–Vu, Pippenger–Spencer, verbatim) |
+| **2** · Prop 8.1(a) strong clique ω(L(G)²) | `omega_lineGraphSq_le_mul_bipartite` | none |
+| **2** · Prop 8.1(b) induced matching ν_s | `edges_le_nu_s_mul_mul_bipartite` | none |
 
 Distinct user axioms across the whole project: **2** (Paper 1 pentagon-Q) + **1**
 Hurley + **9** SEC certificate bridge axioms (general/bipartite/asymmetric ×

@@ -35,9 +35,9 @@ The work partially originates in E. Davey's MSc thesis *Local Flag Algebras* (Un
 | Paper 2, Thm 1.1 | `strong_chromatic_index_bound[_thesis_tight]` | χ'ₛ(G) ≤ 1.74·Δ² (tight form 1.73·Δ²) | 4 (Hurley + 3 SEC cert) |
 | Paper 2, Thm 1.2 | `strong_chromatic_index_bipartite[_thesis_tight]` | χ'ₛ(G) ≤ 1.63·Δ² bipartite (tight 1.6255·Δ²) | 4 |
 | Paper 2, Thm 1.3 | `strong_chromatic_index_asymmetric_bipartite[_thesis_tight]` | χ'ₛ(G) ≤ 1.6633·Δ_A·Δ_B (per-p form 1.6632·p·Δ²) | 4 (Hurley + 3 SEC cert) |
-| Paper 2, Thm 1.4 | `omega_lineGraphSq_le_mul_bipartite` | ω(L(G)²) ≤ Δ_A·Δ_B, bipartite | none |
-| Paper 2, Thm 1.5 | `edges_le_nu_s_mul_mul_bipartite` | ν_s(G) ≥ \|E(G)\|/(Δ_A·Δ_B), bipartite | none |
-| Paper 2, Thm 1.6 | `secRandomBipartite_aas` | Brualdi–Quinn Massey holds a.a.s. for G(n_A,n_B,p) | 2 (verbatim Kim–Vu / Pippenger–Spencer) |
+| Paper 2, Thm 1.4 | `secRandomBipartite_aas` | Brualdi–Quinn Massey holds a.a.s. for G(n_A,n_B,p) | 2 (verbatim Kim–Vu / Pippenger–Spencer) |
+| Paper 2, Prop 8.1(a) | `omega_lineGraphSq_le_mul_bipartite` | ω(L(G)²) ≤ Δ_A·Δ_B, bipartite | none |
+| Paper 2, Prop 8.1(b) | `edges_le_nu_s_mul_mul_bipartite` | ν_s(G) ≥ \|E(G)\|/(Δ_A·Δ_B), bipartite | none |
 
 See **[`RESULTS.md`](RESULTS.md)** for the full side-by-side correspondence: every
 result above with its exact Lean statement, the user-defined definitions it rests
