@@ -134,7 +134,7 @@ to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
       (pentagonCount G : ℝ) * (5 * 8) ≤ G.size * maxDegree G ^ 4
   ```
 - **Defs used:** `Flag`, `IsTriangleFree`, `pentagonCount`, `maxDegree`.
-- **Axioms:** `propext, Classical.choice, Lean.ofReduceBool, Lean.trustCompiler, Quot.sound` — **standard only** (size-5 SDP checked by `native_decide`); **no user axioms**.
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only (kernel `decide`, no `native_decide`), no user axioms.** The size-5 SDP positivity is proved as theorems and the finite CGraph joint/induced counts are discharged in-kernel by `decide` (via `tcJointCountFast` / `tcJointCount_eq_fast` in `CGraphBridge.lean`), so the bound carries neither the compiled-evaluation axioms nor any domain assumption.
 
 ### Theorem 1.2 — tighter pentagon bound
 
