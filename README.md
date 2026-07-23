@@ -9,7 +9,7 @@ This repository contains the code accompanying two papers:
 - **Paper 1.** E. Davey, E. Hurley, R. de Joannis de Verclos, R. J. Kang, J. Volec.
   *Local flag algebras.* [arXiv:2607.12461](https://arxiv.org/abs/2607.12461), 2026.
 - **Paper 2.** E. Davey, E. Hurley, R. de Joannis de Verclos, R. J. Kang, J. Volec.
-  *Strong edge-colouring via local flag algebras.* In preparation, 2026.
+  *Strong edge-colouring via local flag algebras.* [arXiv:2607.17421](https://arxiv.org/abs/2607.17421), 2026.
 
 It has three parts:
 
@@ -167,12 +167,14 @@ source: `cc -O2 local-flags-certificates/sec_search/fast_check.c -o fast_check`.
   primaryClass = {math.CO}
 }
 
-@unpublished{daveySECLocalFlags2026,
+@misc{daveySECLocalFlags2026,
   title  = {Strong Edge-Colouring via Local Flag Algebras},
   author = {Davey, Eoin and Hurley, Eoin and de Joannis de Verclos, R\'emi
             and Kang, Ross J. and Volec, Jan},
   year   = {2026},
-  note   = {In preparation}
+  eprint = {2607.17421},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO}
 }
 ```
 
