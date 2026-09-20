@@ -8823,20 +8823,36 @@ Independently verified by three sources:
    vertices" pattern. The factor-of-2 here is its `Δ·P(G,v) + Σ_{u~v}
    P(G,u)` analogue: each pentagon-extension tuple contributes to
    exactly two `pentagonCountAt G u` terms for the two adjacent
-   `u ∈ S ∩ N(v)`. -/
+   `u ∈ S ∩ N(v)`.
+
+**The `8 ≤ Δ` guard is load-bearing (added 2026-09-20).** Without it this
+axiom is FALSE, and `pentagon_bound_full` was derived from an inconsistent
+hypothesis set. `genUnlabelledDensity` divides by
+`Nat.choose (brrbGenDelta …) 8`, which is `0` when `Δ < 8`; Lean's division
+by zero is zero, so every summand on the right vanishes and the identity
+forces `pentagonQ = 0` — contradicted by any triangle-free regular graph
+carrying pentagons (regularised Petersen blow-ups suffice). The paper's own
+Lemma 7.9 states the identity with a `+ o(1)` along a `Δ`-increasing
+sequence; this guard is the finite-`Δ` shadow of that qualifier, and the
+consumer supplies it from `Filter.eventually_ge_atTop 8`. See
+`PentagonQNonVacuity.lean` for the regression that keeps the hypothesis set
+satisfiable, and the audit record in
+the development notes for the machine-checked refutation of the
+unguarded form. -/
 axiom pentagonQ_basis_combinatorial_identity_step1
     (seq : ℕ → Σ (G : Flag emptyType), Fin G.size)
     (hΔ : StrictMono (fun k => maxDegree (seq k).1))
     (hTF : ∀ k, IsTriangleFree (seq k).1)
-    (hReg : ∀ k, IsRegular (seq k).1)
-    (k : ℕ) (_hΔpos : 0 < maxDegree (seq k).1) :
-    2 * (pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5) =
-      (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-        (fun j => O_Q_coef j *
-          genUnlabelledDensity CG2 (GenFlagType.empty CG2)
-            (Davey2024.PentagonQBasis.flagBasis j)
-            (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
-            brrbGenDelta)
+    (hReg : ∀ k, IsRegular (seq k).1) :
+    Filter.Tendsto
+      (fun k => 2 * (pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5) -
+        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+          (fun j => O_Q_coef j *
+            genUnlabelledDensity CG2 (GenFlagType.empty CG2)
+              (Davey2024.PentagonQBasis.flagBasis j)
+              (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
+              brrbGenDelta))
+      Filter.atTop (nhds 0)
 
 /-- **Phase 3.5 sub-lemma C.1** (deferred): the finite-G combinatorial
 identity. Restated from the original docstring after Phase 1.E's
@@ -8847,21 +8863,23 @@ theorem pentagonQ_basis_combinatorial_identity
     (seq : ℕ → Σ (G : Flag emptyType), Fin G.size)
     (hΔ : StrictMono (fun k => maxDegree (seq k).1))
     (hTF : ∀ k, IsTriangleFree (seq k).1)
-    (hReg : ∀ k, IsRegular (seq k).1)
-    (k : ℕ) (_hΔpos : 0 < maxDegree (seq k).1) :
-    pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5 =
-      (1/2 : ℝ) *
-        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-          (fun j => O_Q_coef j *
-            genUnlabelledDensity CG2 (GenFlagType.empty CG2)
-              (Davey2024.PentagonQBasis.flagBasis j)
-              (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
-              brrbGenDelta) := by
-  -- Phase 1.E (2026-05-13): close from Step 1 scaffold via the (1/2)
-  -- rescaling. Step 1's body is sorry-bodied separately.
-  have hstep1 :=
-    pentagonQ_basis_combinatorial_identity_step1 seq hΔ hTF hReg k _hΔpos
-  linarith [hstep1]
+    (hReg : ∀ k, IsRegular (seq k).1) :
+    Filter.Tendsto
+      (fun k => pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5 -
+        (1/2 : ℝ) *
+          (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+            (fun j => O_Q_coef j *
+              genUnlabelledDensity CG2 (GenFlagType.empty CG2)
+                (Davey2024.PentagonQBasis.flagBasis j)
+                (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
+                brrbGenDelta))
+      Filter.atTop (nhds 0) := by
+  -- The (1/2) rescaling of Step 1, now at the level of the error term:
+  -- `(1/2) * (2*A - S) = A - (1/2)*S`, and `(1/2) * 0 = 0`.
+  have hstep1 := pentagonQ_basis_combinatorial_identity_step1 seq hΔ hTF hReg
+  have hhalf := hstep1.const_mul (1/2 : ℝ)
+  rw [mul_zero] at hhalf
+  exact hhalf.congr (fun k => by ring)
 
 /-! ### Tier B helpers — `flagBasis_str_boundedDensity` decomposition (2026-05-11)
 
@@ -9637,29 +9655,32 @@ theorem pentagonQ_density_identity_per_extension
       Filter.atTop (nhds L) :=
     htend.comp phi.sub_strictMono.tendsto_atTop
   -- Step B: For each `n`, eventually Δ > 0 along the composed subsequence.
+  -- The subsequence index tends to infinity; hoisted, since both the degree
+  -- divergence and the o(1) combinatorial identity are transported along it.
+  have hsubseq_atTop : Filter.Tendsto (fun n => sub (phi.sub n)) Filter.atTop Filter.atTop :=
+    (hsub.comp phi.sub_strictMono).tendsto_atTop
   have hΔ_atTop : Filter.Tendsto
-      (fun n => maxDegree (seq (sub (phi.sub n))).1) Filter.atTop Filter.atTop := by
-    have h₁ : Filter.Tendsto (fun k => maxDegree (seq k).1) Filter.atTop Filter.atTop :=
-      hΔ.tendsto_atTop
-    have h₂ : Filter.Tendsto (fun n => sub (phi.sub n)) Filter.atTop Filter.atTop :=
-      (hsub.comp phi.sub_strictMono).tendsto_atTop
-    exact h₁.comp h₂
-  have hΔ_pos : ∀ᶠ n in Filter.atTop, 0 < maxDegree (seq (sub (phi.sub n))).1 :=
-    (hΔ_atTop.eventually (Filter.eventually_ge_atTop 1)).mono (fun n h => by omega)
-  -- Step C: apply the combinatorial identity pointwise (eventually, when Δ > 0).
-  have hCombinIdent : ∀ᶠ n in Filter.atTop,
-      pentagonQ (seq (sub (phi.sub n))).1 (seq (sub (phi.sub n))).2 /
-        (maxDegree (seq (sub (phi.sub n))).1 : ℝ) ^ 5 =
-      (1/2 : ℝ) *
-        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-          (fun j => O_Q_coef j * uD_k j n) := by
-    apply hΔ_pos.mono
-    intro n hpos
-    -- Apply the combinatorial identity at the index `sub (phi.sub n)`.
-    have := pentagonQ_basis_combinatorial_identity seq hΔ hTF hReg (sub (phi.sub n)) hpos
-    -- The pentagonQ_seq_to_colouredGraphClass def has graph := (seq k).1, so the
-    -- toGenFlag = same construction used in uD_k. Direct rewrite.
-    exact this
+      (fun n => maxDegree (seq (sub (phi.sub n))).1) Filter.atTop Filter.atTop :=
+    hΔ.tendsto_atTop.comp hsubseq_atTop
+  -- Step C: transport the o(1) combinatorial identity along the subsequence.
+  --
+  -- 2026-09-20: the identity is asymptotic, matching the paper's Lemma 7.9
+  -- (`2Q/Δ⁵ = Σ coefⱼ·ρ(basisⱼ) + o(1)`).  It was previously stated as an exact
+  -- pointwise equality, which is FALSE: the left side normalises by a power
+  -- `Δ⁵` and the right by a binomial `Nat.choose Δ 8`, and the coefficients are
+  -- Δ-independent constants, so the two sides agree only in the limit.  Below
+  -- degree 8 the binomial vanishes outright and the old form forced
+  -- `pentagonQ = 0`.  The limit form needs no degree guard: `hΔ` is `StrictMono`,
+  -- so only finitely many terms sit below any threshold and the tail is
+  -- unaffected.
+  have hdiff_tend : Filter.Tendsto
+      (fun n => pentagonQ (seq (sub (phi.sub n))).1 (seq (sub (phi.sub n))).2 /
+          (maxDegree (seq (sub (phi.sub n))).1 : ℝ) ^ 5 -
+        (1/2 : ℝ) *
+          (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+            (fun j => O_Q_coef j * uD_k j n))
+      Filter.atTop (nhds 0) :=
+    (pentagonQ_basis_combinatorial_identity seq hΔ hTF hReg).comp hsubseq_atTop
   -- Step D: per-flag density convergence. With phi constructed from `cseq ∘ sub`,
   -- `phi.convergence` along phi.sub gives convergence of uD at (cseq (sub (phi.sub n))).toGenFlag,
   -- which is exactly `uD_k j n` by definition.
@@ -9732,8 +9753,10 @@ theorem pentagonQ_density_identity_per_extension
       (nhds ((1/2 : ℝ) *
         (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
           (fun j => O_Q_coef j * phi.eval (Davey2024.PentagonQBasis.flagBasis j)))) := by
-    apply hSum_tend.congr'
-    exact hCombinIdent.mono (fun n h => h.symm)
+    -- `LHS = (LHS - RHS) + RHS`, with the first summand vanishing in the limit.
+    have hadd := hdiff_tend.add hSum_tend
+    rw [zero_add] at hadd
+    exact hadd.congr (fun n => by ring)
   -- Step G: conclude L = RHS by uniqueness of limits.
   exact tendsto_nhds_unique htend_phi_sub htend_RHS
 

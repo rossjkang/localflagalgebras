@@ -1,4 +1,5 @@
 import DaveyThesis2024.PentagonBound
+import DaveyThesis2024.PentagonQNonVacuity
 import DaveyThesis2024.PentagonDelta3
 import DaveyThesis2024.PentagonDelta3Unique
 import DaveyThesis2024.PentagonDelta4
@@ -68,6 +69,26 @@ namespace Davey2024
 /-- info: 'Davey2024.pentagon_regular_suffices' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms pentagon_regular_suffices
+
+-- NON-VACUITY REGRESSION for the pentagon-Q domain axioms (added 2026-09-20).
+-- `pentagonQ_basis_combinatorial_identity_step1` was FALSE until that date: it
+-- asserted an exact identity at every index with only `0 < Δ`, while its
+-- right-hand side divides by `Nat.choose Δ 8`, which vanishes below degree 8,
+-- so it forced `pentagonQ = 0`.  `pentagon_bound_full` was therefore derived
+-- from an inconsistent hypothesis set.  The axiom now carries `8 ≤ Δ`.
+-- These two guards are the regression: the first keeps the repaired hypothesis
+-- set SATISFIABLE (so the axiom is not vacuously true), the second pins the
+-- arithmetic fact the old form violated.  Guarding axiom NAMES, as the rest of
+-- this file does, cannot catch a false axiom -- that is how this defect and
+-- three earlier ones in this project survived it.
+
+/-- info: 'Davey2024.PentagonQNonVacuity.admissibleSeq_exists' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms PentagonQNonVacuity.admissibleSeq_exists
+
+/-- info: 'Davey2024.PentagonQNonVacuity.choose_eight_pos_of_guard' depends on axioms: [propext] -/
+#guard_msgs in
+#print axioms PentagonQNonVacuity.choose_eight_pos_of_guard
 
 /-- info: 'Davey2024.strong_chromatic_index_bound' depends on axioms: [propext,
  Classical.choice,

@@ -16,6 +16,7 @@ import DaveyThesis2024.PentagonQBasis
 import DaveyThesis2024.PentagonQSigmaBasis
 import DaveyThesis2024.PentagonQBridge
 import DaveyThesis2024.PentagonBound
+import DaveyThesis2024.PentagonQNonVacuity
 import DaveyThesis2024.PentagonDelta3
 import DaveyThesis2024.PentagonDelta3Unique
 import DaveyThesis2024.PentagonDelta4
