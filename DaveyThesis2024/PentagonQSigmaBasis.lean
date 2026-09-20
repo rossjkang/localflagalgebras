@@ -119,8 +119,17 @@ private def parseDecCharToNat (c : Char) : Nat :=
   if v ≥ '0'.toNat ∧ v ≤ '9'.toNat then v - '0'.toNat
   else 0
 
+/-- Is `c` a decimal digit?  Guards `parseDecStr` against the line-wrap defect
+that corrupted the hex bases on 2026-09-20: `parseDecCharToNat` maps a non-digit
+to `0`, so folding `acc * 10 + 0` over an embedded newline would multiply the
+value by ten.  These literals happen to be unwrapped today; this keeps a future
+re-wrap from silently changing them. -/
+private def isDecChar (c : Char) : Bool :=
+  let v := c.toNat
+  v ≥ '0'.toNat && v ≤ '9'.toNat
+
 private def parseDecStr (s : String) : Nat :=
-  s.foldl (fun acc c => acc * 10 + parseDecCharToNat c) 0
+  s.foldl (fun acc c => if isDecChar c then acc * 10 + parseDecCharToNat c else acc) 0
 
 /-- Re-parse the info record using decimal for the first 4 fields and hex for σ_hex. -/
 def parseSigmaInfoDec (s : String) : SigmaInfo :=

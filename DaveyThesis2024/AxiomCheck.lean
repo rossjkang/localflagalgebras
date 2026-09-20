@@ -1,5 +1,6 @@
 import DaveyThesis2024.PentagonBound
 import DaveyThesis2024.PentagonQNonVacuity
+import DaveyThesis2024.BasisDataIntegrity
 import DaveyThesis2024.PentagonDelta3
 import DaveyThesis2024.PentagonDelta3Unique
 import DaveyThesis2024.PentagonDelta4
@@ -611,3 +612,44 @@ info: 'SECRandomBipartite.secRandomBipartite_aas' depends on axioms: [propext,
 -- Short conceptual Paper-3 bridges.  Their graph-side structural inputs are
 -- explicit hypotheses; these guards check that the injection, aggregation,
 -- and discharging implications themselves introduce no project axioms.
+
+-- Basis data-integrity regressions (added 2026-09-20).  The flag bases are
+-- decoded from hex string literals wrapped across source lines; `parseHexStr`
+-- used to fold `acc * 16` over the embedded newlines, shifting 225 general-SEC,
+-- 117 pentagon-Q and 48 bipartite-SEC entries four bits left and silently
+-- decoding different flags.  `AxiomCheck` pins axiom NAMES, and a basis is a
+-- `def`, so nothing here could catch it.  The four guards below pin properties
+-- the Rust generators guarantee by construction, and fail the moment the decode
+-- drifts again.
+
+/-- info: 'Davey2024.BasisDataIntegrity.pentagon_basis_triangleFree' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.BasisDataIntegrity.pentagon_basis_triangleFree
+
+/-- info: 'Davey2024.BasisDataIntegrity.sec_basis_allAnchored' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.BasisDataIntegrity.sec_basis_allAnchored
+
+/-- info: 'Davey2024.BasisDataIntegrity.sec_bip_basis_allAnchored' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.BasisDataIntegrity.sec_bip_basis_allAnchored
+
+/-- info: 'Davey2024.BasisDataIntegrity.sec_basis_rawVertexColours_lt_two' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.BasisDataIntegrity.sec_basis_rawVertexColours_lt_two

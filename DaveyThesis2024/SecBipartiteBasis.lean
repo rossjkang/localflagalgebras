@@ -84,9 +84,23 @@ def hexCharToNat (c : Char) : Nat :=
   else if v >= 'A'.toNat && v <= 'F'.toNat then 10 + (v - 'A'.toNat)
   else 0
 
-/-- Parse a hex String (no `0x` prefix) to a Nat. -/
+/-- Is `c` a hex digit? -/
+def isHexChar (c : Char) : Bool :=
+  let v := c.toNat
+  (v >= '0'.toNat && v <= '9'.toNat) || (v >= 'a'.toNat && v <= 'f'.toNat) ||
+    (v >= 'A'.toNat && v <= 'F'.toNat)
+
+/-- Parse a hex String (no `0x` prefix) to a Nat.
+
+**Non-hex characters are skipped, not folded.**  The basis literals below are
+wrapped across source lines, so a token may carry an embedded newline; folding
+`acc * 16 + 0` on it would shift the value left by four bits and silently decode
+a different flag.  That defect corrupted 225 (general), 117 (pentagon) and 48
+(bipartite) basis entries before 2026-09-20.  Cf. the certificate parser
+`Davey2024.SecCertificate.parseInts`, which trims each token for the same
+reason. -/
 def parseHexStr (s : String) : Nat :=
-  s.foldl (fun acc c => acc * 16 + hexCharToNat c) 0
+  s.foldl (fun acc c => if isHexChar c then acc * 16 + hexCharToNat c else acc) 0
 
 /-- Parse a comma-separated list of hex tokens to an `Array Nat`. -/
 def parseHexArr (s : String) : Array Nat :=

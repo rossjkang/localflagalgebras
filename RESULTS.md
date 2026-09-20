@@ -415,6 +415,18 @@ the mathematical claim is proved at the identical size-8 scale by the *theorem*
 - `SecBipartiteBridge.flagBasis_sec_bip_isLocalFlag_F` (`:404`) — the 3,808 bipartite basis flags → Paper 2 Thm 1.2
 - `SecAsymmetricBipartiteBridge.flagBasis_asym_isLocalFlag_F` (`SecAsymBridgeF.lean:586`) — the 334 F-free CG4 basis flags → Paper 2 Thm 1.3
 
+Their shared structural premise — *every connected component of every basis flag
+contains an anchor vertex*, which is what the Rust enumeration filters on — is
+machine-checked for the two CG22 bases by
+`BasisDataIntegrity.sec_basis_allAnchored` (17,950) and
+`BasisDataIntegrity.sec_bip_basis_allAnchored` (3,808), both guarded in
+`AxiomCheck.lean`. This does not discharge the axioms, which also assert the
+quantitative density bound; it pins the combinatorial hypothesis they rest on.
+The same module pins `pentagon_basis_triangleFree` (all 9,295 pentagon-Q basis
+flags) and `sec_basis_rawVertexColours_lt_two`, checks that exist because a
+parser defect once decoded 390 basis entries as different flags without any
+guard noticing.
+
 ### 5.3 Combinatorial-bridge-identity axioms
 
 Each equates the raw per-graph combinatorial density (pentagon count, or
