@@ -1,0 +1,144 @@
+{
+ "layer": 11,
+ "masks": 6,
+ "nodes": 6,
+ "chunk_ceiling": 3000,
+ "module_node_cap": 60000,
+ "module_decl_cap": 120,
+ "per_mask": [
+  {
+   "index": 0,
+   "K": 13779398172945,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 1,
+   "K": 11580377014545,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 2,
+   "K": 9381890629905,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 3,
+   "K": 10480865387025,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 4,
+   "K": 9381622194705,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 5,
+   "K": 9381353824785,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  }
+ ],
+ "slices": [
+  {
+   "id": 0,
+   "kind": "light",
+   "first": 0,
+   "width": 6,
+   "nodes": 6
+  }
+ ],
+ "modules": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L11Masks",
+   "file": "L11Masks.lean",
+   "decls": [
+    "Delta4Gen.L11.M_eq",
+    "Delta4Gen.L11.M_residual",
+    "Delta4Gen.L11.stepM"
+   ],
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L11S00",
+   "file": "L11S00.lean",
+   "decls": [
+    "Delta4Gen.L11.slice_0"
+   ],
+   "nodes": 6
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L11",
+   "file": "L11.lean",
+   "decls": [
+    "Delta4Gen.L11.layer_count",
+    "Delta4Gen.L11.layer_ok"
+   ],
+   "nodes": 0
+  }
+ ],
+ "builds": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L11Masks",
+   "path": "DaveyThesis2024/Delta4/Generated/L11Masks.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 9.7,
+   "rss_gb": 5.73,
+   "returncode": 0,
+   "stderr_tail": "        9.65 real         8.13 user         1.49 sys\n          6151733248  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              632571  page reclaims\n                 434  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  38  voluntary context switches\n                7348  involuntary context switches\n          3562259484  instructions retired\n          1108318762  cycles elapsed\n           139530648  peak memory footprint\n",
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L11S00",
+   "path": "DaveyThesis2024/Delta4/Generated/L11S00.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 2.1,
+   "rss_gb": 2.9,
+   "returncode": 0,
+   "stderr_tail": "        2.05 real         1.05 user         0.88 sys\n          3109666816  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              303596  page reclaims\n                1751  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                 958  voluntary context switches\n                2790  involuntary context switches\n          3580555372  instructions retired\n          1139433173  cycles elapsed\n           139432392  peak memory footprint\n",
+   "nodes": 6
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L11",
+   "path": "DaveyThesis2024/Delta4/Generated/L11.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 1.8,
+   "rss_gb": 2.87,
+   "returncode": 0,
+   "stderr_tail": "        1.83 real         1.02 user         0.86 sys\n          3078488064  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              303284  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  38  voluntary context switches\n                5698  involuntary context switches\n          3298726688  instructions retired\n          1067542531  cycles elapsed\n           139694560  peak memory footprint\n",
+   "nodes": 0
+  }
+ ],
+ "build_ok": true
+}

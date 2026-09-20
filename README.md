@@ -32,6 +32,7 @@ The work partially originates in E. Davey's MSc thesis *Local Flag Algebras* (Un
 | Paper 1, Δ=5 | `pentagon_delta5_tight`, `pentagon_delta5_extremal_iff` | per-vertex bound + Clebsch extremal characterisation | none |
 | Paper 1, Δ=3 | `pentagon_bound_delta3`, `pentagon_delta3_extremal_iff` | P(G) ≤ 6·\|G\|/5 (Δ≤3), Petersen unique extremal | none |
 | Paper 1, Δ=4 | `pentagon_bound_delta4`, `pentagon_delta4_witness`, `pentagonCountAt_le_24_tight` | P(G) ≤ 24·\|G\|/5 (Δ≤4); C₁₂(2,3) attains ratio 1/64; per-vertex bound tight | none |
+| Paper 1, Thm 1.7 | `pentagon_bound_delta4_sharp` | P(G) ≤ 4·\|G\| (Δ≤4), sharp — C₁₂(2,3) and C₁₃(2,3) attain it | none |
 | Paper 2, Thm 1.1 | `strong_chromatic_index_bound[_thesis_tight]` | χ'ₛ(G) ≤ 1.74·Δ² (tight form 1.73·Δ²) | 4 (Hurley + 3 SEC cert) |
 | Paper 2, Thm 1.2 | `strong_chromatic_index_bipartite[_thesis_tight]` | χ'ₛ(G) ≤ 1.63·Δ² bipartite (tight 1.6255·Δ²) | 4 |
 | Paper 2, Thm 1.3 | `strong_chromatic_index_asymmetric_bipartite[_thesis_tight]` | χ'ₛ(G) ≤ 1.6633·Δ_A·Δ_B (per-p form 1.6632·p·Δ²) | 4 (Hurley + 3 SEC cert) |
@@ -59,6 +60,8 @@ project is **sorry-free**.
 DaveyThesis2024/            Lean 4 formalisation
 ├── Basic, FlagIso, LocalFlagAlgebra, Extensions, CG22   core flag-algebra framework
 ├── Pentagon*               Thms 1.1/1.2, Δ=3/4/5 per-degree bounds + extremal graphs (Petersen, C₁₂(2,3), Clebsch)
+├── Delta4/                 Thm 1.7, the sharp Δ=4 bound: finite model + assembly (hand-written)
+│   └── Generated/          the finite check, machine-written (88 modules) + its generator; NOT in the default build
 ├── PentagonQCertificate/   auto-generated size-8 SDP cert (278 native_decide blocks)
 ├── StrongEdgeColouring, StrongChromaticIndex, Sec*       SEC headlines, F-faithful SDP bridges, WLOG-biregular reduction
 ├── Sec{,Bipartite}Certificate/, AsymSecCertificate/   auto-generated SEC cert blocks (general / bipartite / asymmetric CG4)
@@ -85,6 +88,28 @@ lake build             # builds + verifies everything, including AxiomCheck
 The certificate blocks are large machine-generated Lean (≈300 MB of source); a full build
 compiles them in parallel and may take a while on first run. `lake build DaveyThesis2024.AxiomCheck`
 re-checks the headline axiom sets.
+
+One result sits outside that build. Theorem 1.7 (the sharp Δ = 4 bound) is carried
+by a finite check whose 88 generated modules under
+`DaveyThesis2024/Delta4/Generated/` cost about two hours to compile, so the root
+module does not import them and their oleans are not tracked. The sources are.
+To check it, after `lake build`:
+
+```bash
+lake env sh -c 'LEAN_PATH=$LEAN_PATH:$PWD/.lake/build/lib/lean \
+  lean -o .lake/build/lib/lean/DaveyThesis2024/Delta4/Generated/CheckAll.olean \
+       DaveyThesis2024/Delta4/Generated/CheckAll.lean'
+```
+
+`CheckAll.lean` ends with `#print axioms`, so this prints
+
+```
+'Delta4Gen.checkAll_true' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Delta4Gen.pentagon_bound_delta4_sharp' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+`DaveyThesis2024/Delta4/Generated/generator/README.md` documents the generator and
+how to regenerate the modules from scratch.
 
 ## Tooling and methodology
 

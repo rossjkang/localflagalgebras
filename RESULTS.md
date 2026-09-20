@@ -134,7 +134,7 @@ to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
       (pentagonCount G : ℝ) * (5 * 8) ≤ G.size * maxDegree G ^ 4
   ```
 - **Defs used:** `Flag`, `IsTriangleFree`, `pentagonCount`, `maxDegree`.
-- **Axioms:** `propext, Classical.choice, Lean.ofReduceBool, Lean.trustCompiler, Quot.sound` — **standard only** (size-5 SDP checked by `native_decide`); **no user axioms**.
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no `native_decide`, no user axioms.** The size-5 certificate is discharged entirely in the kernel: each semidefinite positivity constraint is proved as a theorem and every finite combinatorial count is reduced by the Lean kernel rather than by compiled evaluation, so the two compiled-evaluation axioms are absent.
 
 ### Theorem 1.2 — tighter pentagon bound
 
@@ -198,10 +198,47 @@ to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
 - **Lean:**
   - `pentagon_bound_delta3` (`PentagonDelta3.lean:165`): `… maxDegree G ≤ 3 → 5 * pentagonCount G ≤ 6 * G.size`
   - `pentagon_delta3_extremal_iff` (`PentagonDelta3Unique.lean:736`): `5 * P = 6n ↔` every vertex in an induced closed `petersenGraph` copy
-  - `pentagon_bound_delta4` (`PentagonDelta4.lean:167`): `… maxDegree G ≤ 4 → 5 * pentagonCount G ≤ 24 * G.size`
-  - `pentagon_delta4_witness` (`PentagonDelta4Witness.lean:137`) and `pentagonCountAt_le_24_tight` (`:242`): the C₁₂(2,3) / 11-vertex witnesses attaining the Δ=4 ratio.
+  - `pentagon_bound_delta4` (`PentagonDelta4.lean:2456`): `… maxDegree G ≤ 4 → 5 * pentagonCount G ≤ 24 * G.size`
+  - `pentagon_delta4_witness` (`PentagonDelta4Witness.lean:200`) and `pentagonCountAt_le_24_tight` (`:305`): the C₁₂(2,3) / 11-vertex witnesses attaining the Δ=4 ratio.
 - **Defs used:** `pentagonCount`, `pentagonCountAt`, `maxDegree`, `petersenGraph`, `c12Graph`.
 - **Axioms:** all `propext, Classical.choice, Quot.sound` — **standard only (kernel `decide`, no `native_decide`), no user axioms.**
+
+### Theorem 1.7 — the sharp bound at Δ = 4
+
+- **Math:** Δ ≤ 4 ⟹ `P ≤ 4|G|`, and the constant 4 is best possible — the
+  circulants C₁₂(2,3) and C₁₃(2,3) are triangle-free and 4-regular with 48 and
+  52 pentagons. This sharpens Theorem 1.6(ii) from 24/5 to 4.
+- **Lean:** `pentagon_bound_delta4_sharp`
+  (`DaveyThesis2024/Delta4/Generated/CheckAll.lean`):
+  ```lean
+  theorem Delta4Gen.pentagon_bound_delta4_sharp (G : Flag emptyType)
+      (hTF : IsTriangleFree G) (hdeg : maxDegree G ≤ 4) :
+      pentagonCount G ≤ 4 * G.size
+  ```
+  carried by the finite check `Delta4Gen.checkAll_true : Delta4Assembly.checkAll = true`
+  over the 862 attachment-mask multisets a vertex of such a graph can present,
+  explored in 2,685,792 pruned search nodes.
+- **Defs used:** `pentagonCount`, `maxDegree`, `IsTriangleFree`, and the finite
+  model in `DaveyThesis2024/Delta4/` (17 hand-written modules).
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no
+  `native_decide`, no external enumerator, no user axioms, no open hypothesis.**
+- **Not in the default `lake build`.** The 88 generated modules under
+  `DaveyThesis2024/Delta4/Generated/` are tracked as sources; their oleans are
+  not, and the root module does not import them, because the check costs about
+  two hours. `DaveyThesis2024/Delta4/Generated/generator/README.md` records the
+  generator, the commands that rebuild the check, and the axiom line they print:
+
+  ```sh
+  lake build
+  lake env sh -c 'LEAN_PATH=$LEAN_PATH:$PWD/.lake/build/lib/lean \
+    lean -o .lake/build/lib/lean/DaveyThesis2024/Delta4/Generated/CheckAll.olean \
+         DaveyThesis2024/Delta4/Generated/CheckAll.lean'
+  ```
+
+  `CheckAll.lean` ends with `#print axioms` on both theorems, so that command
+  prints the axiom sets above. Regenerating the modules from scratch, rather
+  than recompiling the tracked sources, takes roughly two hours more and is
+  described in the same README.
 
 ---
 
@@ -451,6 +488,7 @@ semirandom-nibble infrastructure.
 | **1** · 1.4 Clebsch-blowup tightness | `clebsch_blowup_tight` | none |
 | **1** · 1.5 Δ=5 characterisation | `pentagon_delta5_tight`, `pentagon_delta5_extremal_iff` | none |
 | **1** · 1.6 small degree (Δ=3,4) | `pentagon_bound_delta3`(+`_extremal_iff`), `pentagon_bound_delta4`(+witnesses) | none |
+| **1** · 1.7 sharp Δ=4 bound | `pentagon_bound_delta4_sharp` (+`checkAll_true`) | none |
 | **2** · 1.1 general SEC | `strong_chromatic_index_bound[_thesis_tight]` | 4 (Hurley + 3 general `_F` cert) |
 | **2** · 1.2 bipartite SEC | `strong_chromatic_index_bipartite[_thesis_tight]` | 4 (Hurley + 3 bipartite `_F` cert) |
 | **2** · 1.3 asymmetric SEC | `strong_chromatic_index_asymmetric_bipartite[_thesis_tight]` | 4 (Hurley + 3 asymmetric `_F` cert for the per-p form; the p-free form reuses the bipartite axioms) |
