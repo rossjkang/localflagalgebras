@@ -399,7 +399,7 @@ witnesses in the `*Certificate.lean` files, and a proved size-5 peer.
 
 | Axiom (file:line) | Encodes | Feeds |
 |---|---|---|
-| `PentagonQBridge.phi_evalAlg_O_Q_alg_le_bound` (`:9954`) | `φ(O_Q) ≤ 0.4146` (SDPA optimum ≈ 0.41458); halves to the per-pentagon 0.2073 | Paper 1, Thm 1.2 |
+| `PentagonQBridge.phi_evalAlg_O_Q_alg_le_bound` (`:9977`) | `φ(O_Q) ≤ 0.4146` (SDPA optimum ≈ 0.41458); halves to the per-pentagon 0.2073 | Paper 1, Thm 1.2 |
 | `SecBridge.phi_evalAlg_O_sec_alg_le_bound_F` (`:669`) | `φ(O_sec) ≤ 10.644` | Paper 2, Thm 1.1 |
 | `SecBipartiteBridge.phi_evalAlg_O_sec_bip_alg_le_bound_F` (`:377`) | `φ ≤ 4.093` (bipartite factor 1/8) | Paper 2, Thm 1.2 |
 | `SecAsymmetricBipartiteBridge.phi_evalAlg_O_asym_CG4_le_bound` (`SecAsymBridgeF.lean:571`) | `φ ≤ 8·secAsymDensityBound = 4.5496` (F-free CG4, p = 1; `4.5496 > 4.5490937` CSDP optimum) | Paper 2, Thm 1.3 (per-p form) |
@@ -425,8 +425,17 @@ a ~1000-LOC tuple↔embedding bijection; deferred because class-enumeration at
 hand-coded density is ~10⁵ LOC. Corroborated by the proved size-5 peer
 `brrb_averaging_identity`.
 
-- `PentagonQBridge.pentagonQ_basis_combinatorial_identity_step1` (`:8827`) —
-  `2·P(v)/Δ⁵ = Σ_j O_Q_coef_j · ρ(F_j)` (factor 2 = each pentagon-extension tuple counted by its two S∩N(v) vertices) → Paper 1 Thm 1.2
+- `PentagonQBridge.pentagonQ_basis_combinatorial_identity_step1` (`:8842`) —
+  `2·P(v)/Δ⁵ − Σ_j O_Q_coef_j · ρ(F_j) → 0` along a Δ-increasing triangle-free
+  regular sequence (factor 2 = each pentagon-extension tuple counted by its two
+  S∩N(v) vertices) → Paper 1 Thm 1.2.
+  **Asymptotic, not pointwise (repaired 2026-09-20).** The exact pointwise form
+  this axiom previously asserted is *false*: the left side normalises by a power
+  `Δ⁵` and the right by a binomial `C(Δ,8)`, with Δ-independent coefficients, so
+  the two agree only in the limit — and below degree 8 the binomial vanishes
+  outright, collapsing the right side to 0 and forcing `P(v) = 0`. The limit form
+  is what the paper's Lemma 7.9 states (`… + o(1)`). Non-vacuity is regressed in
+  `PentagonQNonVacuity.lean` and guarded in `AxiomCheck.lean`.
 - `SecBridge.sec_combinatorial_identity_F` (`:586`) —
   the F-faithful `edgesInNbhd(L(G)²,·)/C(Δ,2) = (1/16)·Σ_j O_sec_coef_j · ρ(F_j)` (per-F-edge form) → Paper 2 Thm 1.1
 - `SecBipartiteBridge.sec_combinatorial_identity_bipartite_F` (`:301`) — as above, factor 1/8 → Paper 2 Thm 1.2

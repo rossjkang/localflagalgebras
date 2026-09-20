@@ -8825,20 +8825,35 @@ Independently verified by three sources:
    exactly two `pentagonCountAt G u` terms for the two adjacent
    `u ∈ S ∩ N(v)`.
 
-**The `8 ≤ Δ` guard is load-bearing (added 2026-09-20).** Without it this
-axiom is FALSE, and `pentagon_bound_full` was derived from an inconsistent
-hypothesis set. `genUnlabelledDensity` divides by
-`Nat.choose (brrbGenDelta …) 8`, which is `0` when `Δ < 8`; Lean's division
-by zero is zero, so every summand on the right vanishes and the identity
-forces `pentagonQ = 0` — contradicted by any triangle-free regular graph
-carrying pentagons (regularised Petersen blow-ups suffice). The paper's own
-Lemma 7.9 states the identity with a `+ o(1)` along a `Δ`-increasing
-sequence; this guard is the finite-`Δ` shadow of that qualifier, and the
-consumer supplies it from `Filter.eventually_ge_atTop 8`. See
+**This statement is asymptotic, and that is load-bearing (2026-09-20).**
+The pointwise form this axiom used to assert — an *exact* equality at every
+index, guarded only by `0 < Δ` — is FALSE, and `pentagon_bound_full` was for a
+time derived from an inconsistent hypothesis set.
+
+Two things go wrong with the pointwise form, one fatal and one structural.
+`genUnlabelledDensity` divides by `Nat.choose (brrbGenDelta …) 8`, which is `0`
+when `Δ < 8`; Lean's division by zero is zero, so every summand on the right
+vanishes and the identity forces `pentagonQ = 0` — contradicted by any
+triangle-free regular graph carrying pentagons (regularised Petersen blow-ups
+suffice). More fundamentally, the left side normalises by a **power** `Δ⁵` and
+the right by a **binomial** `C(Δ,8)`, while `O_Q_coef` is a `Δ`-independent
+constant, so the two sides can agree only in the limit. Guarding on `8 ≤ Δ`
+removes the first failure but not the second.
+
+The conclusion is therefore a `Filter.Tendsto … (nhds 0)`, which is exactly
+what the paper's Lemma 7.9 asserts (`2Q/Δ⁵ = Σⱼ coefⱼ·ρ(basisⱼ) + o(1)` along a
+`Δ`-increasing sequence). No degree guard is needed or wanted: `hΔ` is
+`StrictMono`, so only finitely many terms sit below any threshold and a limit
+statement is unaffected by them. The consumer takes a limit anyway, so nothing
+is lost — it transports this `o(1)` along its subsequence and concludes
+additively.
+
+This is the shape Paper 2's sibling identities already had
+(`SecBridge.sec_combinatorial_identity_F` is an eventual inequality); the
+pentagon axiom was the last one stated pointwise. See
 `PentagonQNonVacuity.lean` for the regression that keeps the hypothesis set
-satisfiable, and the audit record in
-the development notes for the machine-checked refutation of the
-unguarded form. -/
+satisfiable, and the audit record in the development notes for the
+machine-checked refutation of the pointwise form. -/
 axiom pentagonQ_basis_combinatorial_identity_step1
     (seq : ℕ → Σ (G : Flag emptyType), Fin G.size)
     (hΔ : StrictMono (fun k => maxDegree (seq k).1))
