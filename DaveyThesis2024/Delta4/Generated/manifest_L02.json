@@ -1,0 +1,56 @@
+{
+ "layer": 2,
+ "masks": 0,
+ "nodes": 0,
+ "chunk_ceiling": 3000,
+ "module_node_cap": 60000,
+ "module_decl_cap": 120,
+ "per_mask": [],
+ "slices": [],
+ "modules": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L2Masks",
+   "file": "L2Masks.lean",
+   "decls": [
+    "Delta4Gen.L2.M_eq",
+    "Delta4Gen.L2.M_residual",
+    "Delta4Gen.L2.stepM"
+   ],
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L2",
+   "file": "L2.lean",
+   "decls": [
+    "Delta4Gen.L2.layer_count",
+    "Delta4Gen.L2.layer_ok"
+   ],
+   "nodes": 0
+  }
+ ],
+ "builds": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L2Masks",
+   "path": "DaveyThesis2024/Delta4/Generated/L2Masks.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 1.8,
+   "rss_gb": 2.88,
+   "returncode": 0,
+   "stderr_tail": "        1.83 real         1.00 user         0.86 sys\n          3092791296  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              304243  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  38  voluntary context switches\n                3869  involuntary context switches\n          3299008540  instructions retired\n          1076749192  cycles elapsed\n           139809248  peak memory footprint\n",
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L2",
+   "path": "DaveyThesis2024/Delta4/Generated/L2.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 1.8,
+   "rss_gb": 2.87,
+   "returncode": 0,
+   "stderr_tail": "        1.78 real         0.98 user         0.85 sys\n          3078635520  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              303265  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  37  voluntary context switches\n                5149  involuntary context switches\n          3329347179  instructions retired\n          1079801939  cycles elapsed\n           139416008  peak memory footprint\n",
+   "nodes": 0
+  }
+ ],
+ "build_ok": true
+}

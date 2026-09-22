@@ -1,0 +1,1004 @@
+{
+ "layer": 5,
+ "masks": 92,
+ "nodes": 92,
+ "chunk_ceiling": 3000,
+ "module_node_cap": 60000,
+ "module_decl_cap": 120,
+ "per_mask": [
+  {
+   "index": 0,
+   "K": 1043985,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 1,
+   "K": 1047585,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 2,
+   "K": 1043745,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 3,
+   "K": 1043505,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 4,
+   "K": 978225,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 5,
+   "K": 1047105,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 6,
+   "K": 1043265,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 7,
+   "K": 1043025,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 8,
+   "K": 977745,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 9,
+   "K": 1046625,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 10,
+   "K": 1042785,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 11,
+   "K": 1038945,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 12,
+   "K": 1035105,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 13,
+   "K": 973665,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 14,
+   "K": 1042545,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 15,
+   "K": 977265,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 16,
+   "K": 1034865,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 17,
+   "K": 973425,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 18,
+   "K": 969585,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 19,
+   "K": 1039650,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 20,
+   "K": 1039410,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 21,
+   "K": 974130,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 22,
+   "K": 1046850,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 23,
+   "K": 1039170,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 24,
+   "K": 1046610,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 25,
+   "K": 1042770,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 26,
+   "K": 1038930,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 27,
+   "K": 1035090,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 28,
+   "K": 973650,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 29,
+   "K": 1038690,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 30,
+   "K": 908130,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 31,
+   "K": 1038450,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 32,
+   "K": 1034610,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 33,
+   "K": 973170,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 34,
+   "K": 907890,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 35,
+   "K": 904050,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 36,
+   "K": 1035315,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 37,
+   "K": 973875,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 38,
+   "K": 1046595,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 39,
+   "K": 1042755,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 40,
+   "K": 1038915,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 41,
+   "K": 1035075,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 42,
+   "K": 973635,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 43,
+   "K": 1042515,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 44,
+   "K": 977235,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 45,
+   "K": 1034835,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 46,
+   "K": 973395,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 47,
+   "K": 969555,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 48,
+   "K": 1038435,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 49,
+   "K": 1034595,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 50,
+   "K": 973155,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 51,
+   "K": 907875,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 52,
+   "K": 904035,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 53,
+   "K": 1034355,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 54,
+   "K": 972915,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 55,
+   "K": 969075,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 56,
+   "K": 903795,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 57,
+   "K": 838515,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 58,
+   "K": 1030980,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 59,
+   "K": 1030740,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 60,
+   "K": 965460,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 61,
+   "K": 1030500,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 62,
+   "K": 899940,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 63,
+   "K": 1030260,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 64,
+   "K": 1026420,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 65,
+   "K": 964980,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 66,
+   "K": 899700,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 67,
+   "K": 834420,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 68,
+   "K": 1026645,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 69,
+   "K": 965205,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 70,
+   "K": 1030245,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 71,
+   "K": 1026405,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 72,
+   "K": 964965,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 73,
+   "K": 899685,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 74,
+   "K": 834405,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 75,
+   "K": 1026165,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 76,
+   "K": 964725,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 77,
+   "K": 960885,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 78,
+   "K": 895605,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 79,
+   "K": 834165,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 80,
+   "K": 1022310,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 81,
+   "K": 899430,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 82,
+   "K": 1022070,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 83,
+   "K": 899190,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 84,
+   "K": 956790,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 85,
+   "K": 895350,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 86,
+   "K": 833910,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 87,
+   "K": 1017975,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 88,
+   "K": 956535,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 89,
+   "K": 895095,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 90,
+   "K": 833655,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 91,
+   "K": 829815,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  }
+ ],
+ "slices": [
+  {
+   "id": 0,
+   "kind": "light",
+   "first": 0,
+   "width": 92,
+   "nodes": 92
+  }
+ ],
+ "modules": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L5Masks",
+   "file": "L5Masks.lean",
+   "decls": [
+    "Delta4Gen.L5.M_eq",
+    "Delta4Gen.L5.M_residual",
+    "Delta4Gen.L5.stepM"
+   ],
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L5S00",
+   "file": "L5S00.lean",
+   "decls": [
+    "Delta4Gen.L5.slice_0"
+   ],
+   "nodes": 92
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L5",
+   "file": "L5.lean",
+   "decls": [
+    "Delta4Gen.L5.layer_count",
+    "Delta4Gen.L5.layer_ok"
+   ],
+   "nodes": 0
+  }
+ ],
+ "builds": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L5Masks",
+   "path": "DaveyThesis2024/Delta4/Generated/L5Masks.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 3.6,
+   "rss_gb": 3.65,
+   "returncode": 0,
+   "stderr_tail": "        3.56 real         2.67 user         0.92 sys\n          3922247680  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              354870  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  37  voluntary context switches\n                2064  involuntary context switches\n          3394047145  instructions retired\n          1091989983  cycles elapsed\n           139579872  peak memory footprint\n",
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L5S00",
+   "path": "DaveyThesis2024/Delta4/Generated/L5S00.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 2.1,
+   "rss_gb": 2.98,
+   "returncode": 0,
+   "stderr_tail": "        2.07 real         1.21 user         0.86 sys\n          3201515520  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              310816  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  37  voluntary context switches\n                1967  involuntary context switches\n          3565313736  instructions retired\n          1113059208  cycles elapsed\n           139563488  peak memory footprint\n",
+   "nodes": 92
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L5",
+   "path": "DaveyThesis2024/Delta4/Generated/L5.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 1.9,
+   "rss_gb": 2.87,
+   "returncode": 0,
+   "stderr_tail": "        1.85 real         1.00 user         0.90 sys\n          3078340608  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              303247  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  37  voluntary context switches\n                5556  involuntary context switches\n          3560900299  instructions retired\n          1120552071  cycles elapsed\n           139809296  peak memory footprint\n",
+   "nodes": 0
+  }
+ ],
+ "build_ok": true
+}

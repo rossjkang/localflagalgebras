@@ -53,7 +53,7 @@ To clone this repository run `git clone --recursive http://github.com/EoinDavey/
 The `--recursive` flag is required to include the `rust-flag-algebras` submodule which is a
 modification of [crates.io/crates/flag-algebra](https://crates.io/crates/flag-algebra).
 
-To run one of the scripts in the `example/` folder, e.g. `example/bounded_pentagon.rs`
+To run one of the scripts in the `examples/` folder, e.g. `examples/bounded_pentagon.rs`
 run
 ```
 cargo run --release --example bounded_pentagon

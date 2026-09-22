@@ -696,7 +696,7 @@ the Rust basis enumeration generates exactly the local flags. The class
 change (black-vertex count `≤ Δ` → `≤ 2Δ`) only doubles the anchor budget in
 the `IC ≤ (2Δ)^c·Δ^(5−c)` bound — bounded density is preserved (the claim is
 monotone in the anchor budget). Pentagon Q's proved analog
-(`PentagonQBridge.lean:9518`, strong induction on unlabelled size + per-flag
+(`PentagonQBridge.lean:9550`, strong induction on unlabelled size + per-flag
 `native_decide` witness) is the structural template. -/
 axiom flagBasis_sec_isLocalFlag_F (k : Fin secBasisSize) :
     GenIsLocalFlag (GenFlagType.empty CG22) (SecBasis.flagBasis_sec k)

@@ -15,6 +15,11 @@ local-flags-certificates/.cargo/
 local-flags-certificates/data/
 local-flags-certificates/certificates/
 *.sdpa
+*.cert
+# the rest of what `gunzip -k *.gz` + the splice leave in DaveyThesis2024/certificates/
+DaveyThesis2024/certificates/*.sdpa.prefix
+DaveyThesis2024/certificates/*.multipliers.json
+DaveyThesis2024/certificates/ckpt-*/
 report.html
 
 # Search run outputs
@@ -26,6 +31,9 @@ local-flags-certificates/pentagon_search/hog/*.tsv
 
 # Compiled C helper (rebuild: cc -O2 fast_check.c -o fast_check)
 local-flags-certificates/sec_search/fast_check
+
+# Compiled twin of the Δ=4 search model (rebuild: cc -O2 -o model_b model_b.c)
+DaveyThesis2024/Delta4/Generated/generator/model_b
 
 # Python
 __pycache__/

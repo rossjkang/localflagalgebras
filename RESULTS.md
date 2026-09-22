@@ -63,14 +63,14 @@ File references are `file:line` under `DaveyThesis2024/`.
 | Lean | Paper symbol | Meaning |
 |---|---|---|
 | `Flag` (`Basic.lean:211`), `FlagType` (`:192`), `emptyType` (`:198`) | (F, θ), σ, ∅ | a σ-flag = finite graph with an induced embedding of the type σ; `Flag emptyType` = a plain unlabelled graph |
-| `GenFlag` / `GenFlagType` (`Basic.lean:126/119`), universes `CG2` (`PentagonConjecture.lean:2828`), `CG22` (`CG22.lean:81`), `CG4` (`CG4.lean`) | coloured flags | the same, over a vertex- (CG2), vertex+edge- (CG22), or 4-vertex-colour (CG4, the F-free asymmetric host) coloured relational universe |
+| `GenFlag` / `GenFlagType` (`Basic.lean:126/119`), universes `CG2` (`PentagonConjecture.lean:2826`), `CG22` (`CG22.lean:81`), `CG4` (`CG4.lean`) | coloured flags | the same, over a vertex- (CG2), vertex+edge- (CG22), or 4-vertex-colour (CG4, the F-free asymmetric host) coloured relational universe |
 | `Flag.forget` (`Basic.lean:231`) | ↓F | drop the labelling |
 | `FlagClass` (`FlagIso.lean:68`) | 𝓕^σ | isomorphism classes of σ-flags (the algebra basis) |
-| `FlagAlg` (`LocalFlagAlgebra.lean:71`) | 𝓛^σ | the local flag algebra = finitely-supported real combinations of flag classes |
-| `localFlagProduct` / `FlagAlg.mul` (`LocalFlagAlgebra.lean:190/384`) | F · F′ | the flag-algebra product |
-| `averaging` (`LocalFlagAlgebra.lean:5352`) | ⟦·⟧_σ | the unlabelling / averaging operator into 𝓛^∅ |
-| `LimitFunctional` (`LocalFlagAlgebra.lean:4748`), `.evalAlg` (`:5141`) | φ ∈ Φ^σ | a limit functional φ(F) = limₖ ρ(F;Gₖ): non-negative, φ(σ)=1, iso-invariant, an algebra homomorphism; `evalAlg` extends it linearly to 𝓛^σ |
-| `SemanticCone` (`LocalFlagAlgebra.lean:5194`) | positivity cone | { v : φ(v) ≥ 0 for all limit functionals φ }; `φ(f²) ≥ 0` |
+| `FlagAlg` (`LocalFlagAlgebra.lean:66`) | 𝓛^σ | the local flag algebra = finitely-supported real combinations of flag classes |
+| `localFlagProduct` / `FlagAlg.mul` (`LocalFlagAlgebra.lean:185/379`) | F · F′ | the flag-algebra product |
+| `averaging` (`LocalFlagAlgebra.lean:5346`) | ⟦·⟧_σ | the unlabelling / averaging operator into 𝓛^∅ |
+| `LimitFunctional` (`LocalFlagAlgebra.lean:4742`), `.evalAlg` (`:5135`) | φ ∈ Φ^σ | a limit functional φ(F) = limₖ ρ(F;Gₖ): non-negative, φ(σ)=1, iso-invariant, an algebra homomorphism; `evalAlg` extends it linearly to 𝓛^σ |
+| `SemanticCone` (`LocalFlagAlgebra.lean:5188`) | positivity cone | { v : φ(v) ≥ 0 for all limit functionals φ }; `φ(f²) ≥ 0` |
 | `IsLocalFlag` (`Basic.lean:657`), `IsBoundedDensity` (`:645`) | local σ-flag | bounded local density, hereditarily under label extension — the "local" of *local* flag algebra |
 
 ### 2.2 Densities and graph parameters
@@ -79,27 +79,27 @@ File references are `file:line` under `DaveyThesis2024/`.
 |---|---|---|
 | `genInducedCount` / `inducedCount` (`Basic.lean:182/321`) | c(F; G) | number of induced copies of F in G |
 | `localDensity` (`Basic.lean:508`) | ρ(F; G) | induced count normalised by `C(Δ(G), |F|−|σ|)` — divided by the **degree** binomial, not the order binomial (this is what makes the algebra *local*) |
-| `genUnlabelledDensity` (`LocalFlagAlgebra.lean:6334`) | ρ (÷ Aut) | local density additionally divided by `|Aut(F)|` (the convention `evalAlg` uses) |
-| `maxDegree` (`PentagonConjecture.lean:169`) | Δ(G) | maximum degree |
+| `genUnlabelledDensity` (`LocalFlagAlgebra.lean:6313`) | ρ (÷ Aut) | local density additionally divided by `|Aut(F)|` (the convention `evalAlg` uses) |
+| `maxDegree` (`PentagonConjecture.lean:167`) | Δ(G) | maximum degree |
 | `maxDegreeOn` (`BipartiteL2Clique.lean:351`) | Δ_A, Δ_B | max degree over one side of a bipartition |
-| `IsTriangleFree` (`PentagonConjecture.lean:174`), `IsRegular` (`:179`), `IsBipartite` (`StrongEdgeColouring.lean:281`) | — | no K₃; Δ-regular; bipartite |
-| `GraphClass` / `GraphParam` (`Basic.lean:500/503`); `ColouredGraphClass` (`PentagonConjecture.lean:2357`); `secGenGraphClassF` (`SecBridge.lean:309`) | 𝒢, Δ | the hereditary graph family and its degree parameter (concrete pentagon / F-faithful SEC classes) |
+| `IsTriangleFree` (`PentagonConjecture.lean:172`), `IsRegular` (`:177`), `IsBipartite` (`StrongEdgeColouring.lean:281`) | — | no K₃; Δ-regular; bipartite |
+| `GraphClass` / `GraphParam` (`Basic.lean:500/503`); `ColouredGraphClass` (`PentagonConjecture.lean:2355`); `secGenGraphClassF` (`SecBridge.lean:309`) | 𝒢, Δ | the hereditary graph family and its degree parameter (concrete pentagon / F-faithful SEC classes) |
 
 ### 2.3 Paper-1-specific objects
 
 | Lean | Paper | Meaning |
 |---|---|---|
-| `pentagonCount` (`PentagonConjecture.lean:158`), `pentagonCountAt` (`:163`) | P(G), P(G,v) | number of induced C₅'s (through a vertex v) |
-| `clebschGraph` / `clebschFlag` (`PentagonConjecture.lean:110/114`) | Cl = SRG(16,5,0,2) | the Clebsch graph (folded 5-cube, XOR neighbour rule) |
-| `petersenGraph` / `petersenFlag` (`PentagonDelta3.lean:193/203`) | Petersen | the Petersen graph (Δ=3 extremum) |
-| `c12Graph` / `c12Flag` (`PentagonDelta4Witness.lean:32/42`) | C₁₂(2,3) | the Δ=4 witness circulant |
+| `pentagonCount` (`PentagonConjecture.lean:156`), `pentagonCountAt` (`:161`) | P(G), P(G,v) | number of induced C₅'s (through a vertex v) |
+| `clebschGraph` / `clebschFlag` (`PentagonConjecture.lean:108/112`) | Cl = SRG(16,5,0,2) | the Clebsch graph (folded 5-cube, XOR neighbour rule) |
+| `petersenGraph` / `petersenFlag` (`PentagonDelta3.lean:192/202`) | Petersen | the Petersen graph (Δ=3 extremum) |
+| `c12Graph` / `c12Flag` (`PentagonDelta4Witness.lean:34/44`) | C₁₂(2,3) | the Δ=4 witness circulant |
 
 ### 2.4 Paper-2-specific objects
 
 | Lean | Paper | Meaning |
 |---|---|---|
 | `strongChromaticIndex` (`StrongEdgeColouring.lean:165`), `chiPrimeS` (`SECRandomBipartite.lean:88`) | χ′ₛ(G) | strong chromatic index (Flag version; `ℕ∞`-valued `SimpleGraph` version for the random result) |
-| `lineGraphSqFlag` (`StrongEdgeColouring.lean:677`) | L(G)² | square of the line graph (edges of G, adjacent iff within distance 2 in L(G)) |
+| `lineGraphSqFlag` (`StrongEdgeColouring.lean:621`) | L(G)² | square of the line graph (edges of G, adjacent iff within distance 2 in L(G)) |
 | `cliqueNumber` (`BipartiteOmegaL2.lean:56`) | ω | maximum clique size |
 | `inducedMatchingNumber` (`InducedMatchingAsymmetric.lean:73`) | ν_s(G) | induced (strong) matching number = α(L(G)²) |
 | `edgeFinset` (`StrongEdgeColouring.lean:203`) | E(G) | edge set as ordered pairs; `.card = |E(G)|` |
@@ -115,7 +115,7 @@ File references are `file:line` under `DaveyThesis2024/`.
 Notation: P = `pentagonCount`, n = `G.size`, Δ = `maxDegree G`, all over
 `G : Flag emptyType` with `hG : IsTriangleFree G`. **All Paper 1 bounds are
 unconditional** (no "Δ large" hypothesis): the flag-algebra bound is asymptotic
-in Δ, but `pentagon_asymptotic_suffices` (`PentagonConjecture.lean:1677`) lifts it
+in Δ, but `pentagon_asymptotic_suffices` (`PentagonConjecture.lean:1675`) lifts it
 to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
 
 > **§8 (Bruhn–Joos sparsity) — reproduced, not formalised.** Paper 1 §8 recovers
@@ -134,7 +134,7 @@ to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
       (pentagonCount G : ℝ) * (5 * 8) ≤ G.size * maxDegree G ^ 4
   ```
 - **Defs used:** `Flag`, `IsTriangleFree`, `pentagonCount`, `maxDegree`.
-- **Axioms:** `propext, Classical.choice, Lean.ofReduceBool, Lean.trustCompiler, Quot.sound` — **standard only** (size-5 SDP checked by `native_decide`); **no user axioms**.
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no `native_decide`, no user axioms.** The size-5 certificate is discharged entirely in the kernel: each semidefinite positivity constraint is proved as a theorem and every finite combinatorial count is reduced by the Lean kernel rather than by compiled evaluation, so the two compiled-evaluation axioms are absent.
 
 ### Theorem 1.2 — tighter pentagon bound
 
@@ -198,10 +198,50 @@ to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
 - **Lean:**
   - `pentagon_bound_delta3` (`PentagonDelta3.lean:165`): `… maxDegree G ≤ 3 → 5 * pentagonCount G ≤ 6 * G.size`
   - `pentagon_delta3_extremal_iff` (`PentagonDelta3Unique.lean:736`): `5 * P = 6n ↔` every vertex in an induced closed `petersenGraph` copy
-  - `pentagon_bound_delta4` (`PentagonDelta4.lean:167`): `… maxDegree G ≤ 4 → 5 * pentagonCount G ≤ 24 * G.size`
-  - `pentagon_delta4_witness` (`PentagonDelta4Witness.lean:137`) and `pentagonCountAt_le_24_tight` (`:242`): the C₁₂(2,3) / 11-vertex witnesses attaining the Δ=4 ratio.
+  - `pentagon_bound_delta4` (`PentagonDelta4.lean:2456`): `… maxDegree G ≤ 4 → 5 * pentagonCount G ≤ 24 * G.size`
+  - `pentagon_delta4_witness` (`PentagonDelta4Witness.lean:200`) and `pentagonCountAt_le_24_tight` (`:305`): the C₁₂(2,3) / 11-vertex witnesses attaining the Δ=4 ratio.
 - **Defs used:** `pentagonCount`, `pentagonCountAt`, `maxDegree`, `petersenGraph`, `c12Graph`.
 - **Axioms:** all `propext, Classical.choice, Quot.sound` — **standard only (kernel `decide`, no `native_decide`), no user axioms.**
+
+### Theorem 1.7 — the sharp bound at Δ = 4
+
+- **Math:** Δ ≤ 4 ⟹ `P ≤ 4|G|`, and the constant 4 is best possible — the
+  circulants C₁₂(2,3) and C₁₃(2,3) are triangle-free and 4-regular with 48 and
+  52 pentagons. This sharpens Theorem 1.6(ii) from 24/5 to 4.
+- **Lean:** `pentagon_bound_delta4_sharp`
+  (`DaveyThesis2024/Delta4/Generated/CheckAll.lean`):
+  ```lean
+  theorem Delta4Gen.pentagon_bound_delta4_sharp (G : Flag emptyType)
+      (hTF : IsTriangleFree G) (hdeg : maxDegree G ≤ 4) :
+      pentagonCount G ≤ 4 * G.size
+  ```
+  carried by the finite check `Delta4Gen.checkAll_true : Delta4Assembly.checkAll = true`
+  over the 862 attachment-mask multisets a vertex of such a graph can present,
+  explored in 2,685,792 pruned search nodes.
+- **Defs used:** `pentagonCount`, `maxDegree`, `IsTriangleFree`, and the finite
+  model in `DaveyThesis2024/Delta4/` (17 hand-written modules).
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no
+  `native_decide`, no external enumerator, no user axioms, no open hypothesis.**
+- **Not in the default `lake build`.** The 88 generated modules under
+  `DaveyThesis2024/Delta4/Generated/` are tracked as sources; their oleans are
+  not, and the root module does not import them, because the check costs about
+  two hours. `DaveyThesis2024/Delta4/Generated/generator/README.md` records the
+  generator, the commands that rebuild the check, and the axiom line they print.
+  `lake build` does not produce the generated modules' oleans; they come from
+  `gen_layer.py build <n>` for each layer n = 0…12 (about two hours). After
+  those, the assembled check compiles with:
+
+  ```sh
+  lake build
+  lake env sh -c 'LEAN_PATH=$LEAN_PATH:$PWD/.lake/build/lib/lean \
+    lean -o .lake/build/lib/lean/DaveyThesis2024/Delta4/Generated/CheckAll.olean \
+         DaveyThesis2024/Delta4/Generated/CheckAll.lean'
+  ```
+
+  `CheckAll.lean` ends with `#print axioms` on both theorems, so that command
+  prints the axiom sets above. Regenerating the modules from scratch, rather
+  than recompiling the tracked sources, takes roughly two hours more and is
+  described in the same README.
 
 ---
 
@@ -286,35 +326,7 @@ constant gap is only the `ι`-slack absorbed into the stated coefficient.
   `SecAsymBridgeF.lean`; §5.1–5.3). The p-free forms instead use the 4 bipartite
   axioms of Thm 1.2. No `native_decide`, no separate regularity axiom.
 
-### Theorem 1.4 — asymmetric strong clique number
-
-- **Math:** for bipartite G with sides A, B, `ω(L(G)²) ≤ Δ_A·Δ_B`.
-- **Lean:** `omega_lineGraphSq_le_mul_bipartite` (`BipartiteOmegaL2.lean:999`)
-  ```lean
-  theorem omega_lineGraphSq_le_mul_bipartite
-      (G : Flag emptyType) (S : Finset (Fin G.size))
-      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
-      cliqueNumber (lineGraphSqFlag G) ≤ maxDegreeOn G S * maxDegreeOn G Sᶜ
-  ```
-  (symmetric corollary `omega_lineGraphSq_le_sq_bipartite` (`:1020`): `≤ Δ²`).
-- **Defs used:** `cliqueNumber`, `lineGraphSqFlag`, `maxDegreeOn`.
-- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
-
-### Theorem 1.5 — asymmetric induced matching number
-
-- **Math:** for bipartite G, `|E(G)| ≤ ν_s(G)·Δ_A·Δ_B`, i.e. `ν_s(G) ≥ |E(G)|/(Δ_A·Δ_B)`.
-- **Lean:** `edges_le_nu_s_mul_mul_bipartite` (`InducedMatchingAsymmetric.lean:383`)
-  ```lean
-  theorem edges_le_nu_s_mul_mul_bipartite
-      (G : Flag emptyType) (S : Finset (Fin G.size))
-      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
-      (edgeFinset G).card ≤ inducedMatchingNumber G * maxDegreeOn G S * maxDegreeOn G Sᶜ
-  ```
-  (symmetric corollary `edges_le_nu_s_mul_sq_bipartite` (`:511`): `≤ ν_s·Δ²`).
-- **Defs used:** `edgeFinset`, `inducedMatchingNumber`, `maxDegreeOn`.
-- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
-
-### Theorem 1.6 — a.a.s. Brualdi–Quinn Massey (random bipartite)
+### Theorem 1.4 — a.a.s. Brualdi–Quinn Massey (random bipartite)
 
 - **Math:** for fixed p ∈ (0,1) and bounded aspect ratio `max(n_A,n_B) ≤ C·min(n_A,n_B)`,
   the random bipartite `G ∼ G(n_A,n_B,p)` satisfies `χ′ₛ(G) ≤ Δ_A(G)·Δ_B(G)`
@@ -335,6 +347,35 @@ constant gap is only the `ι`-slack absorbed into the stated coefficient.
 - **Axioms:** `propext, Classical.choice, Quot.sound` **+ 2 verbatim literature axioms** —
   `SecRandomBipartite.KimVu.kim_vu_concentration_verbatim` and
   `SecRandomBipartite.PippengerSpencer.pippenger_spencer_covering_verbatim` (§5.5).
+
+### Proposition 8.1(a) — asymmetric strong clique number
+
+- **Math:** for bipartite G with sides A, B, `ω(L(G)²) ≤ Δ_A·Δ_B`.
+- **Lean:** `omega_lineGraphSq_le_mul_bipartite` (`BipartiteOmegaL2.lean:999`)
+  ```lean
+  theorem omega_lineGraphSq_le_mul_bipartite
+      (G : Flag emptyType) (S : Finset (Fin G.size))
+      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
+      cliqueNumber (lineGraphSqFlag G) ≤ maxDegreeOn G S * maxDegreeOn G Sᶜ
+  ```
+  (symmetric corollary `omega_lineGraphSq_le_sq_bipartite` (`:1020`): `≤ Δ²`).
+- **Defs used:** `cliqueNumber`, `lineGraphSqFlag`, `maxDegreeOn`.
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
+
+### Proposition 8.1(b) — asymmetric induced matching number
+
+- **Math:** for bipartite G, `|E(G)| ≤ ν_s(G)·Δ_A·Δ_B`, i.e. `ν_s(G) ≥ |E(G)|/(Δ_A·Δ_B)`.
+- **Lean:** `edges_le_nu_s_mul_mul_bipartite` (`InducedMatchingAsymmetric.lean:383`)
+  ```lean
+  theorem edges_le_nu_s_mul_mul_bipartite
+      (G : Flag emptyType) (S : Finset (Fin G.size))
+      (hS : ∀ u v : Fin G.size, G.graph.Adj u v → (u ∈ S ↔ v ∉ S)) :
+      (edgeFinset G).card ≤ inducedMatchingNumber G * maxDegreeOn G S * maxDegreeOn G Sᶜ
+  ```
+  (symmetric corollary `edges_le_nu_s_mul_sq_bipartite` (`:511`): `≤ ν_s·Δ²`).
+- **Defs used:** `edgeFinset`, `inducedMatchingNumber`, `maxDegreeOn`.
+- **Axioms:** `propext, Classical.choice, Quot.sound` — **standard only, no user axioms** (purely combinatorial).
+
 
 ---
 
@@ -359,9 +400,45 @@ gated by a regularity/`PhiRegular`-shape hypothesis. Justified by the SDPA-LR / 
 optima (~10⁻⁸ precision), `native_decide`-verified per-block LDL/PSD + slack-budget
 witnesses in the `*Certificate.lean` files, and a proved size-5 peer.
 
+**The pentagon axiom's justification is now stronger than that paragraph
+describes, and is split out here.** The axiom itself is unchanged, and so is
+everything about it in Lean.
+
+What its docstring says it packages is the last inferential step of the size-8
+argument: from "PSD blocks + weighted slack under budget" to the combined
+weak-duality inequality `φ(O_Q) ≤ 0.4146`. That step used to rest on the solver's
+numerical certificate at `~10⁻⁸`, and on a slack measured *at the certificate's own
+dual point* rather than over all of `Φ^∅`. **At the level of the SDP that step is
+now proved** — not in Lean, and not as a statement about `φ` directly. 5,176
+nonnegative rational multipliers over the program's own linear rows bound the
+weighted residual at *every* feasible point of the program, in exact rational
+arithmetic, giving safe value `0.414589418954` against the target `0.4146`, margin
+`1.058e-05`. The certificate, a provenance record and a standard-library checker
+are published in `DaveyThesis2024/certificates/`; the check takes about four
+seconds.
+
+Two things the multiplier certificate does not touch. First, `X ⪰ 0`. The
+four-second check leaves it to the archived 647 s run, which establishes it in exact
+rational arithmetic at the same `10⁻¹⁶` rationalisation. The `native_decide` LDL
+witnesses in `PentagonQCertificate/` are **not** a second, independent check of it:
+they carry the same matrix at `10⁻¹²` with a `10⁻¹¹` shift — a coarser object — and
+PSD there does not give PSD here.
+
+Second, and this is what keeps it an axiom: the bridge from Lean's
+`evalAlg`/`target[]`/`linearScale` encoding to the SDP program. The docstring puts it
+at ~9,114 identities, one per linear-constraint group, plus the per-block isomorphism
+table — both infeasible to hand-code. (Paper 1 §6 names the four families the 9,114
+groups fall into: 1 flag non-negativity, 8 black-vertex normalisations, 7,715
+regularity, 1,390 black-set cardinality — 18,408 rows in all. The size-5 program has
+13 such groups, which is the comparison the docstring draws.) The regularity *hypothesis* `QPhiRegular` is not
+among the gaps: it is a hypothesis of the axiom, which the consumer discharges by
+only ever supplying such a φ — and `PentagonQNonVacuity.qPhiRegular_satisfiable`
+proves such a φ exists, so the axiom is not vacuously true. **The three SEC axioms below
+are NOT in this position**: their solver-point justification is unchanged.
+
 | Axiom (file:line) | Encodes | Feeds |
 |---|---|---|
-| `PentagonQBridge.phi_evalAlg_O_Q_alg_le_bound` (`:9954`) | `φ(O_Q) ≤ 0.4146` (SDPA optimum ≈ 0.41458); halves to the per-pentagon 0.2073 | Paper 1, Thm 1.2 |
+| `PentagonQBridge.phi_evalAlg_O_Q_alg_le_bound` (`:10000`) | `φ(O_Q) ≤ 0.4146`, certified for **every feasible point** by an exact rational multiplier certificate (safe value `0.414589418954`, together with the archived exact LDL^T run for `X ⪰ 0`; see `DaveyThesis2024/certificates/`), not merely at the SDPA optimum ≈ 0.41458; halves to the per-pentagon 0.2073 | Paper 1, Thm 1.2 |
 | `SecBridge.phi_evalAlg_O_sec_alg_le_bound_F` (`:669`) | `φ(O_sec) ≤ 10.644` | Paper 2, Thm 1.1 |
 | `SecBipartiteBridge.phi_evalAlg_O_sec_bip_alg_le_bound_F` (`:377`) | `φ ≤ 4.093` (bipartite factor 1/8) | Paper 2, Thm 1.2 |
 | `SecAsymmetricBipartiteBridge.phi_evalAlg_O_asym_CG4_le_bound` (`SecAsymBridgeF.lean:571`) | `φ ≤ 8·secAsymDensityBound = 4.5496` (F-free CG4, p = 1; `4.5496 > 4.5490937` CSDP optimum) | Paper 2, Thm 1.3 (per-p form) |
@@ -377,6 +454,18 @@ the mathematical claim is proved at the identical size-8 scale by the *theorem*
 - `SecBipartiteBridge.flagBasis_sec_bip_isLocalFlag_F` (`:404`) — the 3,808 bipartite basis flags → Paper 2 Thm 1.2
 - `SecAsymmetricBipartiteBridge.flagBasis_asym_isLocalFlag_F` (`SecAsymBridgeF.lean:586`) — the 334 F-free CG4 basis flags → Paper 2 Thm 1.3
 
+Their shared structural premise — *every connected component of every basis flag
+contains an anchor vertex*, which is what the Rust enumeration filters on — is
+machine-checked for the two CG22 bases by
+`BasisDataIntegrity.sec_basis_allAnchored` (17,950) and
+`BasisDataIntegrity.sec_bip_basis_allAnchored` (3,808), both guarded in
+`AxiomCheck.lean`. This does not discharge the axioms, which also assert the
+quantitative density bound; it pins the combinatorial hypothesis they rest on.
+The same module pins `pentagon_basis_triangleFree` (all 9,295 pentagon-Q basis
+flags) and `sec_basis_rawVertexColours_lt_two`, checks that exist because a
+parser defect once decoded 390 basis entries as different flags without any
+guard noticing.
+
 ### 5.3 Combinatorial-bridge-identity axioms
 
 Each equates the raw per-graph combinatorial density (pentagon count, or
@@ -387,8 +476,17 @@ a ~1000-LOC tuple↔embedding bijection; deferred because class-enumeration at
 hand-coded density is ~10⁵ LOC. Corroborated by the proved size-5 peer
 `brrb_averaging_identity`.
 
-- `PentagonQBridge.pentagonQ_basis_combinatorial_identity_step1` (`:8827`) —
-  `2·P(v)/Δ⁵ = Σ_j O_Q_coef_j · ρ(F_j)` (factor 2 = each pentagon-extension tuple counted by its two S∩N(v) vertices) → Paper 1 Thm 1.2
+- `PentagonQBridge.pentagonQ_basis_combinatorial_identity_step1` (`:8857`) —
+  `2·P(v)/Δ⁵ − Σ_j O_Q_coef_j · ρ(F_j) → 0` along a Δ-increasing triangle-free
+  regular sequence (factor 2 = each pentagon-extension tuple counted by its two
+  S∩N(v) vertices) → Paper 1 Thm 1.2.
+  **Asymptotic, not pointwise (repaired 2026-09-20).** The exact pointwise form
+  this axiom previously asserted is *false*: the left side normalises by a power
+  `Δ⁵` and the right by a binomial `C(Δ,8)`, with Δ-independent coefficients, so
+  the two agree only in the limit — and below degree 8 the binomial vanishes
+  outright, collapsing the right side to 0 and forcing `P(v) = 0`. The limit form
+  is what the paper's Lemma 7.9 states (`… + o(1)`). Non-vacuity is regressed in
+  `PentagonQNonVacuity.lean` and guarded in `AxiomCheck.lean`.
 - `SecBridge.sec_combinatorial_identity_F` (`:586`) —
   the F-faithful `edgesInNbhd(L(G)²,·)/C(Δ,2) = (1/16)·Σ_j O_sec_coef_j · ρ(F_j)` (per-F-edge form) → Paper 2 Thm 1.1
 - `SecBipartiteBridge.sec_combinatorial_identity_bipartite_F` (`:301`) — as above, factor 1/8 → Paper 2 Thm 1.2
@@ -450,12 +548,13 @@ semirandom-nibble infrastructure.
 | **1** · 1.4 Clebsch-blowup tightness | `clebsch_blowup_tight` | none |
 | **1** · 1.5 Δ=5 characterisation | `pentagon_delta5_tight`, `pentagon_delta5_extremal_iff` | none |
 | **1** · 1.6 small degree (Δ=3,4) | `pentagon_bound_delta3`(+`_extremal_iff`), `pentagon_bound_delta4`(+witnesses) | none |
+| **1** · 1.7 sharp Δ=4 bound | `pentagon_bound_delta4_sharp` (+`checkAll_true`) | none |
 | **2** · 1.1 general SEC | `strong_chromatic_index_bound[_thesis_tight]` | 4 (Hurley + 3 general `_F` cert) |
 | **2** · 1.2 bipartite SEC | `strong_chromatic_index_bipartite[_thesis_tight]` | 4 (Hurley + 3 bipartite `_F` cert) |
 | **2** · 1.3 asymmetric SEC | `strong_chromatic_index_asymmetric_bipartite[_thesis_tight]` | 4 (Hurley + 3 asymmetric `_F` cert for the per-p form; the p-free form reuses the bipartite axioms) |
-| **2** · 1.4 strong clique ω(L(G)²) | `omega_lineGraphSq_le_mul_bipartite` | none |
-| **2** · 1.5 induced matching ν_s | `edges_le_nu_s_mul_mul_bipartite` | none |
-| **2** · 1.6 a.a.s. Brualdi–Quinn Massey | `secRandomBipartite_aas` | 2 (Kim–Vu, Pippenger–Spencer, verbatim) |
+| **2** · 1.4 a.a.s. Brualdi–Quinn Massey | `secRandomBipartite_aas` | 2 (Kim–Vu, Pippenger–Spencer, verbatim) |
+| **2** · Prop 8.1(a) strong clique ω(L(G)²) | `omega_lineGraphSq_le_mul_bipartite` | none |
+| **2** · Prop 8.1(b) induced matching ν_s | `edges_le_nu_s_mul_mul_bipartite` | none |
 
 Distinct user axioms across the whole project: **2** (Paper 1 pentagon-Q) + **1**
 Hurley + **9** SEC certificate bridge axioms (general/bipartite/asymmetric ×

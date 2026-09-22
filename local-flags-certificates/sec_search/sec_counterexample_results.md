@@ -595,7 +595,7 @@ complete shortcut (every edge-pair in this graph is strong-adjacent,
 so all 125 edges need distinct colours).
 
 This matches the formalised Lean theorem
-`pentagon_conjecture_tight` (`PentagonConjecture.lean:751`), which
+`pentagon_local_bound_tight` (`PentagonConjecture.lean:16694`), which
 proves the corresponding "tight" half for the pentagon conjecture
 (thesis Conj 4 / lemma `pentagon_conjecture.tex:51`).
 
@@ -800,7 +800,7 @@ or with SAT fallback enabled).
   `thesis_source/chapters/strong_edge_colouring.tex:54-60`
   (Erdős–Nešetřil) and `:10` (Faudree).
 - Formalised tight extremals:
-  - `pentagon_conjecture_tight` (Lean, `PentagonConjecture.lean:751`),
+  - `pentagon_local_bound_tight` (Lean, `PentagonConjecture.lean:16694`),
     proving the pentagon-conjecture analog at Δ=10.
   - The 5-blowup of C₅ construction directly verifies
     `χ'_s = 1.25·Δ²` at Δ=10, matching the Erdős–Nešetřil tight value.

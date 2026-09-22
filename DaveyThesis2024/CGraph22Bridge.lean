@@ -242,7 +242,7 @@ reduction (the F-faithful `SecBridge.colouredGraph22OfEdgeF` produces one
 from `(G, F, u, w)`).
 This section bridges from `ColouredGraph22` to `GenFlag CG22 ∅` in
 direct analogy to `ColouredGraphClass.toGenFlag : ColouredGraphClass →
-GenFlag CG2 ∅` in `PentagonConjecture.lean:1962`.
+GenFlag CG2 ∅` in `PentagonConjecture.lean:2829`.
 
 The bridge is used by `SecBridge.sec_seq_to_genFlag` (Phase S3.E.2) to
 package the SEC reduction's coloured-graph output as a CG22-typed flag,
@@ -253,7 +253,7 @@ by extracting its three components (graph, vertex colour, edge colour)
 into the CG22.Str triple.
 
 This is the SEC analog of `ColouredGraphClass.toGenFlag` from
-`PentagonConjecture.lean:1962`. The empty `embedding` reflects the ∅-type
+`PentagonConjecture.lean:2829`. The empty `embedding` reflects the ∅-type
 context: every CG22 flag at `(GenFlagType.empty CG22)` has trivial type
 embedding (vertices of `Fin 0` → vertices of `Fin n`).
 

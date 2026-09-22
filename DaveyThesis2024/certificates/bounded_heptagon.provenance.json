@@ -1,0 +1,53 @@
+{
+  "certificate": "bounded_heptagon",
+  "result": "phi(O_7) <= 1/9, giving P_7(G) <= |G| Delta^6 / 126",
+  "status": "VERIFIED",
+  "verified_utc": "2026-09-15",
+  "archived_utc": "2026-09-16",
+  "files": {
+    "sdpa": {
+      "name": "bounded_heptagon.sdpa",
+      "bytes": 1191900,
+      "sha256": "022e3f7dcbbe36ff77ee2ff97b841eeeb3c75d89a6b54ad2e2c16db5b6b0639c",
+      "role": "load-bearing: carries the whole problem (m, block sizes, objective c, every F_k entry, all asserted integral). Every exact quantity in the proof is computed from this file."
+    },
+    "cert": {
+      "name": "bounded_heptagon.cert",
+      "bytes": 1685008,
+      "sha256": "766345322f0d921c20f798b6d8adc55b6e9431086a03b78de28d492e4bb3e052",
+      "role": "heuristic seed only: the verifier reads matrix_id == 2 as floats, rationalises it, and never trusts it again. Not a proof object."
+    }
+  },
+  "problem": {"m": 1390, "blocks": 1247, "entries": 68060, "psd_blocks_verified": 64},
+  "verification": {
+    "verifier": "plans/pentagon_sharp/verify_exact_certificate.py",
+    "verifier_sha256": "f5f8df9d9d508a617238662fd20d2532c67f12adf3f8ab1bf2bd4bbc5780e5a1",
+    "flags": "--target-numer 1 --target-denom 9 --raw-scale 1 --graph-divisor 14 --skip-sum-y --repair-with-flag-block --residual-method highs-ipm --strict-zero-residual-buffer (defaults --denom-exp 14 --lambda-exp 11)",
+    "rationalisation": "X at 10^-14, lambda = 10^-11 on PSD blocks, diagonal clipped at 0",
+    "flag_block_repair": {"coordinates_touched": 1144, "absorbed": 8.049e-08, "positive_remainder": 299},
+    "residuals": {"positive": 299, "of": 1390, "max": 6.423e-08, "min": -2.900e-13},
+    "multipliers": 763,
+    "weighted_absorb_term": 8.772e-06,
+    "neg_tr_F0_X": 0.110509767682,
+    "safe_value": 0.110518540052,
+    "target": {"numer": 1, "denom": 9, "decimal": 0.111111111111},
+    "margin": 5.926e-04,
+    "graph_divisor": 14,
+    "graph_density_bound": 0.0079365079,
+    "wall_seconds": {"csdp_solve": 2.29, "exact_verifier": 4}
+  },
+  "reproducibility": {
+    "sdpa": "byte-deterministic given the same flag-basis cache",
+    "cert": "NOT bit-reproducible. csdp has no RNG and is algorithmically deterministic, but varies at the level of its stopping tolerances (axtol=atytol=objtol=1e-7 in param.csdp) and floating-point summation order. An August 2026 run of this same .sdpa produced cert 7746c04aa4b49c4a87379876d2e8c4d8961a671591a82f330a571ef968b335ec with safe value 0.110518572725 - agreeing only to seven decimals. That cert no longer exists anywhere. This file is therefore a unique witness, not a reproducible artifact; the sha256 above is not a target a regeneration can hit.",
+    "margin_over_jitter": "about 18000x (jitter 3.27e-08 vs margin 5.926e-04)"
+  },
+  "regeneration": {
+    "generator": "local-flags-certificates/examples/bounded_heptagon.rs",
+    "flag_basis_cache": "local-flags-certificates/data/Two-Coloured Heptagon Bound Graphs/ (about 40 MB, 982 files; GITIGNORED, single copy). This cache WAS computed on this machine, at roughly 4 MB/s, so a cold rebuild is cheap (order 10 s).",
+    "warning": "`make clean` in local-flags-certificates/ deletes ./data/ and ./*.sdpa together (RUBBISH := ./certificate ./data/ ./*.sdpa ./report.html).",
+    "note": "cargo run --example also spawns csdp in-process and writes ./certificate, not bounded_heptagon.cert; the named cert comes from a separate `csdp bounded_heptagon.sdpa bounded_heptagon.cert`."
+  },
+  "port_tag": "v1-5-g899e2d9",
+  "citation_note": "The paper cites github.com/rossjkang/localflagalgebras, which carries no .cert/.sdpa by design. This archive is internal preservation, not the cited artifact. The only result depending on this certificate is thm:c6c7, which is draft-only and not in arXiv v1.",
+  "citation_note_2026_09_21": "Addendum, 2026-09-21. The note above is retained exactly as written and is not retracted; it records the position at the time of archiving. Two of its three statements are no longer accurate of this repository. (1) 'carries no .cert/.sdpa by design' described a blanket exclusion of raw certificate files from the public port, enforced by the sync manifest, which excludes both extensions, and by .gitignore, which as originally written excluded *.sdpa only. That exclusion was harmless for every other certificate because the port ships those as Lean-embedded rationalised data; these C6/C7 certificates are the only ones behind a stated theorem of the paper that have no Lean-embedded counterpart (the two bounded_pentagon_sharp* certificates also lack one, but no stated result depends on them), so under the blanket rule they had no route to the public at all. The exclusion was lifted for them and they are published here. (2) 'This archive is internal preservation, not the cited artifact' was written of the monorepo copy; this copy IS the cited artifact. The third statement remains accurate: arXiv carries only v1 of the paper, in which Theorem C.3 does not appear. The draft prepared as v2 states Theorem C.3 and mentions its subject in the abstract, which is why the certificates were published; that version is not yet posted, and this addendum asserts nothing about it beyond the content of the draft. Separately, the port_tag field above names a commit that is no longer on the main branch: the published history was rewritten on 2026-09-21 and main no longer contains it. It is NOT unreachable -- it remains in the published repository via the remote tag v2, which still points at the pre-rewrite chain. The field is left as recorded rather than corrected, for the same reason the note above is."
+}

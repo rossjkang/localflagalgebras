@@ -11,7 +11,7 @@ analog of `CG2 := colouredGraphUniverse 2` used in Pentagon Q.
 
 ## Why a new universe?
 
-`StrongEdgeColouring.lean:404` introduces `ColouredGraph22`: a `SimpleGraph`
+`StrongEdgeColouring.lean:372` introduces `ColouredGraph22`: a `SimpleGraph`
 together with `vertexColour : Fin n → Fin 2` AND `edgeColour : Fin n → Fin n → Fin 2`
 (with edge-colour symmetry). The reduction Davey uses (Thesis §4.3) routes through
 this 2-component structure. Pentagon Q's `CG2` only carries a vertex colour,

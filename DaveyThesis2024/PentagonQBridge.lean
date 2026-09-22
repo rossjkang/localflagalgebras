@@ -8500,7 +8500,7 @@ theorem phi_evalAlg_O_Q_alg_eq_target_sum
 /-! ## §3.5. Density bridge — `Q(G,v)/Δ⁵ → φ(O_Q)/2` in the limit
 
 The standard pattern (see BRRB's `brrb_sdp_limit_bound` in
-`SdpEvaluation.lean:10223`): for any sequence of triangle-free regular
+`SdpEvaluation.lean:9922`): for any sequence of triangle-free regular
 graphs with `Δ → ∞`, the rescaled density `Q(G,v)/Δ⁵` converges along a
 subsequence (Bolzano-Weierstrass), and the limit equals
 `(genFlagAutCount · phi.eval pentagonQGenFlag)` where `pentagonQGenFlag`
@@ -8537,7 +8537,7 @@ This section provides:
 2. A strengthened bridge `pentagonQ_density_bridge_strong` with sorry body.
 3. Per-extension averaging machinery hooks (sorry-bodied stubs).
 
-Mirrors `brrb_averaging_identity` (PentagonConjecture.lean:14758, ~700 LOC)
+Mirrors `brrb_averaging_identity` (PentagonConjecture.lean:14225, ~700 LOC)
 at size 8.
 -/
 
@@ -8809,7 +8809,7 @@ Independently verified by three sources:
    mathematical source.
 
 2. **Size-5 BRRB analogue, fully proved.** `brrb_averaging_identity`
-   (`PentagonConjecture.lean:14759`) is the size-5 limit-level analogue
+   (`PentagonConjecture.lean:14225`) is the size-5 limit-level analogue
    of this finite-G pre-limit identity. It decomposes
    `phi.eval(brrbGenFlag) = (1/5)·phi.eval(F_9) + (1/10)·phi.eval(F_37)
    + (1/5)·phi.eval(F_55)` via the same pentagon-vertex-marking pattern
@@ -8817,26 +8817,57 @@ Independently verified by three sources:
    clean, no sorries; provides the structural template for the size-8
    version.
 
-3. **`pentagonCount_sum` (PentagonConjecture.lean:129).** The fully-
+3. **`pentagonCount_sum` (PentagonConjecture.lean:193).** The fully-
    proved Lean witness `Σ_v pentagonCountAt G v = 5 · pentagonCount G`
    encodes the related "each pentagon counted by each of its 5
    vertices" pattern. The factor-of-2 here is its `Δ·P(G,v) + Σ_{u~v}
    P(G,u)` analogue: each pentagon-extension tuple contributes to
    exactly two `pentagonCountAt G u` terms for the two adjacent
-   `u ∈ S ∩ N(v)`. -/
+   `u ∈ S ∩ N(v)`.
+
+**This statement is asymptotic, and that is load-bearing (2026-09-20).**
+The pointwise form this axiom used to assert — an *exact* equality at every
+index, guarded only by `0 < Δ` — is FALSE, and `pentagon_bound_full` was for a
+time derived from an inconsistent hypothesis set.
+
+Two things go wrong with the pointwise form, one fatal and one structural.
+`genUnlabelledDensity` divides by `Nat.choose (brrbGenDelta …) 8`, which is `0`
+when `Δ < 8`; Lean's division by zero is zero, so every summand on the right
+vanishes and the identity forces `pentagonQ = 0` — contradicted by any
+triangle-free regular graph carrying pentagons (regularised Petersen blow-ups
+suffice). More fundamentally, the left side normalises by a **power** `Δ⁵` and
+the right by a **binomial** `C(Δ,8)`, while `O_Q_coef` is a `Δ`-independent
+constant, so the two sides can agree only in the limit. Guarding on `8 ≤ Δ`
+removes the first failure but not the second.
+
+The conclusion is therefore a `Filter.Tendsto … (nhds 0)`, which is exactly
+what the paper's Lemma 7.9 asserts (`2Q/Δ⁵ = Σⱼ coefⱼ·ρ(basisⱼ) + o(1)` along a
+`Δ`-increasing sequence). No degree guard is needed or wanted: `hΔ` is
+`StrictMono`, so only finitely many terms sit below any threshold and a limit
+statement is unaffected by them. The consumer takes a limit anyway, so nothing
+is lost — it transports this `o(1)` along its subsequence and concludes
+additively.
+
+This is the shape Paper 2's sibling identities already had
+(`SecBridge.sec_combinatorial_identity_F` is an eventual inequality); the
+pentagon axiom was the last one stated pointwise. See
+`PentagonQNonVacuity.lean` for the regression that keeps the hypothesis set
+satisfiable, and the audit record in the development notes for the
+machine-checked refutation of the pointwise form. -/
 axiom pentagonQ_basis_combinatorial_identity_step1
     (seq : ℕ → Σ (G : Flag emptyType), Fin G.size)
     (hΔ : StrictMono (fun k => maxDegree (seq k).1))
     (hTF : ∀ k, IsTriangleFree (seq k).1)
-    (hReg : ∀ k, IsRegular (seq k).1)
-    (k : ℕ) (_hΔpos : 0 < maxDegree (seq k).1) :
-    2 * (pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5) =
-      (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-        (fun j => O_Q_coef j *
-          genUnlabelledDensity CG2 (GenFlagType.empty CG2)
-            (Davey2024.PentagonQBasis.flagBasis j)
-            (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
-            brrbGenDelta)
+    (hReg : ∀ k, IsRegular (seq k).1) :
+    Filter.Tendsto
+      (fun k => 2 * (pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5) -
+        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+          (fun j => O_Q_coef j *
+            genUnlabelledDensity CG2 (GenFlagType.empty CG2)
+              (Davey2024.PentagonQBasis.flagBasis j)
+              (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
+              brrbGenDelta))
+      Filter.atTop (nhds 0)
 
 /-- **Phase 3.5 sub-lemma C.1** (deferred): the finite-G combinatorial
 identity. Restated from the original docstring after Phase 1.E's
@@ -8847,21 +8878,23 @@ theorem pentagonQ_basis_combinatorial_identity
     (seq : ℕ → Σ (G : Flag emptyType), Fin G.size)
     (hΔ : StrictMono (fun k => maxDegree (seq k).1))
     (hTF : ∀ k, IsTriangleFree (seq k).1)
-    (hReg : ∀ k, IsRegular (seq k).1)
-    (k : ℕ) (_hΔpos : 0 < maxDegree (seq k).1) :
-    pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5 =
-      (1/2 : ℝ) *
-        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-          (fun j => O_Q_coef j *
-            genUnlabelledDensity CG2 (GenFlagType.empty CG2)
-              (Davey2024.PentagonQBasis.flagBasis j)
-              (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
-              brrbGenDelta) := by
-  -- Phase 1.E (2026-05-13): close from Step 1 scaffold via the (1/2)
-  -- rescaling. Step 1's body is sorry-bodied separately.
-  have hstep1 :=
-    pentagonQ_basis_combinatorial_identity_step1 seq hΔ hTF hReg k _hΔpos
-  linarith [hstep1]
+    (hReg : ∀ k, IsRegular (seq k).1) :
+    Filter.Tendsto
+      (fun k => pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5 -
+        (1/2 : ℝ) *
+          (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+            (fun j => O_Q_coef j *
+              genUnlabelledDensity CG2 (GenFlagType.empty CG2)
+                (Davey2024.PentagonQBasis.flagBasis j)
+                (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
+                brrbGenDelta))
+      Filter.atTop (nhds 0) := by
+  -- The (1/2) rescaling of Step 1, now at the level of the error term:
+  -- `(1/2) * (2*A - S) = A - (1/2)*S`, and `(1/2) * 0 = 0`.
+  have hstep1 := pentagonQ_basis_combinatorial_identity_step1 seq hΔ hTF hReg
+  have hhalf := hstep1.const_mul (1/2 : ℝ)
+  rw [mul_zero] at hhalf
+  exact hhalf.congr (fun k => by ring)
 
 /-! ### Tier B helpers — `flagBasis_str_boundedDensity` decomposition (2026-05-11)
 
@@ -9571,7 +9604,7 @@ graph sequence arising from triangle-free regular pentagons, the
 eval-level Q-objective sum equals the limit of pentagonQ densities
 scaled by 2.
 
-This is the analogue of `brrb_averaging_identity` (PentagonConjecture.lean:14758)
+This is the analogue of `brrb_averaging_identity` (PentagonConjecture.lean:14225)
 at size 8 over 69 extensions. Mathematical content:
 
   L = (1/2) · Σ_{k ∈ nonzeroTargetIndices}
@@ -9637,29 +9670,32 @@ theorem pentagonQ_density_identity_per_extension
       Filter.atTop (nhds L) :=
     htend.comp phi.sub_strictMono.tendsto_atTop
   -- Step B: For each `n`, eventually Δ > 0 along the composed subsequence.
+  -- The subsequence index tends to infinity; hoisted, since both the degree
+  -- divergence and the o(1) combinatorial identity are transported along it.
+  have hsubseq_atTop : Filter.Tendsto (fun n => sub (phi.sub n)) Filter.atTop Filter.atTop :=
+    (hsub.comp phi.sub_strictMono).tendsto_atTop
   have hΔ_atTop : Filter.Tendsto
-      (fun n => maxDegree (seq (sub (phi.sub n))).1) Filter.atTop Filter.atTop := by
-    have h₁ : Filter.Tendsto (fun k => maxDegree (seq k).1) Filter.atTop Filter.atTop :=
-      hΔ.tendsto_atTop
-    have h₂ : Filter.Tendsto (fun n => sub (phi.sub n)) Filter.atTop Filter.atTop :=
-      (hsub.comp phi.sub_strictMono).tendsto_atTop
-    exact h₁.comp h₂
-  have hΔ_pos : ∀ᶠ n in Filter.atTop, 0 < maxDegree (seq (sub (phi.sub n))).1 :=
-    (hΔ_atTop.eventually (Filter.eventually_ge_atTop 1)).mono (fun n h => by omega)
-  -- Step C: apply the combinatorial identity pointwise (eventually, when Δ > 0).
-  have hCombinIdent : ∀ᶠ n in Filter.atTop,
-      pentagonQ (seq (sub (phi.sub n))).1 (seq (sub (phi.sub n))).2 /
-        (maxDegree (seq (sub (phi.sub n))).1 : ℝ) ^ 5 =
-      (1/2 : ℝ) *
-        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-          (fun j => O_Q_coef j * uD_k j n) := by
-    apply hΔ_pos.mono
-    intro n hpos
-    -- Apply the combinatorial identity at the index `sub (phi.sub n)`.
-    have := pentagonQ_basis_combinatorial_identity seq hΔ hTF hReg (sub (phi.sub n)) hpos
-    -- The pentagonQ_seq_to_colouredGraphClass def has graph := (seq k).1, so the
-    -- toGenFlag = same construction used in uD_k. Direct rewrite.
-    exact this
+      (fun n => maxDegree (seq (sub (phi.sub n))).1) Filter.atTop Filter.atTop :=
+    hΔ.tendsto_atTop.comp hsubseq_atTop
+  -- Step C: transport the o(1) combinatorial identity along the subsequence.
+  --
+  -- 2026-09-20: the identity is asymptotic, matching the paper's Lemma 7.9
+  -- (`2Q/Δ⁵ = Σ coefⱼ·ρ(basisⱼ) + o(1)`).  It was previously stated as an exact
+  -- pointwise equality, which is FALSE: the left side normalises by a power
+  -- `Δ⁵` and the right by a binomial `Nat.choose Δ 8`, and the coefficients are
+  -- Δ-independent constants, so the two sides agree only in the limit.  Below
+  -- degree 8 the binomial vanishes outright and the old form forced
+  -- `pentagonQ = 0`.  The limit form needs no degree guard: `hΔ` is `StrictMono`,
+  -- so only finitely many terms sit below any threshold and the tail is
+  -- unaffected.
+  have hdiff_tend : Filter.Tendsto
+      (fun n => pentagonQ (seq (sub (phi.sub n))).1 (seq (sub (phi.sub n))).2 /
+          (maxDegree (seq (sub (phi.sub n))).1 : ℝ) ^ 5 -
+        (1/2 : ℝ) *
+          (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+            (fun j => O_Q_coef j * uD_k j n))
+      Filter.atTop (nhds 0) :=
+    (pentagonQ_basis_combinatorial_identity seq hΔ hTF hReg).comp hsubseq_atTop
   -- Step D: per-flag density convergence. With phi constructed from `cseq ∘ sub`,
   -- `phi.convergence` along phi.sub gives convergence of uD at (cseq (sub (phi.sub n))).toGenFlag,
   -- which is exactly `uD_k j n` by definition.
@@ -9732,8 +9768,10 @@ theorem pentagonQ_density_identity_per_extension
       (nhds ((1/2 : ℝ) *
         (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
           (fun j => O_Q_coef j * phi.eval (Davey2024.PentagonQBasis.flagBasis j)))) := by
-    apply hSum_tend.congr'
-    exact hCombinIdent.mono (fun n h => h.symm)
+    -- `LHS = (LHS - RHS) + RHS`, with the first summand vanishing in the limit.
+    have hadd := hdiff_tend.add hSum_tend
+    rw [zero_add] at hadd
+    exact hadd.congr (fun n => by ring)
   -- Step G: conclude L = RHS by uniqueness of limits.
   exact tendsto_nhds_unique htend_phi_sub htend_RHS
 
@@ -9864,18 +9902,29 @@ The natural Lean proof is the **upper-bound mirror** of
 2. Re-express the LHS as `phi.evalAlg O_Q_alg · linearScale`.
 3. Divide by `linearScale` and absorb the slack appropriately.
 
-Step 2 has the same blocker as `dual_feasibility_eval`: the per-block
-iso table mapping `cls.out.forget → flagBasis k` is missing. Phase 1.D
-spike (2026-05-13, `scratch/phase_1D_notes.md`) confirmed BRRB's
+Step 2 has the blocker that stopped the dual-feasibility step (a
+`sorry`'d `dual_feasibility_eval`, deleted 2026-05-13 as a dead chain):
+the per-block iso table mapping `cls.out.forget → flagBasis k` is missing. Phase 1.D
+spike (2026-05-13, the development notes) confirmed BRRB's
 pattern does NOT transfer:
 
 * **Size 5 (BRRB):** exact integer identity `linSum + cs0 + cs1 =
   target`, eval-level closure via `ring` + 12 iso rewrites + the
   normalisation `phi_eval_certF1_eq_one` (~350 LOC total).
-* **Size 8 (PentagonQ):** approximate cert; would need ~9114
-  flag-density normalisation identities (vs BRRB's 1) **plus** the
-  same iso table as `dual_feasibility_eval`. Both are infeasible at
-  hand-coded density per `scratch/per_block_iso_table_results.md`.
+* **Size 8 (PentagonQ):** approximate cert; would need one identity
+  per linear-constraint group, ~9114 of them, against the single
+  normalisation the size-5 route needed above, **plus** the iso table
+  that deleted step needed. Both are infeasible at hand-coded density
+  per the development notes. (The 9114 is the size-8 `.sdpa` header's
+  count of diagonal blocks; 18408 is the paper's row count, each of the
+  1398 equalities counted once where the header carries it as a `-2`
+  block, 19806 diagonal entries in all. Paper 1 §6 enumerates the 18408
+  rows in four families — 9295 flag non-negativity, 7715 regularity, 8
+  black-vertex normalisation, 1390 black-set cardinality — which
+  correspond to 1, 7715, 8 and 1390 groups. Only 8 of the 9114 groups
+  are normalisations, so earlier wording here, which called all 9114
+  normalisation identities, named them wrongly; the count and the
+  comparison were right.)
 
 Phase 1.D's verdict was NO, recommending Phase-3 axiomatisation.
 
@@ -9937,7 +9986,7 @@ The underlying SDP solution is identical; the constant tightening
 just shrinks the budget extracted from it.
 
 The size-5 BRRB peer `brrb_certificate_arithmetic_eval`
-(`SdpEvaluation.lean:9934`) is the fully-proved structural template
+(`SdpEvaluation.lean:9633`) is the fully-proved structural template
 demonstrating the same conceptual pattern (cert + cone → upper bound)
 at smaller scale (~350 LOC, 0 sorries, all axioms standard).
 
@@ -10121,8 +10170,8 @@ theorem flagBasis_class_ne_of_iso_check_false
     this Finset has `card ≤ 9295`; the converse (`card = 9295`) is the
     pairwise-distinctness claim and is **not currently established** —
     see the §3.10 docstring for the rationale (no downstream consumer
-    requires it; the future `dual_feasibility_eval` iso table is a
-    different, per-block construction).
+    requires it; the per-block iso table the deleted dual-feasibility
+    step would have needed is a different construction).
 
     Kept as a public definition because it cleanly names "the support
     set of basis-flag iso classes" and is useful for any future
@@ -10176,7 +10225,8 @@ theorem genFlagIso_of_cgraph_bijection {n : ℕ} (G₁ G₂ : CGraph n)
     `phi.eval_iso` (the `evalAlg` linearity tactic that rewrites
     `phi.eval cls.out.forget` to `phi.eval (flagBasis k)`).
 
-    **Usage pattern** (from BRRB analogue at `SdpEvaluation.lean:9946`):
+    **Usage pattern** (the BRRB analogue is used this way throughout
+    `SdpEvaluation.lean`, e.g. at line 529):
     ```lean
     have hcls_iso := phi.eval_iso cls.out.forget (flagBasis k)
       (cls_emp_forget_iso_flagBasis cls k hadj hcol)

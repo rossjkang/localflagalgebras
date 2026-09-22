@@ -5,7 +5,7 @@ import DaveyThesis2024.PentagonConjecture
 # WLOG-regular reduction for the strong chromatic index
 
 This file closes the `strong_chromatic_index_Reg_suffices` axiom
-(formerly at `StrongChromaticIndex.lean:417`) as a **theorem**, using
+(formerly an axiom in `StrongChromaticIndex.lean`) as a **theorem**, using
 the Molloy–Reed sparse-cover (iterated doubling) construction. The
 construction reuses the `doubledFlag` substrate from
 `PentagonConjecture.lean` (already proved to preserve `maxDegree` and
@@ -16,7 +16,7 @@ the strong chromatic index does not decrease under doubling, because any
 strong edge colouring of `doubledFlag G` restricts (along the copy-0
 embedding) to a strong edge colouring of `G` using the same colour set.
 
-Mirrors `pentagon_regular_suffices` (`PentagonConjecture.lean:1368`)
+Mirrors `pentagon_regular_suffices` (`PentagonConjecture.lean:2244`)
 structurally.
 
 Phase 3 of the development notes. After this file lands,

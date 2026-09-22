@@ -1,0 +1,89 @@
+{
+  "certificate": "bounded_pentagon_alt",
+  "result": "phi(O_Q) <= 4146/10000, giving P(G) <= 0.02073 |G| Delta^4 (divisor 20)",
+  "status": "VERIFIED",
+  "verified_utc": "2026-09-21",
+  "archived_utc": "2026-09-21",
+  "multipliers_regenerated_utc": "2026-09-22",
+  "files": {
+    "sdpa": {
+      "name": "bounded_pentagon_alt.sdpa",
+      "bytes": 22797176,
+      "sha256": "b46467ab2d34b672c122f4ebbd372d75aff808f63b336c873b56859ca24ca6ad",
+      "role": "load-bearing: carries the whole problem (m, block sizes, objective c, every F_k entry) The public bundle ships lines 1-9407 only; see reconstruction.",
+      "reconstruction": {
+        "script": "splice_pentagon_sdpa.py",
+        "input": "bounded_hexagon_alt.sdpa (published as bounded_hexagon_alt.sdpa.gz), sha256 1f190f413154357fbc0fad4b95ebe3a9c3c82accfce61ce243a0fea868cdae5b -- of the UNCOMPRESSED file, as every sha256 in these records is; the .gz itself hashes 2428721b77bf91444fa483cbf4c95612c459df99d7c1439b9d84f698e26cf885",
+        "note": "the pentagon and hexagon size-8 programs are the SAME constraint system with two objectives: their F_0 and F_k entry blocks are byte-identical (1,252,263 lines: 1,252,260 entries and three blank lines). The bundle ships lines 1-9407 of the pentagon file; the script splices the rest from the published hexagon file and asserts both input and output sha256."
+      }
+    },
+    "cert": {
+      "name": "bounded_pentagon_alt.cert",
+      "bytes": 24030541,
+      "sha256": "650958f2b69d0800dab31b32de8803013c88d274b8d465d14ec24d1ddfb7e6fe",
+      "role": "heuristic seed only: the verifier reads matrix_id == 2 as floats, rationalises it, and never trusts it"
+    },
+    "multipliers": {
+      "name": "bounded_pentagon_alt.multipliers.json",
+      "bytes": 361859,
+      "sha256": "a515a0d42b90e80d0ef4ad48065e3469e26a1c781310ff2d3c40d260dbf521b1",
+      "published_as": "bounded_pentagon_alt.multipliers.json.gz",
+      "role": "the certificate proper: nonnegative rational multipliers over the program's linear rows certifying sum_k r_k^+ y_k <= T for EVERY feasible y. check_multipliers.py checks it against the .sdpa and the .cert with the standard library alone, in about four seconds, once the .sdpa has been reconstructed by splice_pentagon_sdpa.py: it authenticates both inputs by sha256 and the rationalisation exponents the certificate records, recomputes r^+ and -tr(F_0 X) = 0.414584635843, and confirms the safe value 0.414589418954 against 2073/5000, which is the checker's own constant and is not read from this file. It does NOT verify X >= 0; the archived verifier run does, in exact rational arithmetic at this same 10^-16 rationalisation. The native_decide LDL witnesses in PentagonQCertificate/ are not a second, independent check of that: they carry the same matrix at 10^-12 with a 10^-11 shift, and PSD there does not give PSD here."
+    }
+  },
+  "problem": {
+    "m": 9295,
+    "blocks": 9392,
+    "entries": 1252260,
+    "psd_blocks_verified": 278
+  },
+  "verification": {
+    "verifier": "plans/pentagon_sharp/verify_exact_certificate.py",
+    "verifier_sha256": "f5f8df9d9d508a617238662fd20d2532c67f12adf3f8ab1bf2bd4bbc5780e5a1",
+    "flags": "--denom-exp 16 --lambda-exp 16 --target-numer 4146 --target-denom 10000 --raw-scale 1 --graph-divisor 20 --skip-sum-y --repair-with-flag-block --residual-method highs-ipm --strict-zero-residual-buffer",
+    "rationalisation": "X at 10^-16, lambda = 10^-16 on PSD blocks, diagonal clipped at 0",
+    "flag_block_repair": {
+      "coordinates_touched": 5729,
+      "absorbed": 2.403e-11,
+      "positive_remainder": 17
+    },
+    "residuals": {
+      "positive": 17,
+      "of": 9295,
+      "max": 3.136e-12,
+      "min": -1.12e-12
+    },
+    "multipliers": 5176,
+    "residual_lp": {
+      "columns": 9295,
+      "row_multipliers": 10511,
+      "positive_targets": 17,
+      "solve_scale": 1000000000000,
+      "buffer": 1e-12,
+      "strict_zero": true,
+      "method": "highs-ipm"
+    },
+    "weighted_absorb_term": 4.783111e-06,
+    "neg_tr_F0_X": 0.414584635843,
+    "safe_value": 0.414589418954,
+    "target": 0.4146,
+    "margin": 1.058e-05,
+    "graph_divisor": 20,
+    "graph_density_bound": 0.02073,
+    "wall_seconds": {
+      "exact_verifier": 647
+    },
+    "note": "The weighted-residual dual is UNIVERSAL: sum_k r_k^+ y_k <= T is certified for every feasible y by exact nonnegative rational multipliers over the program's own linear rows, not measured at the certificate's dual point."
+  },
+  "significance": "This is the archived size-8 thesis certificate behind Theorem 1.2 (the 0.02073 bound). Section 6 of the paper once called passing from a residual bounded at the certificate's own dual point to a bound valid over all of Phi^empty 'the step this section does not carry out: it is the certificate output bound, one of the two named domain assumptions'. This run carries out that step at the level of the SDP, at the paper's own constant, with margin 1.058e-05 -- not in Lean, where the bound remains an axiom. Section 6 was rewritten on 2026-09-21 to record it; the quoted sentence is no longer in the paper. The remaining domain assumption is the flag-to-graph bridge (the basis combinatorial identity).",
+  "scope": "Certificate-level. The verifier's own label is 'THEOREM-GRADE (mod standard bridge)': consuming this as a graph theorem still uses the PentagonQBridge conventions. Not formalised in Lean; the axiom phi_evalAlg_O_Q_alg_le_bound is unchanged as a Lean declaration, but its mathematical content is now backed by an exact universal certificate rather than a solver-point measurement.",
+  "reproducibility": {
+    "sdpa": "byte-deterministic given the same flag-basis cache. Generator-to-problem link, verified 2026-09-20: `cargo run --release --example bounded_pentagon_alt_approach` regenerates this exact file, sha256 b46467ab..., so the problem can be rebuilt from published source rather than taken on trust. Note it is emitted as bounded_pentagon.sdpa -- the same name bounded_pentagon.rs uses for the unrelated 4 KB size-5 program.",
+    "cert": "NOT bit-reproducible across solver runs; what reproduces is the verification of this archived certificate, not its regeneration",
+    "checkpoint": "the verifier caches PSD work keyed to (sdpa, cert, denom_exp, lambda_exp); use a fresh --ckpt when changing exponents",
+    "margin_over_jitter": "about 935x. A second CSDP point for this exact program exists (2026-09-20; the archived cert is 2026-03-07). Dual objectives -c^T y: 0.414584646485 vs 0.414584657802, drift 1.13e-08, against a margin of 1.058e-05. Relative to the safe value that is 2.55e-05 headroom, 0.0026 %. NB this is a -c^T y proxy; the strictly comparable safe-value jitter would need a second full verifier run. For comparison the hexagon records about 138x and the heptagon about 18000x.",
+    "precision_sensitivity": "The verifier's DEFAULT rationalisation (--denom-exp 14 --lambda-exp 11) does NOT clear the target: it gives safe value 0.414795538369 > 0.4146. Only 16/16 clears, at 0.414589418954. See history."
+  },
+  "history": "A first run at the verifier's default rationalisation (--denom-exp 14 --lambda-exp 11) also certified a universal bound, with 5578 multipliers and absorb term 2.109e-04, but gave safe value 0.414795538369 > 0.4146 and so would have required weakening the constant to 0.020740. The finer 16/16 rationalisation cuts the positive residuals from 6106 to 17 and the absorb term to 4.783e-06, clearing the paper's constant. The apparent trade-off was an artefact of the rationalisation.",
+  "citation_note_2026_09_21": "Addendum, 2026-09-21, recorded so that every certificate record in this directory carries the same statement. The public port excludes raw .cert/.sdpa files by a rule in its sync manifest, and by .gitignore, which as originally written excluded *.sdpa only. That rule was blanket until 2026-09-21, when it was lifted for the C6/C7 certificates, which are the only ones in that directory behind a stated theorem with no Lean-embedded counterpart (the size-5 bounded_pentagon.* behind Theorem 1.1 has one in SdpFlags.lean and SdpEvaluation.lean, discharged entirely in the kernel; the SEC certificates have theirs in Sec*Certificate.lean; bounded_pentagon_sharp* are behind no stated result); it had already been lifted before this record was written. That exclusion is harmless where the port ships the certificate as Lean-embedded rationalised data, as it does for this one, in DaveyThesis2024/PentagonQCertificate/. Note that the Lean-embedded copy is the same object as the .cert here -- both are matrix-id 2 of the solver output, and all 19806 diag_y and 9295 x_int entries agree exactly -- but it is carried rounded to 10^-12, whereas the verification recorded above requires 10^-16. Publication of the raw files for this certificate is planned but not yet carried out. SUPERSEDED 2026-09-21, later the same day: the prefix of the .sdpa (lines 1-9407), the splice and checker scripts, the gzipped .cert and the rational multiplier certificate are now published in the port under DaveyThesis2024/certificates/. The raw .sdpa is not published; it is reconstructed byte-for-byte from the prefix and the already-published hexagon problem, the two being the same constraint system with different objectives."
+}
