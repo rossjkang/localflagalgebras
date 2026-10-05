@@ -23,7 +23,7 @@ with `F` = all 25 edges except `{4, 9}`, designated edge `{0, 5} ∈ F`.
 Then `N(u) ∪ N(w)` = all 10 vertices (every vertex colour 0 = black/X), and
 the edge colouring is 1 except on `{4,9}`. Exactly three basis flags in the
 cert objective support embed (found by exhaustive `#eval` search over all
-17,950 basis flags, session scratchpad `discover*.lean`):
+17,950 basis flags, generated `discover*.lean` probes):
 
 | j | shape | induced count | `targetArr[j]` |
 |---|---|---|---|

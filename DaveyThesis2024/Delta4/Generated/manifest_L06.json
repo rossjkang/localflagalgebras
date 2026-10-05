@@ -1,0 +1,2302 @@
+{
+ "layer": 6,
+ "masks": 221,
+ "nodes": 3764,
+ "chunk_ceiling": 3000,
+ "module_node_cap": 60000,
+ "module_decl_cap": 120,
+ "per_mask": [
+  {
+   "index": 0,
+   "K": 15655185,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 1,
+   "K": 16695825,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 2,
+   "K": 15651345,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 3,
+   "K": 15647505,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 4,
+   "K": 16688145,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 5,
+   "K": 15643665,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 6,
+   "K": 15639825,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 7,
+   "K": 16680465,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 8,
+   "K": 15635985,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 9,
+   "K": 16557585,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 10,
+   "K": 15574545,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 11,
+   "K": 15513105,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 12,
+   "K": 15632145,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 13,
+   "K": 15509265,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 14,
+   "K": 16630305,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 15,
+   "K": 15585825,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 16,
+   "K": 16565025,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 17,
+   "K": 15581985,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 18,
+   "K": 16745505,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 19,
+   "K": 16684065,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 20,
+   "K": 16622625,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 21,
+   "K": 16561185,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 22,
+   "K": 15578145,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 23,
+   "K": 16680225,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 24,
+   "K": 15635745,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 25,
+   "K": 16557345,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 26,
+   "K": 15574305,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 27,
+   "K": 15512865,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 28,
+   "K": 16614945,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 29,
+   "K": 16553505,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 30,
+   "K": 15570465,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 31,
+   "K": 14525985,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 32,
+   "K": 14464545,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 33,
+   "K": 16549665,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 34,
+   "K": 15566625,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 35,
+   "K": 15505185,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 36,
+   "K": 14460705,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 37,
+   "K": 13416225,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 38,
+   "K": 15516465,
+   "nodes": 53,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 39,
+   "K": 16679985,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 40,
+   "K": 15635505,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 41,
+   "K": 16557105,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 42,
+   "K": 15574065,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 43,
+   "K": 15512625,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 44,
+   "K": 15631665,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 45,
+   "K": 15508785,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 46,
+   "K": 16549425,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 47,
+   "K": 15566385,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 48,
+   "K": 15504945,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 49,
+   "K": 14460465,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 50,
+   "K": 13415985,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 51,
+   "K": 15501105,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 52,
+   "K": 13412145,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 53,
+   "K": 16491585,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 54,
+   "K": 15447105,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 55,
+   "K": 16426305,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 56,
+   "K": 15443265,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 57,
+   "K": 16483905,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 58,
+   "K": 16422465,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 59,
+   "K": 15439425,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 60,
+   "K": 14394945,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 61,
+   "K": 13350465,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 62,
+   "K": 16418625,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 63,
+   "K": 15435585,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 64,
+   "K": 15374145,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 65,
+   "K": 14329665,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 66,
+   "K": 13346625,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 67,
+   "K": 15377745,
+   "nodes": 53,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 68,
+   "K": 16418385,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 69,
+   "K": 15435345,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 70,
+   "K": 15373905,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 71,
+   "K": 14329425,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 72,
+   "K": 13346385,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 73,
+   "K": 15370065,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 74,
+   "K": 13281105,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 75,
+   "K": 16352865,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 76,
+   "K": 14386785,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 77,
+   "K": 15308385,
+   "nodes": 29,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 78,
+   "K": 14325345,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 79,
+   "K": 13342305,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 80,
+   "K": 16287585,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 81,
+   "K": 15304545,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 82,
+   "K": 14321505,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 83,
+   "K": 13338465,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 84,
+   "K": 13277025,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 85,
+   "K": 15239025,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 86,
+   "K": 13272945,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 87,
+   "K": 14537250,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 88,
+   "K": 14533410,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 89,
+   "K": 16618530,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 90,
+   "K": 14529570,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 91,
+   "K": 16614690,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 92,
+   "K": 16553250,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 93,
+   "K": 15570210,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 94,
+   "K": 14525730,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 95,
+   "K": 14464290,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 96,
+   "K": 14521890,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 97,
+   "K": 14518050,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 98,
+   "K": 14456610,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 99,
+   "K": 14467890,
+   "nodes": 53,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 100,
+   "K": 16614450,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 101,
+   "K": 16553010,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 102,
+   "K": 15569970,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 103,
+   "K": 14525490,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 104,
+   "K": 14464050,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 105,
+   "K": 16549170,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 106,
+   "K": 15566130,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 107,
+   "K": 15504690,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 108,
+   "K": 14460210,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 109,
+   "K": 13415730,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 110,
+   "K": 14517810,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 111,
+   "K": 14456370,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 112,
+   "K": 14452530,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 113,
+   "K": 13408050,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 114,
+   "K": 16487490,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 115,
+   "K": 14398530,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 116,
+   "K": 16483650,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 117,
+   "K": 16422210,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 118,
+   "K": 15439170,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 119,
+   "K": 14394690,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 120,
+   "K": 13350210,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 121,
+   "K": 16356930,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 122,
+   "K": 14390850,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 123,
+   "K": 16353090,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 124,
+   "K": 14387010,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 125,
+   "K": 15308610,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 126,
+   "K": 14325570,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 127,
+   "K": 13342530,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 128,
+   "K": 16418130,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 129,
+   "K": 15435090,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 130,
+   "K": 15373650,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 131,
+   "K": 14329170,
+   "nodes": 29,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 132,
+   "K": 13346130,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 133,
+   "K": 16352850,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 134,
+   "K": 14386770,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 135,
+   "K": 15308370,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 136,
+   "K": 14325330,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 137,
+   "K": 13342290,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 138,
+   "K": 16287570,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 139,
+   "K": 15304530,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 140,
+   "K": 14321490,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 141,
+   "K": 13338450,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 142,
+   "K": 13277010,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 143,
+   "K": 14259810,
+   "nodes": 53,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 144,
+   "K": 14255970,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 145,
+   "K": 13211490,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 146,
+   "K": 14190450,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 147,
+   "K": 13207410,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 148,
+   "K": 13419315,
+   "nodes": 881,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 149,
+   "K": 16548915,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 150,
+   "K": 15565875,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 151,
+   "K": 15504435,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 152,
+   "K": 14459955,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 153,
+   "K": 13415475,
+   "nodes": 27,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 154,
+   "K": 15500595,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 155,
+   "K": 13411635,
+   "nodes": 77,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 156,
+   "K": 14452275,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 157,
+   "K": 13407795,
+   "nodes": 77,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 158,
+   "K": 13403955,
+   "nodes": 27,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 159,
+   "K": 16483395,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 160,
+   "K": 16421955,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 161,
+   "K": 15438915,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 162,
+   "K": 14394435,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 163,
+   "K": 13349955,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 164,
+   "K": 16418115,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 165,
+   "K": 15435075,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 166,
+   "K": 15373635,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 167,
+   "K": 14329155,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 168,
+   "K": 13346115,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 169,
+   "K": 16352835,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 170,
+   "K": 14386755,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 171,
+   "K": 15308355,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 172,
+   "K": 14325315,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 173,
+   "K": 13342275,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 174,
+   "K": 16287555,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 175,
+   "K": 15304515,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 176,
+   "K": 14321475,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 177,
+   "K": 13338435,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 178,
+   "K": 13276995,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 179,
+   "K": 15369555,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 180,
+   "K": 13280595,
+   "nodes": 65,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 181,
+   "K": 16287315,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 182,
+   "K": 15304275,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 183,
+   "K": 14321235,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 184,
+   "K": 13338195,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 185,
+   "K": 13276755,
+   "nodes": 12,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 186,
+   "K": 15238995,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 187,
+   "K": 13272915,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 188,
+   "K": 14255715,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 189,
+   "K": 13211235,
+   "nodes": 65,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 190,
+   "K": 14190435,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 191,
+   "K": 13207395,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 192,
+   "K": 13141875,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 193,
+   "K": 12301380,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 194,
+   "K": 12297540,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 195,
+   "K": 12293700,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 196,
+   "K": 12289860,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 197,
+   "K": 12228420,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 198,
+   "K": 12232020,
+   "nodes": 53,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 199,
+   "K": 12289620,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 200,
+   "K": 12228180,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 201,
+   "K": 12224340,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 202,
+   "K": 11179860,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 203,
+   "K": 12162660,
+   "nodes": 53,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 204,
+   "K": 12158820,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 205,
+   "K": 11114340,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 206,
+   "K": 12093300,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 207,
+   "K": 11110260,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 208,
+   "K": 11183445,
+   "nodes": 881,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 209,
+   "K": 12224085,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 210,
+   "K": 11179605,
+   "nodes": 77,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 211,
+   "K": 11175765,
+   "nodes": 27,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 212,
+   "K": 12158565,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 213,
+   "K": 11114085,
+   "nodes": 65,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 214,
+   "K": 12093285,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 215,
+   "K": 11110245,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 216,
+   "K": 11044725,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 217,
+   "K": 10065510,
+   "nodes": 881,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 218,
+   "K": 10061670,
+   "nodes": 27,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 219,
+   "K": 9996150,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  },
+  {
+   "index": 220,
+   "K": 8947575,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  }
+ ],
+ "slices": [
+  {
+   "id": 0,
+   "kind": "light",
+   "first": 0,
+   "width": 217,
+   "nodes": 2854
+  },
+  {
+   "id": 1,
+   "kind": "light",
+   "first": 217,
+   "width": 4,
+   "nodes": 910
+  }
+ ],
+ "modules": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L6Masks",
+   "file": "L6Masks.lean",
+   "decls": [
+    "Delta4Gen.L6.M_eq",
+    "Delta4Gen.L6.M_residual",
+    "Delta4Gen.L6.stepM"
+   ],
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L6S00",
+   "file": "L6S00.lean",
+   "decls": [
+    "Delta4Gen.L6.slice_0",
+    "Delta4Gen.L6.slice_1"
+   ],
+   "nodes": 3764
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L6",
+   "file": "L6.lean",
+   "decls": [
+    "Delta4Gen.L6.layer_count",
+    "Delta4Gen.L6.layer_ok"
+   ],
+   "nodes": 0
+  }
+ ],
+ "builds": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L6Masks",
+   "path": "DaveyThesis2024/Delta4/Generated/L6Masks.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 5.4,
+   "rss_gb": 4.43,
+   "returncode": 0,
+   "stderr_tail": "        5.42 real         4.49 user         0.95 sys\n          4753555456  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              406150  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  37  voluntary context switches\n                1922  involuntary context switches\n          3305057133  instructions retired\n          1076693053  cycles elapsed\n           139530720  peak memory footprint\n",
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L6S00",
+   "path": "DaveyThesis2024/Delta4/Generated/L6S00.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 8.9,
+   "rss_gb": 4.59,
+   "returncode": 0,
+   "stderr_tail": "        8.89 real         7.77 user         1.12 sys\n          4929372160  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              478235  page reclaims\n                 216  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  46  voluntary context switches\n                3689  involuntary context switches\n          3309076623  instructions retired\n          1095562407  cycles elapsed\n           139481544  peak memory footprint\n",
+   "nodes": 3764
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L6",
+   "path": "DaveyThesis2024/Delta4/Generated/L6.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 1.9,
+   "rss_gb": 2.87,
+   "returncode": 0,
+   "stderr_tail": "        1.86 real         1.01 user         0.91 sys\n          3079618560  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              303176  page reclaims\n                 290  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  45  voluntary context switches\n                6222  involuntary context switches\n          3566831638  instructions retired\n          1121909144  cycles elapsed\n           139481592  peak memory footprint\n",
+   "nodes": 0
+  }
+ ],
+ "build_ok": true
+}

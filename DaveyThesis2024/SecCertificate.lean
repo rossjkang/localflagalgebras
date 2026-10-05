@@ -166,7 +166,7 @@ mirrors Pentagon Q's `cert_slack_within_tight_budget` structural
 pattern (`PentagonQCertificate.lean:422`) and provides direct
 constructive `native_decide` support for the bound
 `phi.evalAlg O_sec_alg ≤ 10.644` carried by
-`phi_evalAlg_O_sec_alg_le_bound` in `SecBridge.lean`.
+`phi_evalAlg_O_sec_alg_le_bound_F` in `SecBridge.lean`.
 
 Measured `total_slack_abs ≈ 1.262 × 10²³`; safety ratio ~1.6×.
 Compared to Pentagon Q's 1.8× ratio at the thesis-tight bound, SEC's

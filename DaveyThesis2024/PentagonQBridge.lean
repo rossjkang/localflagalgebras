@@ -1,4 +1,6 @@
 import DaveyThesis2024.PentagonQCertificate
+import DaveyThesis2024.PentagonQObjective
+import DaveyThesis2024.PentagonQAssembleA
 import DaveyThesis2024.PentagonQBasis
 import DaveyThesis2024.PentagonQSigmaBasis
 import DaveyThesis2024.SdpEvaluation
@@ -38,7 +40,9 @@ This file scales the same pattern from 2 → 278 Cauchy-Schwarz blocks:
 * `linSum_Q_alg` — algebra-level linear part (analogue of `linSum_alg`).
 * `csBlock_i_alg` for `i ∈ [0, 278)` — the 278 Cauchy-Schwarz block
   contributions at the algebra level (analogues of `cs0_alg`, `cs1_alg`).
-* `csBlock_in_cone_of_LDL` — the **generic helper** that promotes a
+* `csBlock_in_cone_of_LDL` — excised by `0203247`, **restored 2026-10-03**
+  (§Step G). It is the generic helper
+  that promotes a
   block's integer LDL witness to a `SemCone^∅` membership for
   `csBlock_i_alg`. The mathematical content: `L D Lᵀ = Y + λI` ⟹
   `Y + λI` is a sum-of-squares (each row of L weighted by `√D_i` gives
@@ -63,8 +67,12 @@ This file scales the same pattern from 2 → 278 Cauchy-Schwarz blocks:
   σ-type (a size-8 σ-type derived from the SDPA file) and a list of
   σ-flag indices (the block's basis). Definition shape:
   `csBlock_i_alg = Σ_{p,q} Y_{p,q} • genAveragingAlg σ_i (basis p * basis q)`.
-* The generic helper `csBlock_in_cone_of_LDL` is signature-only;
-  the body needs the `genSquare_in_cone` + linearity argument.
+* The generic helper `csBlock_in_cone_of_LDL` was excised as signature-only
+  and was restored 2026-10-03 once both σ-locality legs landed. It is proved,
+  and `AxiomCheck` pins its axiom set — but **nothing consumes it yet**: the
+  sign-correct residual element `bound·∅ − O_Q_alg − Σ_i csBlock_alg i` does
+  not exist in the tree, and `linSum_Q_alg` is the *wrong* residual for weak
+  duality. `pentagon_bound_full`'s axiom set is unchanged by it.
 
 ## Naming convention
 
@@ -92,53 +100,23 @@ The cert's integer-encoded `target` vector (in `PentagonQCertificate`)
 holds the corresponding coefficient for each basis index, scaled by
 `linearScale = 10^12`. -/
 
-/-- The cert's `target` vector cached as an `Array Int` for O(1) indexing.
-
-Wraps `PentagonQCertificate.target : List Int`; computed once to avoid
-re-parsing on every basis index lookup. -/
-def targetArr : Array Int :=
-  (Davey2024.PentagonQCertificate.target).toArray
-
-/-- The ℝ coefficient for basis index `k : Fin 9295`.
-
-**Sign convention (load-bearing).** The PentagonQ SDPA file
-`DaveyThesis2024/certificates/bounded_pentagon_alt.sdpa` uses the
-`min -(...)` objective:
-
-```
-Minimizing: -([|Σ f(F)F|] + [|Σ f(F)F|] + 2*[|Σ f(F)F|])
-```
-
-so SDPA's `c` vector represents the **negative** of the actual pentagon
-flag coefficients. `emit_lean_cert.py` line 922 stores
-`target_int = c_rat * DENOM_Y` directly (no sign flip), hence
-`targetArr[k] ≤ 0` for every basis index `k` (empirically: 9295 entries,
-0 positive). `O_Q_coef` flips this sign so it represents the TRUE
-non-negative pentagon flag coefficient at basis index `k`:
-
-```
-O_Q_coef k = -target[k] / linearScale ≥ 0
-```
-
-(`linearScale = 10^12` is the rationalisation precision used by
-`local-flags-certificates/emit_lean_cert.py`.)
-
-This sign flip makes the combinatorial identity
-`pentagonQ/Δ⁵ = (1/2)·Σ O_Q_coef · density` sign-consistent: LHS ≥ 0
-(pentagonQ count), and RHS ≥ 0 (both factors non-negative). Without
-the flip, the identity is FALSE as stated (LHS ≥ 0, RHS ≤ 0); see
-`project_pentagonQ_sign_convention.md` for the full diagnosis. -/
-noncomputable def O_Q_coef (k : Fin Davey2024.PentagonQBasis.basisSize) : ℝ :=
-  -((targetArr[k.val]! : ℝ) /
-    (Davey2024.PentagonQCertificate.linearScale : ℝ))
+/-! `targetArr`, `O_Q_weight` and `O_Q_coef` live in `PentagonQObjective` and are
+re-exported here, so this module's existing uses of them are unaffected.  They
+moved out on 2026-10-01 so that `PentagonQWeights` — and through it the whole
+item-(a) chain — no longer depends on this module, which is what made
+`pentagonQ_basis_combinatorial_identity_step1` impossible to discharge in place.
+Their sign convention and the 2026-09-26 exact-coefficient repair are documented
+there, with the definitions. -/
+export Davey2024.PentagonQObjective (targetArr O_Q_weight O_Q_coef)
 
 /-- **Algebra-level Q-objective** (Phase 3.1).
 
 `O_Q_alg = Σ_{k=0}^{9294}  O_Q_coef k • GenFlagAlg.single (flagBasis k)`,
-where `O_Q_coef k = -target[k] / linearScale ≥ 0` is the TRUE
-(non-negative) pentagon flag coefficient at basis index `k` — see
-`O_Q_coef`'s docstring for the SDPA `min -(...)` sign-convention
-rationale.
+where `O_Q_coef k = O_Q_weight k / 6720 ≥ 0` is the TRUE (non-negative)
+pentagon flag coefficient at basis index `k`, the exact rational `μ_k/6720`
+recovered from the certificate's 12-digit target — see `O_Q_coef`'s
+docstring for the SDPA `min -(...)` sign convention and the exact-coefficient
+repair.
 
 The `flagBasis k` is the size-8 ∅-typed flag at basis index `k` (see
 `PentagonQBasis.lean`).
@@ -1951,29 +1929,56 @@ Lifts the packed-bit σ-flag basis bitmaps in
 `PentagonQSigmaBasis.csBlockBasisAdj i` to `GenFlag CG2 (csBlockSigma i)`
 via `CGraph.toTypedGenFlag` (already shipped in `CGraphBridge.lean`).
 
-The encoding for σ-typed basis flags (per `PentagonQSigmaBasis.lean`):
-* bits 0..20: edges in SymNonRefl order, `v*(v-1)/2 + u` for `u < v`
-              (up to C(7, 2) = 21 bits, ample for outer_size ≤ 7);
-* bits 21..27: colours, bit `21 + v` is the colour of vertex `v`
-               (up to 7 bits).
+The encoding for σ-typed basis flags (per `PentagonQSigmaBasis.lean`), where
+`k` is the flag's own size — `outer_size i` for a basis flag, `σ_size i` for a
+σ-type:
+* bits `0 .. C(k,2)-1`: edges in SymNonRefl order, `v*(v-1)/2 + u` for `u < v`;
+* bits `C(k,2) .. C(k,2)+k-1`: colours, bit `C(k,2) + v` is vertex `v`'s.
 
-Both σ-info and basis flags use the **Rust colour convention**
-(0 = black, 1 = red). The σ-info's colour is decoded by
-`csBlockSigmaColRaw` from `bitAt sigmaHex (sigmaEdgeBits + v.val)`;
-the basis flag's colour is decoded below from
-`bitAt basisHex (21 + v.val)`. These read from different packed Nats
-(`sigmaHex` vs `basisHex`) but the cert's emitter guarantees the σ-info
-of every basis flag matches `csBlockSigma i`. The compatibility check
-is wrapped in a `Classical.byCases` guard: when the comap-equality
-holds, we return the lifted `GenFlagAlg.single`; when it doesn't (a
-"shouldn't happen by cert correctness" branch), we fall back to `0`.
+**The colour offset varies with `k`.** It was hard-coded as the constant `21`
+= C(7,2) until 2026-10-02, which is right only for the 260 blocks of outer
+size 7; `csBlockOuterSize` is also 5 and 6, on 2 and 16 blocks. For those 18
+the constant is *larger* than the colour field's offset, so the decoders read
+past the colours into unused high bits — all clear — and every one of those
+2,232 flags decoded as uniformly colour-`0`.
+
+Both decoders present colours in the **`CG2` convention** (`1 = black`), like
+`PentagonQBasis.extractColour` for the ∅-typed size-8 basis. The generator
+packs the opposite (`0 = black`: `bounded_pentagon_alt_approach.rs:26` anchors
+components on colour `0` and `:29-32` forbids edges between two colour-`0`
+vertices), so both invert the bit. Until 2026-10-02 this file instead passed
+the bit through and documented the asymmetry as deliberate and internally
+consistent. It was neither: the offset bug above meant `csBlockBasisColour`,
+`csBlockBasisHasSpanningOrderBool` and `cg2VertexOrderProp_n` did *not* agree
+for the 18 small blocks.
+
+The σ-info's colour is decoded by `csBlockSigmaCol` from
+`bitAt sigmaHex (C(σ_size i, 2) + v)`; the basis flag's colour below from
+`bitAt basisHex (sigmaBasisEdgeBits i + v.val)`. These read from different
+packed Nats (`sigmaHex` vs `basisHex`), and that they agree on the σ-prefix is
+no longer taken on trust from the emitter: `csBlockBasis_comap_agrees` checks
+it for all 10,387 flags. The compatibility check below is wrapped in a
+`Classical.byCases` guard: when the comap-equality holds we return the lifted
+`GenFlagAlg.single`, and otherwise fall back to `0` — a fallback that fired
+silently for 1,949 flags while the offset was wrong, which is why the guard
+now exists.
 
 This keeps `csBlockBasis` block-parametric (works for all 278 blocks
 without per-block proof obligations) while threading real GenFlag data
 through Step B / Step C. -/
 
-/-- Bit width for edges in a σ-typed basis flag (`C(7, 2) = 21`). -/
-def sigmaBasisEdgeBits : Nat := 21
+/-- Bit width for edges in a σ-typed basis flag of block `i`:
+`C(outerSize i, 2)`.
+
+**This was the constant `21` until 2026-10-02.**  `csBlockOuterSize` takes
+three values — 5, 6 and 7, on 2, 16 and 260 blocks — so `21` was correct only
+for the 260 outer-7 blocks.  For the other 18 it is *larger* than the colour
+field's offset (`C(5,2) = 10`, `C(6,2) = 15`), so the decoders read past the
+colours into unused high bits, which are all clear: all 2,232 flags of those
+blocks decoded as all-colour-`0`. -/
+def sigmaBasisEdgeBits (i : Fin 278) : Nat :=
+  PentagonQSigmaBasis.csBlockOuterSize i *
+    (PentagonQSigmaBasis.csBlockOuterSize i - 1) / 2
 
 /-- Decode the adjacency bit between vertices `u` and `v` of a σ-typed basis flag. -/
 def csBlockBasisEdge (i : Fin 278) (k : Fin (PentagonQSigmaBasis.csBlockDim i))
@@ -1986,11 +1991,13 @@ def csBlockBasisEdge (i : Fin 278) (k : Fin (PentagonQSigmaBasis.csBlockDim i))
   else
     false
 
-/-- Decode the colour of vertex `v` of a σ-typed basis flag (Rust convention). -/
+/-- Decode the colour of vertex `v` of a σ-typed basis flag, in the `CG2`
+convention (`1 = black`).  The generator packs `0` for black, so the bit is
+inverted here; it was passed through unchanged until 2026-10-02. -/
 def csBlockBasisColour (i : Fin 278) (k : Fin (PentagonQSigmaBasis.csBlockDim i))
     (v : Fin (PentagonQSigmaBasis.csBlockOuterSize i)) : Fin 2 :=
   let bm : Nat := (PentagonQSigmaBasis.csBlockBasisAdj i)[k.val]!
-  if PentagonQBasis.bitAt bm (sigmaBasisEdgeBits + v.val) then 1 else 0
+  PentagonQBasis.colourOfBit (PentagonQBasis.bitAt bm (sigmaBasisEdgeBits i + v.val))
 
 /-- The `k`-th σ-typed basis flag of block `i`, as a computable
 `CGraph (csBlockOuterSize i)`.
@@ -2001,6 +2008,100 @@ def csBlockBasisCGraph (i : Fin 278) (k : Fin (PentagonQSigmaBasis.csBlockDim i)
     CGraph (PentagonQSigmaBasis.csBlockOuterSize i) where
   adj := csBlockBasisEdge i k
   col := csBlockBasisColour i k
+
+/-! ### The comap-agreement regression (2026-10-02)
+
+`csBlockBasis` below lifts a decoded basis flag into `GenFlag CG2 (csBlockSigma i)`
+only when the flag's σ-prefix equals the block's σ-type, and falls back to `0`
+otherwise.  Nothing asserted that the premise holds, so when the colour offset
+was wrong the fallback fired silently for 1,949 of the 10,387 flags and the
+whole small-block layer was empty while every check stayed green.  These two
+pin it. -/
+
+/-- The σ size never exceeds the outer size, so the `v.val < n` gate in
+`csBlockComapAgreeBool` is a restriction and not a vacuity. -/
+theorem csBlockSigmaSize_le_outerSize :
+    ∀ i : Fin 278,
+      PentagonQSigmaBasis.csBlockSigmaSize i ≤
+        PentagonQSigmaBasis.csBlockOuterSize i := by
+  native_decide
+
+/-- The decoded σ-prefix of basis flag `k` of block `i` agrees with the block's
+σ-type, on adjacency and on colour.  This is exactly the premise `csBlockBasis`
+tests. -/
+def csBlockComapAgreeBool (i : Fin 278)
+    (k : Fin (PentagonQSigmaBasis.csBlockDim i)) : Bool :=
+  let n := PentagonQSigmaBasis.csBlockSigmaSize i
+  (List.finRange (PentagonQSigmaBasis.csBlockOuterSize i)).all (fun v =>
+    !decide (v.val < n) ||
+      (csBlockBasisColour i k v == PentagonQSigmaBasis.csBlockSigmaCol i v.val)) &&
+  (List.finRange (PentagonQSigmaBasis.csBlockOuterSize i)).all (fun u =>
+    (List.finRange (PentagonQSigmaBasis.csBlockOuterSize i)).all (fun w =>
+      !(decide (u.val < n) && decide (w.val < n)) ||
+        (csBlockBasisEdge i k u w ==
+          PentagonQSigmaBasis.csBlockSigmaAdj i u.val w.val)))
+
+/-- **Regression.**  Every one of the 10,387 σ-typed basis flags agrees with
+its block's σ-type on the prefix, so `csBlockBasis`'s guard fires for all of
+them.  This failed for 1,949 flags before the 2026-10-02 decoder repair. -/
+theorem csBlockBasis_comap_agrees :
+    ∀ (i : Fin 278) (k : Fin (PentagonQSigmaBasis.csBlockDim i)),
+      csBlockComapAgreeBool i k = true := by
+  native_decide
+
+/-- **The Bool check implies the propositional guard.**
+
+`csBlockBasis` falls back to `0` unless the *propositional* comap condition
+holds; `csBlockBasis_comap_agrees` just above checks the corresponding *Bool*
+condition over all 10,387 flags. Nothing connected the two, so that regression
+did not in fact establish that the guard ever fires — and a silently-zero
+`csBlockBasis` would make every `csBlock_alg i` zero and the whole Step G/H
+chain a vacuous `0 ≥ 0`. This is the same silent-fallback class that hit 1,949
+flags before the 2026-10-02 decoder repair.
+
+Both components are covered: the Bool check's first conjunct gives the
+colours and its second gives adjacency, with `fromRel`'s symmetrisation
+handled by reading the adjacency fact in both orders. -/
+theorem csBlockBasis_comap_eq (i : Fin 278)
+    (k : Fin (PentagonQSigmaBasis.csBlockDim i))
+    (hle : (PentagonQSigmaBasis.csBlockSigma i).size
+            ≤ PentagonQSigmaBasis.csBlockOuterSize i) :
+    CG2.comap (Fin.castLE hle)
+        (⟨SimpleGraph.fromRel
+            (fun a b : Fin (PentagonQSigmaBasis.csBlockOuterSize i) =>
+              (csBlockBasisCGraph i k).adj a b),
+          (csBlockBasisCGraph i k).col⟩ : CG2.Str _)
+      = (PentagonQSigmaBasis.csBlockSigma i).str := by
+  have hB := csBlockBasis_comap_agrees i k
+  simp only [csBlockComapAgreeBool, Bool.and_eq_true, List.all_eq_true,
+    List.mem_finRange, Bool.or_eq_true, Bool.not_eq_true', decide_eq_false_iff_not,
+    beq_iff_eq, forall_true_left] at hB
+  obtain ⟨hcol, hadj⟩ := hB
+  have hsize : (PentagonQSigmaBasis.csBlockSigma i).size
+      = PentagonQSigmaBasis.csBlockSigmaSize i := rfl
+  refine Prod.ext ?_ ?_
+  · ext u v
+    have hu : (Fin.castLE hle u).val < PentagonQSigmaBasis.csBlockSigmaSize i :=
+      hsize ▸ u.isLt
+    have hv : (Fin.castLE hle v).val < PentagonQSigmaBasis.csBlockSigmaSize i :=
+      hsize ▸ v.isLt
+    have euv := hadj (Fin.castLE hle u) (Fin.castLE hle v)
+    have evu := hadj (Fin.castLE hle v) (Fin.castLE hle u)
+    simp only [Fin.val_castLE, Bool.and_eq_false_iff,
+      decide_eq_false_iff_not, not_lt] at euv evu
+    rcases euv with h | huv
+    · omega
+    rcases evu with h | hvu
+    · omega
+    simp only [colouredGraphUniverse, SimpleGraph.comap_adj, csBlockBasisCGraph,
+      PentagonQSigmaBasis.csBlockSigma, SimpleGraph.fromRel_adj, huv, hvu,
+      ne_eq, Fin.ext_iff, Fin.val_castLE]
+  · funext v
+    have h := hcol (Fin.castLE hle v)
+    simp only [Fin.val_castLE] at h
+    rcases h with h | h
+    · exact absurd (hsize ▸ v.isLt) h
+    · simpa [csBlockBasisCGraph, PentagonQSigmaBasis.csBlockSigma] using h
 
 /-- The block's σ-flag basis as algebra elements,
     `Fin (csBlockDim i) → GenFlagAlg CG2 (csBlockSigma i)`.
@@ -7109,7 +7210,7 @@ that remain are:
 
 * **Sub-goal 1:** σ-locality of `csBlockSigma i` (`GenIsLocalType`).
   Needs a generic σ-locality theorem for CG2 σ-types of size ≤ 6;
-  278 instances total (62 size-4, 260 size-6, 2 size-2 per the cert).
+  278 instances total (2 of size 2, 16 of size 4, 260 of size 6).
 * **Sub-goal 3:** local support of `csBlockSqColumn i k` (per-k) and
   of the aggregate sum (`Σ_k D_k • column_k²`). Reduces to per-basis
   flag locality (`GenIsLocalFlag` for each `csBlockBasis i k`) chained
@@ -7177,28 +7278,45 @@ section decomposes that obligation into:
 * `csBlockSigma_isLocalType` — combines the two via `Bool.dichotomy`,
   the user-facing dispatcher consumed by `csBlock_in_cone_of_LDL`.
 
-**Coverage status (2026-05-12).** A computable check over all 278
-blocks (`csBlockSigma_BBEdge_count`) reports 211 blocks satisfy the
-BB-edge predicate (vacuously local) and 67 do not. The dichotomy
-therefore closes 211/278 blocks structurally; the remaining 67 are
-isolated to the named `csBlockSigma_isLocalType_no_BBEdge` lemma. -/
+**Coverage status — withdrawn 2026-10-02.** This read: a computable check
+(`csBlockSigma_BBEdge_count`) reports 211 of 278 blocks satisfy the BB-edge
+predicate and are vacuously local, so the dichotomy closes 211/278
+structurally and isolates the remaining 67.
+
+That was an artefact of the inverted colour decoder. The predicate was
+counting red–red edges; a *black*–black edge cannot occur at all, because the
+generator rejects one outright (`bounded_pentagon_alt_approach.rs:29-32`).
+`csBlockSigma_BBEdge_count` is now `= 0`, so **the vacuity route closes no
+blocks**, and a σ-locality argument has to cover all 278 rather than 67.
+
+What the corrected reading gives instead is better than what it takes: all
+278 σ-types are anchored (every connected component contains a black vertex),
+against 214 under the inverted reading, and all 278 satisfy the spanning-order
+predicate, against 214. -/
 
 /-- BB-edge predicate at the Nat level: there exist `a, b < csBlockSigmaSize i`
-with `a ≠ b`, an adjacency, and both colours equal to `1` (Lean's "black"). -/
+with `a ≠ b`, an adjacency, and both colours equal to `1` (`CG2`'s black).
+Since 2026-10-02 `csBlockSigmaCol` reads in the `CG2` convention, so this now
+means what its name says; it previously detected red–red edges. No σ-type
+satisfies it — see `csBlockSigma_BBEdge_count`. -/
 def csBlockSigmaHasBBEdgeBool (i : Fin 278) : Bool :=
   let n := PentagonQSigmaBasis.csBlockSigmaSize i
   (List.range n).any (fun a =>
     (List.range n).any (fun b =>
       a ≠ b &&
       PentagonQSigmaBasis.csBlockSigmaAdj i a b &&
-      decide (PentagonQSigmaBasis.csBlockSigmaColRaw i a = 1) &&
-      decide (PentagonQSigmaBasis.csBlockSigmaColRaw i b = 1)))
+      decide (PentagonQSigmaBasis.csBlockSigmaCol i a = 1) &&
+      decide (PentagonQSigmaBasis.csBlockSigmaCol i b = 1)))
 
 set_option linter.style.nativeDecide false in
-/-- 211/278 blocks have a BB-edge (vacuously local via black-independence). -/
+/-- **No** σ-type has a black–black edge, which is what the generator
+guarantees (`bounded_pentagon_alt_approach.rs:29-32` rejects any edge between
+two colour-`0` vertices).  This read `= 211` until 2026-10-02, when the σ
+colour decoder was inverted to the `CG2` convention: the predicate was then
+counting red–red edges, and 211 is how many blocks have one. -/
 theorem csBlockSigma_BBEdge_count :
     ((Finset.univ : Finset (Fin 278)).filter
-      (fun i => csBlockSigmaHasBBEdgeBool i = true)).card = 211 := by
+      (fun i => csBlockSigmaHasBBEdgeBool i = true)).card = 0 := by
   native_decide
 
 /-- A `Bool`-level witness implies the existential at the Lean level. -/
@@ -7207,8 +7325,8 @@ private theorem csBlockSigmaHasBBEdge_witness (i : Fin 278)
     ∃ a b : Fin (PentagonQSigmaBasis.csBlockSigma i).size,
       a ≠ b ∧
       PentagonQSigmaBasis.csBlockSigmaAdj i a.val b.val = true ∧
-      PentagonQSigmaBasis.csBlockSigmaColRaw i a.val = 1 ∧
-      PentagonQSigmaBasis.csBlockSigmaColRaw i b.val = 1 := by
+      PentagonQSigmaBasis.csBlockSigmaCol i a.val = 1 ∧
+      PentagonQSigmaBasis.csBlockSigmaCol i b.val = 1 := by
   unfold csBlockSigmaHasBBEdgeBool at h
   rw [List.any_eq_true] at h
   obtain ⟨a, ha_mem, ha_inner⟩ := h
@@ -7247,8 +7365,8 @@ private theorem csBlockSigma_str_BBEdge (i : Fin 278)
     rw [SimpleGraph.fromRel_adj]
     refine ⟨hne, ?_⟩
     left; exact hadj
-  · change PentagonQSigmaBasis.csBlockSigmaColRaw i a.val = (1 : Fin 2); exact hca
-  · change PentagonQSigmaBasis.csBlockSigmaColRaw i b.val = (1 : Fin 2); exact hcb
+  · change PentagonQSigmaBasis.csBlockSigmaCol i a.val = (1 : Fin 2); exact hca
+  · change PentagonQSigmaBasis.csBlockSigmaCol i b.val = (1 : Fin 2); exact hcb
 
 /-! ### Vacuous σ-locality engine (inlined; mirrors `linSum_vacuous_isLocalType`)
 
@@ -7721,7 +7839,7 @@ def csBlockSigmaRankArr (i : Fin 278) : Array Nat := Id.run do
   let mut counter : Nat := 0
   -- Step 1: assign rank `counter` to each black vertex.
   for v in List.range n do
-    if PentagonQSigmaBasis.csBlockSigmaColRaw i v = 1 then
+    if PentagonQSigmaBasis.csBlockSigmaCol i v = 1 then
       rank := rank.set! v counter
       counter := counter + 1
   -- Step 2: iterate up to `n` times; at each pass, find an unranked vertex
@@ -7751,10 +7869,287 @@ def csBlockSigmaHasSpanningOrderBool (i : Fin 278) : Bool :=
   (List.range n).all (fun v => csBlockSigmaRank i v < n) &&
   -- For every non-black v, ∃ adjacent w with rank w < rank v.
   (List.range n).all (fun v =>
-    decide (PentagonQSigmaBasis.csBlockSigmaColRaw i v = 1) ||
+    decide (PentagonQSigmaBasis.csBlockSigmaCol i v = 1) ||
     (List.range n).any (fun w =>
       PentagonQSigmaBasis.csBlockSigmaAdj i v w &&
       decide (csBlockSigmaRank i w < csBlockSigmaRank i v)))
+
+/-- **Regression (2026-10-03).**  Every one of the 278 σ-types admits a spanning
+vertex order rooted at a black vertex: every vertex is ranked, and every
+non-black vertex has an adjacent vertex of strictly smaller rank.
+
+This is the hypothesis the deleted `qbridge_sigma_local_via_ordering`
+(`d698895^:8027`) consumes, so it is the finite half of σ-locality.  Under the
+pre-2026-10-02 inverted colour decoder only **214** of 278 satisfied it, and
+the 64 failures were read as a genuine obstruction; they were an artefact of
+the convention.  See the development notes.
+
+It has no consumer until that engine is restored — this is a data-integrity
+regression in the spirit of `BasisDataIntegrity`, not a step in the proof. -/
+theorem csBlockSigma_allSpanningOrder :
+    ∀ i : Fin 278, csBlockSigmaHasSpanningOrderBool i = true := by
+  native_decide
+
+/-! ### σ-locality engine, restored 2026-10-03
+
+Recovered from `d698895^` (the engine and its helpers) and `436209e^` (the
+instantiation), deleted in May 2026 when an inverted colour reading made the
+σ-locality premise look false.  Under the corrected reading all 278 σ-types
+satisfy it — `csBlockSigma_allSpanningOrder` above.
+
+One semantic repair was needed: `brrbGenGraphClass` has since gained a fourth
+conjunct and changed `card ≤ sup` to `card = sup`, so destructuring the class
+now yields a conjunction and the bound needs `le_of_eq hBC.1`.
+
+These discharge `Step_F`'s `hσ` premise, and since 2026-10-03 they have a
+consumer: `csBlock_in_cone_of_LDL` (§Step G). -/
+
+private def csBlockSigmaRankFin (i : Fin 278) :
+    Fin (PentagonQSigmaBasis.csBlockSigma i).size → ℕ :=
+  fun k => csBlockSigmaRank i k.val
+
+/-- Lift the `Bool` spanning-order predicate to a Lean-level statement about
+`(csBlockSigma i).str`: every σ-vertex `k` is either black or has a
+strictly-lower-ranked adjacent vertex. -/
+private theorem csBlockSigma_spanningOrder (i : Fin 278)
+    (h : csBlockSigmaHasSpanningOrderBool i = true) :
+    ∀ k : Fin (PentagonQSigmaBasis.csBlockSigma i).size,
+      (PentagonQSigmaBasis.csBlockSigma i).str.2 k = (1 : Fin 2) ∨
+      ∃ j : Fin (PentagonQSigmaBasis.csBlockSigma i).size,
+        csBlockSigmaRankFin i j < csBlockSigmaRankFin i k ∧
+        (PentagonQSigmaBasis.csBlockSigma i).str.1.Adj j k := by
+  unfold csBlockSigmaHasSpanningOrderBool at h
+  rw [Bool.and_eq_true] at h
+  obtain ⟨_hAllRanked, hOrd⟩ := h
+  rw [List.all_eq_true] at hOrd
+  intro k
+  have hsize_eq : (PentagonQSigmaBasis.csBlockSigma i).size =
+      PentagonQSigmaBasis.csBlockSigmaSize i := rfl
+  have hk_mem : k.val ∈ List.range (PentagonQSigmaBasis.csBlockSigmaSize i) := by
+    rw [List.mem_range]; exact hsize_eq ▸ k.isLt
+  have hk := hOrd _ hk_mem
+  rw [Bool.or_eq_true] at hk
+  rcases hk with hcol | hadj
+  · left
+    rw [decide_eq_true_eq] at hcol
+    change PentagonQSigmaBasis.csBlockSigmaCol i k.val = (1 : Fin 2)
+    exact hcol
+  · right
+    rw [List.any_eq_true] at hadj
+    obtain ⟨j, hj_mem, hj_cond⟩ := hadj
+    rw [List.mem_range] at hj_mem
+    rw [Bool.and_eq_true] at hj_cond
+    obtain ⟨hj_adj, hj_rank⟩ := hj_cond
+    rw [decide_eq_true_eq] at hj_rank
+    have hj_lt_n : j < (PentagonQSigmaBasis.csBlockSigma i).size := by
+      rw [hsize_eq]; omega
+    -- Note: from j adjacent (csBlockSigmaAdj i v w = true) the SimpleGraph.fromRel
+    -- adjacency must have j ≠ k. The rank strict inequality gives j ≠ k as a corollary.
+    have hj_ne_k : j ≠ k.val := by
+      intro h_eq; rw [h_eq] at hj_rank; omega
+    refine ⟨⟨j, hj_lt_n⟩, ?_, ?_⟩
+    · show csBlockSigmaRank i j < csBlockSigmaRank i k.val; exact hj_rank
+    · -- (csBlockSigma i).str.1.Adj ⟨j, _⟩ k via SimpleGraph.fromRel
+      change (SimpleGraph.fromRel (fun u v : Fin _ =>
+        PentagonQSigmaBasis.csBlockSigmaAdj i u.val v.val)).Adj ⟨j, hj_lt_n⟩ k
+      rw [SimpleGraph.fromRel_adj]
+      refine ⟨?_, ?_⟩
+      · intro h_eq
+        have : j = k.val := Fin.mk.injEq .. |>.mp h_eq
+        exact hj_ne_k this
+      · -- hj_adj : csBlockSigmaAdj i k.val j = true; we need rel ⟨j,_⟩ k ∨ rel k ⟨j,_⟩.
+        -- rel a b := csBlockSigmaAdj i a.val b.val. So rel k ⟨j,_⟩ = csBlockSigmaAdj i k.val j.
+        right; exact hj_adj
+
+/-- HEq adjacency transport: if `s : R.Str n`, `t : R.Str m` with `n = m`, `HEq s t`,
+and `i.val = i'.val`, `j.val = j'.val`, then `s.1.Adj i j ↔ t.1.Adj i' j'`. -/
+private theorem qbridge_heq_adj_transport
+    {n m : ℕ} (s : CG2.Str n) (t : CG2.Str m) (hn : n = m)
+    (hs : HEq s t) (i j : Fin n) (i' j' : Fin m)
+    (hi : i.val = i'.val) (hj : j.val = j'.val) :
+    s.1.Adj i j → t.1.Adj i' j' := by
+  intro hadj
+  subst hn
+  have hii : i = i' := Fin.ext hi; subst hii
+  have hjj : j = j' := Fin.ext hj; subst hjj
+  rwa [← congr_arg Prod.fst (eq_of_heq hs)]
+
+/-- HEq colour transport. -/
+private theorem qbridge_heq_col_transport
+    {n m : ℕ} (s : CG2.Str n) (t : CG2.Str m) (hn : n = m)
+    (hs : HEq s t) (i : Fin n) (j : Fin m) (hij : i.val = j.val) :
+    s.2 i = t.2 j := by
+  subst hn
+  have hij' : i = j := Fin.ext hij; subst hij'
+  exact congr_fun (congr_arg Prod.snd (eq_of_heq hs)) i
+
+open Classical in
+set_option maxHeartbeats 800000 in
+/-- **Generic σ-locality via spanning order.** For any σ-type `σ_template`
+with a "rank" function `rank` such that every σ-vertex `k` is either black,
+or has a strictly-lower-ranked adjacent σ-vertex, `σ_template` is a local
+type in `brrbGenGraphClass`.
+
+Proof: joint induction on the unlabelled size of any flag `G` with
+`G.forget = F.forget`. At each step, decompose `G`'s bounded density by
+case-splitting on the lowest-ranked unlabelled σ-vertex. If all σ-vertices
+are labelled, use `qbridge_genBoundedDensity_of_superset_labels`. Else find
+the minimum-rank unlabelled σ-vertex `k`; by the spanning-order property,
+`k` is either black (bound via blackCount ≤ Δ) or adjacent to some `j` with
+`rank j < rank k` (which must itself be labelled, since `k` is minimal-rank
+unlabelled — bound via maxDegree ≤ Δ). -/
+private theorem qbridge_sigma_local_via_ordering
+    (σ_template : GenFlagType CG2)
+    (rank : Fin σ_template.size → ℕ)
+    (hOrd : ∀ k : Fin σ_template.size,
+      σ_template.str.2 k = (1 : Fin 2) ∨
+      ∃ j : Fin σ_template.size, rank j < rank k ∧ σ_template.str.1.Adj j k) :
+    GenIsLocalType σ_template brrbGenGraphClass brrbGenDelta := by
+  intro F hF
+  -- Joint induction on G.unlabelledSize across all G with G.forget = F.forget.
+  suffices aux : ∀ m : ℕ, ∀ (τ : GenFlagType CG2) (G : GenFlag CG2 τ),
+      G.forget = F.forget → G.unlabelledSize ≤ m →
+      GenIsLocalFlag τ G brrbGenGraphClass brrbGenDelta from
+    aux F.forget.unlabelledSize (GenFlagType.empty CG2) F.forget rfl le_rfl
+  intro m
+  induction m with
+  | zero =>
+    intro τ G _hG hm
+    have hsz : G.size = τ.size := by
+      unfold GenFlag.unlabelledSize at hm; have := G.hsize; omega
+    exact qbridge_genIsLocalFlag_of_fully_labeled
+      (qbridge_genBoundedDensity_fully_labeled hsz) hsz
+  | succ m ih =>
+    intro τ G hG hm
+    apply GenIsLocalFlag.intro
+    · -- Bounded density of G at τ.
+      have hGF_size : G.size = F.size := congrArg GenFlag.size hG
+      have hGF_str : HEq G.str F.str := by show HEq G.forget.str F.forget.str; rw [hG]
+      have hσle : σ_template.size ≤ F.size := F.hsize
+      -- Try IH first if G has spare unlabelledSize headroom.
+      by_cases hm_full : G.size - τ.size ≤ m
+      · -- G.unlabelledSize ≤ m → IH gives locality (and bounded density via .bounded).
+        exact (ih τ G hG (show G.unlabelledSize ≤ m by
+          unfold GenFlag.unlabelledSize; exact hm_full)).bounded
+      · push_neg at hm_full
+        -- G is "tight" at unlabelledSize = m+1. Decompose by σ-vertex labelling.
+        -- For each k : Fin σ_template.size, define wk : Fin G.size.
+        let wk : Fin σ_template.size → Fin G.size :=
+          fun k => ⟨(F.embedding k).val, by have := (F.embedding k).isLt; omega⟩
+        -- Set of σ-indices whose wk is unlabelled in G.
+        let unlabelledSet : Finset (Fin σ_template.size) :=
+          Finset.univ.filter (fun k => wk k ∉ Set.range G.embedding)
+        by_cases hue : unlabelledSet.Nonempty
+        · -- Find unlabelled σ-vertex with minimum rank.
+          -- Image of unlabelledSet under rank is a nonempty Finset ℕ.
+          have hue_image : (unlabelledSet.image rank).Nonempty := hue.image rank
+          let rmin : ℕ := (unlabelledSet.image rank).min' hue_image
+          have hrmin_mem : rmin ∈ unlabelledSet.image rank :=
+            (unlabelledSet.image rank).min'_mem hue_image
+          obtain ⟨kmin, hkmin_mem, hkmin_rank⟩ := Finset.mem_image.mp hrmin_mem
+          have hkmin_unlab : wk kmin ∉ Set.range G.embedding := by
+            have := Finset.mem_filter.mp hkmin_mem; exact this.2
+          -- Every σ-vertex with strictly smaller rank is labelled in G.
+          have h_smaller_labelled : ∀ j : Fin σ_template.size, rank j < rank kmin →
+              wk j ∈ Set.range G.embedding := by
+            intro j hj
+            by_contra hj_unlab
+            have hj_in : j ∈ unlabelledSet :=
+              Finset.mem_filter.mpr ⟨Finset.mem_univ _, hj_unlab⟩
+            have hj_image : rank j ∈ unlabelledSet.image rank :=
+              Finset.mem_image.mpr ⟨j, hj_in, rfl⟩
+            have hrmin_le : rmin ≤ rank j :=
+              (unlabelledSet.image rank).min'_le _ hj_image
+            -- hkmin_rank : rank kmin = rmin; hj : rank j < rank kmin
+            -- So rank j < rmin, contradicting rmin ≤ rank j.
+            omega
+          -- Setup extension at wk kmin.
+          have hext_unl :
+              (GenLabelExtension.mk (wk kmin) hkmin_unlab).extendedFlag.unlabelledSize ≤ m := by
+            unfold GenFlag.unlabelledSize
+            change G.size - (τ.size + 1) ≤ m
+            unfold GenFlag.unlabelledSize at hm; omega
+          have hext_bd :=
+            (ih _ (GenLabelExtension.mk (wk kmin) hkmin_unlab).extendedFlag hG
+              hext_unl).bounded
+          -- Apply hOrd kmin and dispatch.
+          rcases hOrd kmin with hcol | ⟨jord, hj_lt, hadj⟩
+          · -- Case: kmin is black. Bound e(wk kmin) via blackCount ≤ Δ.
+            -- First, prove wk kmin is black in G.
+            have hF_col : F.str.2 (F.embedding kmin) = (1 : Fin 2) := by
+              change (F.str.2 ∘ F.embedding) kmin = (1 : Fin 2)
+              have hsnd_eq : F.str.2 ∘ F.embedding = σ_template.str.2 :=
+                congr_arg Prod.snd F.isInduced
+              rw [hsnd_eq]; exact hcol
+            have hG_col : G.str.2 (wk kmin) = (1 : Fin 2) := by
+              rw [qbridge_heq_col_transport G.str F.str hGF_size hGF_str
+                (wk kmin) (F.embedding kmin) rfl]
+              exact hF_col
+            exact qbridge_genBoundedDensity_of_vertex_decomp (wk kmin) hkmin_unlab hext_bd
+              (fun H => Finset.univ.filter (fun p : Fin H.size => H.str.2 p = (1 : Fin 2)))
+              (fun H _hH e => by
+                simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+                have he_col : (CG2.comap e.toFun H.str).2 (wk kmin) = G.str.2 (wk kmin) := by
+                  rw [e.isInduced]
+                simp only [colouredGraphUniverse, Function.comp] at he_col
+                rw [he_col, hG_col])
+              (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
+          · -- Case: ∃ jord < kmin with σ.adj jord kmin. wk jord is labelled.
+            have hj_labelled : wk jord ∈ Set.range G.embedding :=
+              h_smaller_labelled jord hj_lt
+            obtain ⟨i_j, hi_j⟩ := hj_labelled
+            -- σ.adj jord kmin → F.adj (F.emb jord) (F.emb kmin) → G.adj (wk jord) (wk kmin).
+            have hF_adj : F.str.1.Adj (F.embedding jord) (F.embedding kmin) := by
+              have h1 : (F.str.1.comap F.embedding).Adj jord kmin := by
+                change (CG2.comap F.embedding F.str).1.Adj jord kmin
+                rw [F.isInduced]; exact hadj
+              simp only [SimpleGraph.comap_adj] at h1; exact h1
+            have hadj_G : G.str.1.Adj (wk jord) (wk kmin) := by
+              apply qbridge_heq_adj_transport F.str G.str hGF_size.symm hGF_str.symm
+                (F.embedding jord) (F.embedding kmin) (wk jord) (wk kmin) rfl rfl hF_adj
+            exact qbridge_genBoundedDensity_of_vertex_decomp (wk kmin) hkmin_unlab hext_bd
+              (fun H => Finset.univ.filter (fun p => H.str.1.Adj (H.embedding i_j) p))
+              (fun H _hH e => by
+                simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+                have he_adj : H.str.1.Adj (e.toFun (wk jord)) (e.toFun (wk kmin)) := by
+                  have h_eq : H.str.1.comap e.toFun = G.str.1 :=
+                    congr_arg Prod.fst e.isInduced
+                  have : (H.str.1.comap e.toFun).Adj (wk jord) (wk kmin) :=
+                    h_eq ▸ hadj_G
+                  rwa [SimpleGraph.comap_adj] at this
+                have he_j : e.toFun (wk jord) = H.embedding i_j := by
+                  have := e.compat i_j; rw [hi_j] at this; exact this
+                rw [he_j] at he_adj; exact he_adj)
+              (fun H _hH => Finset.le_sup
+                (f := fun v => (Finset.univ.filter (H.str.1.Adj v)).card)
+                (Finset.mem_univ (H.embedding i_j)))
+        · -- All σ-vertices are labelled in G → superset_labels.
+          refine qbridge_genBoundedDensity_of_superset_labels hF hGF_size hGF_str (fun k => ?_)
+          have hk_labelled : wk k ∈ Set.range G.embedding := by
+            by_contra hk_unlab
+            have hk_in : k ∈ unlabelledSet :=
+              Finset.mem_filter.mpr ⟨Finset.mem_univ _, hk_unlab⟩
+            exact hue ⟨k, hk_in⟩
+          obtain ⟨jt, hjt⟩ := hk_labelled
+          exact ⟨jt, congr_arg Fin.val hjt⟩
+    · -- Extensions: use IH.
+      intro ext
+      apply ih ext.extendedType ext.extendedFlag hG
+      unfold GenFlag.unlabelledSize at hm ⊢
+      change G.size - (τ.size + 1) ≤ m; omega
+
+/-- **σ-locality of `csBlockSigma i`** for blocks with a spanning order
+(every σ-vertex is either black or has a strictly-lower-ranked adjacent
+vertex, where rank is the BFS rank from black vertices). Closed by
+`qbridge_sigma_local_via_ordering` after lifting the decidable `Bool`
+predicate to the Lean-level spanning-order property. -/
+theorem csBlockSigma_isLocalType_of_spanningOrder (i : Fin 278)
+    (h : csBlockSigmaHasSpanningOrderBool i = true) :
+    GenIsLocalType (PentagonQSigmaBasis.csBlockSigma i)
+      brrbGenGraphClass brrbGenDelta :=
+  qbridge_sigma_local_via_ordering _ (csBlockSigmaRankFin i)
+    (csBlockSigma_spanningOrder i h)
+
 
 def csBlockBasisHasBBEdgeBool (i : Fin 278)
     (p : Fin (PentagonQSigmaBasis.csBlockDim i)) : Bool :=
@@ -7766,8 +8161,13 @@ def csBlockBasisRankArr (i : Fin 278)
     (p : Fin (PentagonQSigmaBasis.csBlockDim i)) : Array Nat := Id.run do
   let n := PentagonQSigmaBasis.csBlockOuterSize i
   let bm : Nat := (PentagonQSigmaBasis.csBlockBasisAdj i)[p.val]!
+  -- `CG2` black is the *clear* bit (the generator packs 0 = black), so this is
+  -- the `Bool` reading of `PentagonQBasis.colourOfBit … = 1`.  Kept as a direct
+  -- negation rather than routed through `colourOfBit`: that primitive is
+  -- `Bool → Fin 2`, and forcing a `Bool` closure through it buys no safety and
+  -- changes a definition two `native_decide`s depend on.
   let isBlack : Nat → Bool := fun v =>
-    PentagonQBasis.bitAt bm (sigmaBasisEdgeBits + v)
+    !PentagonQBasis.bitAt bm (sigmaBasisEdgeBits i + v)
   let edge : Nat → Nat → Bool := fun u v =>
     if u < v then PentagonQBasis.bitAt bm (PentagonQSigmaBasis.sigmaEdgeIdx u v)
     else if v < u then PentagonQBasis.bitAt bm (PentagonQSigmaBasis.sigmaEdgeIdx v u)
@@ -7807,8 +8207,13 @@ def csBlockBasisHasSpanningOrderBool (i : Fin 278)
     (p : Fin (PentagonQSigmaBasis.csBlockDim i)) : Bool :=
   let n := PentagonQSigmaBasis.csBlockOuterSize i
   let bm : Nat := (PentagonQSigmaBasis.csBlockBasisAdj i)[p.val]!
+  -- `CG2` black is the *clear* bit (the generator packs 0 = black), so this is
+  -- the `Bool` reading of `PentagonQBasis.colourOfBit … = 1`.  Kept as a direct
+  -- negation rather than routed through `colourOfBit`: that primitive is
+  -- `Bool → Fin 2`, and forcing a `Bool` closure through it buys no safety and
+  -- changes a definition two `native_decide`s depend on.
   let isBlack : Nat → Bool := fun v =>
-    PentagonQBasis.bitAt bm (sigmaBasisEdgeBits + v)
+    !PentagonQBasis.bitAt bm (sigmaBasisEdgeBits i + v)
   let edge : Nat → Nat → Bool := fun u v =>
     if u < v then PentagonQBasis.bitAt bm (PentagonQSigmaBasis.sigmaEdgeIdx u v)
     else if v < u then PentagonQBasis.bitAt bm (PentagonQSigmaBasis.sigmaEdgeIdx v u)
@@ -7979,7 +8384,7 @@ private theorem cg2_sizeN_vertexOrderBound_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2)) with hB_def
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v) with hN_def
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   -- Destructure F, subst F.size = n.
@@ -8443,7 +8848,23 @@ private theorem csBlockBasis_str_boundedDensity_no_BBEdge_spanningOrder
       _ ≤ (7 ^ 7 * Nat.choose Δ' k' : ℝ) :=
           mul_le_mul_of_nonneg_right (by exact_mod_cast hkk) (Nat.cast_nonneg _)
 
-/- **Per-basis σ-flag bounded density** for basis flags WITHOUT a
+/- **Withdrawn 2026-10-02.** This read: per-basis σ-flag bounded density for
+the 2634 of 10387 basis flags with neither a BB-edge nor a spanning order is
+FALSE in the literal `GenIsBoundedDensity` sense, those flags having an
+isolated red σ-vertex whose density grows as `Ω(Δ²)`.
+
+Both counts came from the inverted colour decoder and the wrong colour-bit
+offset. Under the corrected reading **no** basis flag lacks both: the
+population is 2634 → 0, and the spanning-order predicate holds for all 10387
+rather than 6617. The isolated vertices in question are *black*, hence
+anchored, hence harmless — the obstruction described below does not exist.
+
+The deletions and the judgement recorded in the rest of this comment were
+made on that false premise and should be re-examined before they are relied
+on; see the development notes. The original text
+follows.
+
+**Per-basis σ-flag bounded density** for basis flags WITHOUT a
 BB-edge AND WITHOUT a spanning order (2634 of 10387 basis flags) is
 **FALSE** in the literal `GenIsBoundedDensity` sense — these basis
 flags have an isolated red σ-vertex (at the basis-flag layer) whose
@@ -8466,7 +8887,362 @@ axiomatising the leaf would risk inconsistency.
 The per-block cone-membership route (the `csBlock_alg_in_cone_axiom`
 axiom + `csBlock_in_cone_of_LDL`/`pentagon_Q_cone_membership` chain) was
 a dead alternative path, never consumed by `pentagon_bound_full` (which
-goes through `phi_evalAlg_O_Q_alg_le_bound`), and has been excised. -/
+goes through `phi_evalAlg_O_Q_alg_le_bound`), and was excised.
+
+`csBlock_in_cone_of_LDL` alone came back on 2026-10-03 (§Step G), now proved
+rather than axiomatised. `pentagon_Q_cone_membership` did **not**, and should
+not: it concluded `0 ≤ φ(O_Q_alg)`, which is free from `O_Q_coef ≥ 0` and
+proves nothing. The restored helper has the opposite standing — its σ-locality
+premise was believed false for 26 blocks until the colour repair, so the
+sum-of-squares shape gives none of it. -/
+
+/-! ### Basis-flag locality (`hlocal`), restored 2026-10-03
+
+The `hlocal` leg of the σ-locality obligation, companion to the engine above.
+Recovered from `436209e^:9175-9395`, deleted in May 2026 alongside the σ-leg.
+
+Two pieces are **not** restores. `436209e^`'s chain dispatched on a BB-edge
+dichotomy whose no-spanning-order arm was `sorry`-bodied and false — it
+asserted unbounded density for the 2,634 flags that, under the inverted colour
+decoder, appeared to have neither a BB-edge nor a spanning order. Under the
+corrected decoder that population is **0**: every one of the 10,387 σ-typed
+basis flags has a spanning order. So the dichotomy is dead, and
+`csBlockBasis_str_boundedDensity` below is a direct call to the surviving
+`..._no_BBEdge_spanningOrder` rather than a case split. The four pieces that
+implemented the dichotomy are discarded, not restored. -/
+
+/-- **Regression (2026-10-03).** Every one of the 10,387 σ-typed basis flags
+admits a spanning vertex order rooted at a black vertex. The basis-flag
+companion to `csBlockSigma_allSpanningOrder`; under the pre-2026-10-02
+inverted decoder only 8,275 did. -/
+theorem csBlockBasis_allSpanningOrder :
+    ∀ (i : Fin 278) (p : Fin (PentagonQSigmaBasis.csBlockDim i)),
+      csBlockBasisHasSpanningOrderBool i p = true := by
+  native_decide
+
+/-- Bounded density for every σ-typed basis flag.
+
+Signature is `436209e^:9162`'s verbatim; only the body differs. That version
+case-split on `csBlockBasisHasBBEdgeBool`; this one applies the spanning-order
+branch directly, which is sound because `csBlockBasis_allSpanningOrder`
+discharges its hypothesis for all 10,387 flags and the surviving theorem takes
+no `hNotBB`. -/
+private theorem csBlockBasis_str_boundedDensity (i : Fin 278)
+    (p : Fin (PentagonQSigmaBasis.csBlockDim i))
+    (τ : GenFlagType CG2) (F : GenFlag CG2 τ)
+    (hsize : F.size = PentagonQSigmaBasis.csBlockOuterSize i)
+    (hstr : HEq F.str ((csBlockBasisCGraph i p).toGenFlag.str)) :
+    GenIsBoundedDensity τ F brrbGenGraphClass brrbGenDelta :=
+  csBlockBasis_str_boundedDensity_no_BBEdge_spanningOrder i p
+    (csBlockBasis_allSpanningOrder i p) τ F hsize hstr
+/-- **σ-typed analogue of `flagBasis_isLocalFlag`** (locality of basis flags).
+
+Every flag class in `(csBlockBasis i p).support` is local at type
+`csBlockSigma i` in `brrbGenGraphClass`.
+
+**Proof structure** (mirrors `flagBasis_isLocalFlag`, PentagonQBridge:9608):
+
+* By `Classical.byCases` on the `csBlockBasis` definition's inner
+  guard, `csBlockBasis i p` is either `GenFlagAlg.single F` for some
+  σ-typed flag `F = (csBlockBasisCGraph i p).toTypedGenFlag _ hle hstr`,
+  or `0` (the cert-fallback branch).
+
+* In the `0` case, `Finsupp.support_zero = ∅` makes `hcls` impossible.
+
+* In the `single F` case, `Finsupp.support_single_subset` puts
+  `cls ∈ {GenFlagClass.mk F}`, so `cls = GenFlagClass.mk F`.
+  `GenIsLocalFlag_flagIso` then transfers locality from `F` to
+  `cls.out` via the canonical `(mk F).out ≈ F` quotient iso.
+
+* `GenIsLocalFlag (csBlockSigma i) F` itself is proved by strong
+  induction on `F.unlabelledSize` (= `csBlockOuterSize i - csBlockSigmaSize i`,
+  bounded by 5 for all 278 blocks), using
+  `csBlockBasis_str_boundedDensity` at every layer (the underlying
+  `str` is preserved through `GenLabelExtension`, so the same per-flag
+  witness applies).
+
+**Status (restored 2026-10-03):** closed. The per-flag bounded-density leaf
+`csBlockBasis_str_boundedDensity` is discharged above, directly from the
+spanning-order branch, so nothing here is left modulo anything. -/
+theorem csBlockBasis_isLocalFlag_support (i : Fin 278)
+    (p : Fin (PentagonQSigmaBasis.csBlockDim i)) :
+    ∀ cls ∈ (csBlockBasis i p).support,
+      GenIsLocalFlag (PentagonQSigmaBasis.csBlockSigma i) cls.out
+        brrbGenGraphClass brrbGenDelta := by
+  classical
+  intro cls hcls
+  -- Abbreviate the σ-type, outer size, and underlying CGraph.
+  -- Use `let` (not `set`) so that subsequent rewrites preserve definitional
+  -- equality at the level of `hcls`'s type.
+  let σ : GenFlagType CG2 := PentagonQSigmaBasis.csBlockSigma i
+  let n : ℕ := PentagonQSigmaBasis.csBlockOuterSize i
+  let G : CGraph n := csBlockBasisCGraph i p
+  -- Split on the two `Classical.byCases` guards that appear in
+  -- `csBlockBasis`. In the active branch we get a concrete `single F`;
+  -- in the two fallback branches the support is empty.
+  by_cases hle : σ.size ≤ n
+  · by_cases hstr :
+        CG2.comap (Fin.castLE hle)
+            (⟨SimpleGraph.fromRel (fun i j : Fin n => G.adj i j), G.col⟩ : CG2.Str n)
+          = σ.str
+    · -- Active branch: `csBlockBasis i p = GenFlagAlg.single F`.
+      let F : GenFlag CG2 σ := G.toTypedGenFlag σ hle hstr
+      have hbasis_eq : csBlockBasis i p = GenFlagAlg.single F := by
+        show (csBlockBasis i p : GenFlagAlg CG2 σ) = GenFlagAlg.single F
+        change (by classical
+          by_cases h1 : σ.size ≤ n
+          · by_cases h2 :
+                CG2.comap (Fin.castLE h1)
+                    (⟨SimpleGraph.fromRel (fun i j : Fin n => G.adj i j), G.col⟩ :
+                      CG2.Str n)
+                  = σ.str
+            · exact GenFlagAlg.single (G.toTypedGenFlag σ h1 h2)
+            · exact 0
+          · exact 0 : GenFlagAlg CG2 σ) = GenFlagAlg.single F
+        rw [dif_pos hle, dif_pos hstr]
+      rw [hbasis_eq] at hcls
+      -- support of `single F` ⊆ {GenFlagClass.mk F}.
+      have hsub : (GenFlagAlg.single F).support ⊆
+          ({GenFlagClass.mk F} : Finset (GenFlagClass CG2 σ)) := by
+        unfold GenFlagAlg.single
+        exact Finsupp.support_single_subset
+      have hsupp : cls ∈ ({GenFlagClass.mk F} : Finset (GenFlagClass CG2 σ)) :=
+        hsub hcls
+      rw [Finset.mem_singleton] at hsupp
+      subst hsupp
+      -- Goal: GenIsLocalFlag σ (GenFlagClass.mk F).out brrbGenGraphClass brrbGenDelta.
+      -- Transfer locality from F via the canonical iso F ≈ (mk F).out
+      -- (the `.symm` of `Quotient.exact (Quotient.out_eq _)`).
+      have hiso_raw : GenFlagIso σ (GenFlagClass.mk F).out F :=
+        Quotient.exact (Quotient.out_eq (GenFlagClass.mk F))
+      apply GenIsLocalFlag_flagIso hiso_raw.symm
+      -- Goal: GenIsLocalFlag σ F brrbGenGraphClass brrbGenDelta.
+      -- Strong induction on F.unlabelledSize, mirroring `flagBasis_isLocalFlag`.
+      -- Key invariants: H.size = n (= csBlockOuterSize i) and
+      -- HEq H.str G.toGenFlag.str. Both are preserved through extensions
+      -- (`ext.extendedFlag.size = H.size`, `ext.extendedFlag.str = H.str`).
+      suffices aux : ∀ k (τ : GenFlagType CG2) (H : GenFlag CG2 τ),
+          H.size = n →
+          HEq H.str G.toGenFlag.str →
+          H.unlabelledSize ≤ k →
+          GenIsLocalFlag τ H brrbGenGraphClass brrbGenDelta from
+        aux F.unlabelledSize σ F rfl HEq.rfl le_rfl
+      intro k; induction k with
+      | zero =>
+        intro τ H hHsize hHstr hHn
+        -- unlabelledSize = 0 means fully labelled (H.size = τ.size).
+        have hH_eq : H.size = τ.size := by
+          unfold GenFlag.unlabelledSize at hHn
+          have := H.hsize; omega
+        refine GenIsLocalFlag.intro τ H brrbGenGraphClass brrbGenDelta ?_ ?_
+        · -- Bounded density at fully-labelled H.
+          exact csBlockBasis_str_boundedDensity i p τ H hHsize hHstr
+        · -- No extensions possible: H.embedding is surjective.
+          intro ext
+          exfalso
+          have hsurj : Function.Surjective H.embedding :=
+            H.embedding.injective.surjective_of_finite (finCongr hH_eq.symm)
+          exact ext.unlabelled (hsurj ext.vertex)
+      | succ k ih =>
+        intro τ H hHsize hHstr hHn
+        refine GenIsLocalFlag.intro τ H brrbGenGraphClass brrbGenDelta ?_ ?_
+        · -- Bounded density at H.
+          exact csBlockBasis_str_boundedDensity i p τ H hHsize hHstr
+        · -- Recurse into each extension; size and str are preserved.
+          intro ext
+          apply ih ext.extendedType ext.extendedFlag
+          · -- ext.extendedFlag.size = H.size = n.
+            change H.size = n; exact hHsize
+          · -- HEq ext.extendedFlag.str G.toGenFlag.str via H.str = ext.extendedFlag.str.
+            change HEq H.str G.toGenFlag.str; exact hHstr
+          · -- ext.extendedFlag.unlabelledSize = H.size - (τ.size + 1) ≤ k.
+            unfold GenFlag.unlabelledSize at hHn ⊢
+            change H.size - (τ.size + 1) ≤ k; omega
+    · -- Inactive branch (hstr fails): csBlockBasis i p = 0.
+      have hbasis_eq : csBlockBasis i p = (0 : GenFlagAlg CG2 σ) := by
+        show (csBlockBasis i p : GenFlagAlg CG2 σ) = 0
+        change (by classical
+          by_cases h1 : σ.size ≤ n
+          · by_cases h2 :
+                CG2.comap (Fin.castLE h1)
+                    (⟨SimpleGraph.fromRel (fun i j : Fin n => G.adj i j), G.col⟩ :
+                      CG2.Str n)
+                  = σ.str
+            · exact GenFlagAlg.single (G.toTypedGenFlag σ h1 h2)
+            · exact 0
+          · exact 0 : GenFlagAlg CG2 σ) = 0
+        rw [dif_pos hle, dif_neg hstr]
+      rw [hbasis_eq, Finsupp.support_zero] at hcls
+      exact absurd hcls (by simp)
+  · -- Inactive branch (hle fails): csBlockBasis i p = 0.
+    have hbasis_eq : csBlockBasis i p = (0 : GenFlagAlg CG2 σ) := by
+      show (csBlockBasis i p : GenFlagAlg CG2 σ) = 0
+      change (by classical
+        by_cases h1 : σ.size ≤ n
+        · by_cases h2 :
+              CG2.comap (Fin.castLE h1)
+                  (⟨SimpleGraph.fromRel (fun i j : Fin n => G.adj i j), G.col⟩ :
+                    CG2.Str n)
+                = σ.str
+          · exact GenFlagAlg.single (G.toTypedGenFlag σ h1 h2)
+          · exact 0
+        · exact 0 : GenFlagAlg CG2 σ) = 0
+      rw [dif_neg hle]
+    rw [hbasis_eq, Finsupp.support_zero] at hcls
+    exact absurd hcls (by simp)
+
+/-- **Local support of `csBlockSqColumn i k`** (restored 2026-10-03).
+
+The k-th column is `Σ_p csBlockL i p k • csBlockBasis i p`; its support
+reduces via `Finsupp.support_finset_sum` + `Finsupp.support_smul` to
+the per-`p` support of `csBlockBasis i p`, dispatched to
+`csBlockBasis_isLocalFlag_support`. -/
+theorem csBlockSqColumn_local_support (i : Fin 278)
+    (k : Fin (PentagonQSigmaBasis.csBlockDim i)) :
+    ∀ cls ∈ (csBlockSqColumn i k).support,
+      GenIsLocalFlag (PentagonQSigmaBasis.csBlockSigma i) cls.out
+        brrbGenGraphClass brrbGenDelta := by
+  classical
+  intro cls hcls
+  unfold csBlockSqColumn at hcls
+  -- Apply Finsupp.support_finset_sum to get cls ∈ biUnion over p of (smul).support.
+  have hbU : cls ∈
+      (Finset.univ : Finset (Fin (PentagonQSigmaBasis.csBlockDim i))).biUnion
+        (fun p => (csBlockL i p.val k.val • csBlockBasis i p).support) :=
+    Finsupp.support_finset_sum hcls
+  rw [Finset.mem_biUnion] at hbU
+  obtain ⟨p, _hp_mem, hcls_p⟩ := hbU
+  -- The smul support is ⊆ the underlying support.
+  have hcls_basis : cls ∈ (csBlockBasis i p).support :=
+    Finsupp.support_smul hcls_p
+  exact csBlockBasis_isLocalFlag_support i p cls hcls_basis
+
+/-- **Local support of `(csBlockSqColumn i k).mul (csBlockSqColumn i k)`** (restored 2026-10-03).
+
+The k-th column squared. Reduces via `genMul_local_support` to the
+per-k local support of `csBlockSqColumn i k`. -/
+theorem csBlockSqColumn_sq_local_support (i : Fin 278)
+    (k : Fin (PentagonQSigmaBasis.csBlockDim i)) :
+    ∀ cls ∈ ((csBlockSqColumn i k).mul (csBlockSqColumn i k)).support,
+      GenIsLocalFlag (PentagonQSigmaBasis.csBlockSigma i) cls.out
+        brrbGenGraphClass brrbGenDelta := by
+  intro cls hcls
+  exact genMul_local_support (csBlockSqColumn i k) (csBlockSqColumn i k)
+    brrbGenGraphClass brrbGenDelta
+    (csBlockSqColumn_local_support i k)
+    (csBlockSqColumn_local_support i k) cls hcls
+
+/-- **Local support of the aggregate `Σ_k D_k • column_k²`** (restored 2026-10-03).
+
+The body of `genAveragingAlg σ_i` is `Σ_k csBlockD i k • column_k²`.
+Reduces via `Finsupp.support_finset_sum` + `Finsupp.support_smul` to
+the per-k local support of `column_k²` (= `csBlockSqColumn_sq_local_support`). -/
+theorem csBlock_inner_local_support (i : Fin 278) :
+    ∀ cls ∈
+      ((Finset.univ : Finset (Fin (PentagonQSigmaBasis.csBlockDim i))).sum
+        (fun k =>
+          csBlockD i k.val •
+            (csBlockSqColumn i k).mul (csBlockSqColumn i k))).support,
+      GenIsLocalFlag (PentagonQSigmaBasis.csBlockSigma i) cls.out
+        brrbGenGraphClass brrbGenDelta := by
+  classical
+  intro cls hcls
+  have hbU : cls ∈
+      (Finset.univ : Finset (Fin (PentagonQSigmaBasis.csBlockDim i))).biUnion
+        (fun k => (csBlockD i k.val •
+          (csBlockSqColumn i k).mul (csBlockSqColumn i k)).support) :=
+    Finsupp.support_finset_sum hcls
+  rw [Finset.mem_biUnion] at hbU
+  obtain ⟨k, _hk_mem, hcls_k⟩ := hbU
+  have hcls_sq : cls ∈ ((csBlockSqColumn i k).mul (csBlockSqColumn i k)).support :=
+    Finsupp.support_smul hcls_k
+  exact csBlockSqColumn_sq_local_support i k cls hcls_sq
+
+/-! ### Step G — Composition: `csBlock_alg i ∈ SemCone^∅` -/
+
+/-- **Per-block cone membership**, leg (γ) of the weak-duality assembly.
+
+`csBlock_alg i` is the `D`-weighted square form averaged down to the empty
+type, so it is cone-positive by Step F over Step E over Step D, with
+`D_k ≥ 0` at the leaves.
+
+The σ-locality premise is the part that was missing, and the reason `0203247`
+excised an earlier version of this theorem: that version discharged the
+premise through a BB-edge dichotomy whose no-spanning-order arm was a
+`sorry`. Under the repaired σ-decoder that arm is empty — the BB-edge count
+is `0`, not the `211` the broken reading reported — and
+`csBlockSigma_isLocalType_of_spanningOrder` discharges the premise outright
+for all 278 blocks, on `csBlockSigma_allSpanningOrder`.
+
+This theorem is what makes `STATUS.md`, `RESTORE.md` and `STEP6.md` true:
+each recorded leg (γ) as closing on no user axiom while its consumer was
+absent from the tree. -/
+theorem csBlock_in_cone_of_LDL (i : Fin 278) :
+    (csBlock_alg i).isPositive brrbGenGraphClass brrbGenDelta := by
+  unfold csBlock_alg
+  apply Step_F_averaging_preserves_positivity i _
+  · exact csBlockSigma_isLocalType_of_spanningOrder i
+      (csBlockSigma_allSpanningOrder i)
+  · apply Step_E_weighted_sum_in_cone i
+    · intro k; exact csBlockD_nonneg i k.val
+    · intro k
+      apply Step_D_each_square_in_cone i k
+      exact csBlockSqColumn_local_support i k
+  · exact csBlock_inner_local_support i
+
+/-! ### Step H — the sign-correct residual, and what it would buy
+
+Leg (γ) above is useless on its own, and the one residual element that
+existed before this section (`linSum_Q_alg = O_Q_alg − Σ_i csBlock_alg i`)
+has the **wrong sign** for weak duality: composing leg (γ) with it reproduces
+`0 ≤ φ(O_Q_alg)`, which is free from `O_Q_coef ≥ 0` and proves nothing.
+
+What weak duality actually needs is `bound·∅ − O_Q_alg − Σ_i csBlock_alg i`.
+That element is named here, and the implication it supports is proved. The
+cone membership of the residual is **not** proved — that is dual feasibility,
+and it is the real remaining obligation behind
+`phi_evalAlg_O_Q_alg_le_bound`. -/
+
+/-- The ∅-typed unit: the empty flag, which every functional sends to `1`. -/
+noncomputable def oneAlg : GenFlagAlg CG2 (GenFlagType.empty CG2) :=
+  GenFlagAlg.single (GenFlagType.empty CG2).toFlag
+
+/-- **The sign-correct weak-duality residual**,
+`0.4146·∅ − O_Q_alg − Σ_i csBlock_alg i`. Contrast `linSum_Q_alg`, which
+omits the `bound·∅` term and is therefore the wrong element to put in a cone. -/
+noncomputable def residual_Q_alg : GenFlagAlg CG2 (GenFlagType.empty CG2) :=
+  (0.4146 : ℝ) • oneAlg - O_Q_alg
+    - (Finset.univ : Finset (Fin 278)).sum (fun i => csBlock_alg i)
+
+/-- The residual, the objective and the blocks sum to `bound·∅`. -/
+theorem residual_decomposition :
+    residual_Q_alg + O_Q_alg + (Finset.univ : Finset (Fin 278)).sum (fun i => csBlock_alg i)
+      = (0.4146 : ℝ) • oneAlg := by
+  simp only [residual_Q_alg]; abel
+
+/-- **Weak duality for the size-8 certificate, conditional on dual feasibility.**
+
+If the sign-correct residual lies in the cone, then the certificate output
+bound follows — because each of the 278 blocks contributes non-negatively, by
+`csBlock_in_cone_of_LDL`.
+
+This is what leg (γ) is *for*, and the first consumer it has had. It does not
+retire `phi_evalAlg_O_Q_alg_le_bound`: it replaces that axiom's content with a
+single sharper obligation, `residual_Q_alg.isPositive`, which is dual
+feasibility and is not proved here. -/
+theorem phi_evalAlg_O_Q_alg_le_bound_of_residual_in_cone
+    (hres : residual_Q_alg.isPositive brrbGenGraphClass brrbGenDelta)
+    (phi : GenLimitFunctional CG2 (GenFlagType.empty CG2)
+      brrbGenGraphClass brrbGenDelta) :
+    phi.evalAlg O_Q_alg ≤ 0.4146 := by
+  have hdec := congrArg phi.evalAlg residual_decomposition
+  rw [phi.evalAlg_add, phi.evalAlg_add, phi.evalAlg_smul, oneAlg,
+      phi.evalAlg_single, phi.eval_type, mul_one] at hdec
+  have hblocks : 0 ≤ phi.evalAlg ((Finset.univ : Finset (Fin 278)).sum
+      (fun i => csBlock_alg i)) := by
+    rw [phi.evalAlg_finset_sum]
+    exact Finset.sum_nonneg (fun i _ => csBlock_in_cone_of_LDL i phi)
+  linarith [hres phi, hblocks]
 
 /-! ## §3.4. Eval expansion of `O_Q_alg`
 
@@ -8500,7 +9276,7 @@ theorem phi_evalAlg_O_Q_alg_eq_target_sum
 /-! ## §3.5. Density bridge — `Q(G,v)/Δ⁵ → φ(O_Q)/2` in the limit
 
 The standard pattern (see BRRB's `brrb_sdp_limit_bound` in
-`SdpEvaluation.lean:10223`): for any sequence of triangle-free regular
+`SdpEvaluation.lean:9922`): for any sequence of triangle-free regular
 graphs with `Δ → ∞`, the rescaled density `Q(G,v)/Δ⁵` converges along a
 subsequence (Bolzano-Weierstrass), and the limit equals
 `(genFlagAutCount · phi.eval pentagonQGenFlag)` where `pentagonQGenFlag`
@@ -8537,7 +9313,7 @@ This section provides:
 2. A strengthened bridge `pentagonQ_density_bridge_strong` with sorry body.
 3. Per-extension averaging machinery hooks (sorry-bodied stubs).
 
-Mirrors `brrb_averaging_identity` (PentagonConjecture.lean:14758, ~700 LOC)
+Mirrors `brrb_averaging_identity` (PentagonConjecture.lean:14234, ~700 LOC)
 at size 8.
 -/
 
@@ -8727,26 +9503,32 @@ Steps 2-3 (weight matching at the cert-arithmetic level, algebraic
 normalisation) remain to be written. The main body derives from Step 1
 by a (1/2) rescaling (`linarith`). -/
 
-/-- **Axiom: finite-G pentagon-extension combinatorial identity**
-(factor-of-2-prescaled).
+/-! **Finite-G pentagon-extension combinatorial identity**, factor-of-2-prescaled.
+An axiom until 2026-10-01; now the theorem below.
 
 ## Statement
 
 For every triangle-free regular `(G, v)` (encoded as a sequence
 `seq : ℕ → Σ G : Flag emptyType, Fin G.size` with strictly increasing
-max degree, triangle-free, regular, with positive max degree at index
-`k`),
+max degree, triangle-free, regular),
 
-    2 · pentagonQ (seq k).1 (seq k).2 / Δ_k⁵
-      = Σ_{j ∈ Fin 9295}  O_Q_coef j
-                          · genUnlabelledDensity (flagBasis j)
-                                                 (Gc_k.toGenFlag)
-                                                 brrbGenDelta,
+    Tendsto (fun k =>
+        2 · pentagonQ (seq k).1 (seq k).2 / Δ_k⁵
+          − Σ_{j ∈ Fin 9295}  O_Q_coef j
+                              · genUnlabelledDensity (flagBasis j)
+                                                     (Gc_k.toGenFlag)
+                                                     brrbGenDelta)
+      atTop (nhds 0),
+
+i.e. the two sides agree ASYMPTOTICALLY along the sequence.  The pointwise
+equality this section used to display, guarded on `0 < Δ`, is FALSE — see
+"the statement is asymptotic" below; do not restate it here.
 
 where `Gc_k = pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k`
 is the size-`Δ` coloured graph with `col v u := if Adj v u then 1 else 0`,
-`O_Q_coef j = -targetArr[j.val]! / linearScale ≥ 0` is the sign-fixed
-cert coefficient (Phase 0, `feedback_verify_shortcut_math_content.md`),
+`O_Q_coef j = O_Q_weight j / 6720 ≥ 0` is the exact sign-fixed cert
+coefficient (exact form since 2026-09-26; the retired 12-digit rounding
+`-target/linearScale` appears nowhere in the definition),
 and `flagBasis : Fin 9295 → GenFlag CG2 ∅` is the canonical size-8
 basis (`Davey2024.PentagonQBasis.flagBasis`).
 
@@ -8780,7 +9562,8 @@ The natural Lean proof would decompose into three steps (per
 
 * **Algebraic normalisation (~50-100 LOC):** convert integer IC counts
   to densities via `genUnlabelledDensity = IC / (C(Δ,8) · Aut)` and
-  the rationalisation `O_Q_coef = -target/linearScale`.
+  the exact coefficient `O_Q_coef = O_Q_weight / 6720` (the rationalisation
+  `-target/linearScale` was retired by the 2026-09-26 repair).
 
 Per-`k` `native_decide` is also NOT viable: `genInducedCount` depends
 on the abstract graph `Gc`, not a fixed graph, so the per-`k` claim is
@@ -8801,7 +9584,7 @@ Independently verified by three sources:
    the raw SDPA objective vector `c` and sets
    `target[k] = round(c_k · linearScale)`. The `c_k` are density-space
    objective coefficients, all `≤ 0` under the SDPA min-convention, so
-   `target[k] ≤ 0` and `O_Q_coef = -targetArr/linearScale ≥ 0`. No
+   `target[k] ≤ 0` and `O_Q_coef = round(-targetArr·6720/linearScale)/6720 ≥ 0`. No
    per-flag `Aut(flagBasis k)` or explicit tuple count enters the
    emitter; the `Aut` normalisation is carried by the density
    `genUnlabelledDensity = IC / (C(Δ,8)·Aut)`, and structurally
@@ -8809,7 +9592,7 @@ Independently verified by three sources:
    mathematical source.
 
 2. **Size-5 BRRB analogue, fully proved.** `brrb_averaging_identity`
-   (`PentagonConjecture.lean:14759`) is the size-5 limit-level analogue
+   (`PentagonConjecture.lean:14234`) is the size-5 limit-level analogue
    of this finite-G pre-limit identity. It decomposes
    `phi.eval(brrbGenFlag) = (1/5)·phi.eval(F_9) + (1/10)·phi.eval(F_37)
    + (1/5)·phi.eval(F_55)` via the same pentagon-vertex-marking pattern
@@ -8817,26 +9600,72 @@ Independently verified by three sources:
    clean, no sorries; provides the structural template for the size-8
    version.
 
-3. **`pentagonCount_sum` (PentagonConjecture.lean:129).** The fully-
+3. **`pentagonCount_sum` (PentagonConjecture.lean:193).** The fully-
    proved Lean witness `Σ_v pentagonCountAt G v = 5 · pentagonCount G`
    encodes the related "each pentagon counted by each of its 5
    vertices" pattern. The factor-of-2 here is its `Δ·P(G,v) + Σ_{u~v}
    P(G,u)` analogue: each pentagon-extension tuple contributes to
    exactly two `pentagonCountAt G u` terms for the two adjacent
-   `u ∈ S ∩ N(v)`. -/
-axiom pentagonQ_basis_combinatorial_identity_step1
+   `u ∈ S ∩ N(v)`.
+
+**This statement is asymptotic, and that is load-bearing (2026-09-20).**
+The pointwise form this axiom used to assert — an *exact* equality at every
+index, guarded only by `0 < Δ` — is FALSE, and `pentagon_bound_full` was for a
+time derived from an inconsistent hypothesis set.
+
+Two things go wrong with the pointwise form, one fatal and one structural.
+`genUnlabelledDensity` divides by `Nat.choose (brrbGenDelta …) 8`, which is `0`
+when `Δ < 8`; Lean's division by zero is zero, so every summand on the right
+vanishes and the identity forces `pentagonQ = 0` — contradicted by any
+triangle-free regular graph carrying pentagons (regularised Petersen blow-ups
+suffice). More fundamentally, the left side normalises by a **power** `Δ⁵` and
+the right by a **binomial** `C(Δ,8)`, while `O_Q_coef` is a `Δ`-independent
+constant, so the two sides can agree only in the limit. Guarding on `8 ≤ Δ`
+removes the first failure but not the second.
+
+The coefficients `O_Q_coef` are the EXACT rationals `μ_j/6720` (see
+`O_Q_coef`); with the 12-digit roundings the previous form of this axiom was
+false, its limit being `−4.36·10⁻¹¹` on Clebsch blow-ups (found by the audit
+of 2026-09-26).
+
+The conclusion is therefore a `Filter.Tendsto … (nhds 0)`, which is exactly
+what the paper's basis combinatorial identity lemma asserts
+(`2Q/Δ⁵ = Σⱼ coefⱼ·ρ(basisⱼ) + o(1)` along a
+`Δ`-increasing sequence). No degree guard is needed or wanted: `hΔ` is
+`StrictMono`, so only finitely many terms sit below any threshold and a limit
+statement is unaffected by them. The consumer takes a limit anyway, so nothing
+is lost — it transports this `o(1)` along its subsequence and concludes
+additively.
+
+This is the shape Paper 2's sibling identities already had
+(`SecBridge.sec_combinatorial_identity_F` is an eventual inequality); the
+pentagon axiom was the last one stated pointwise. See
+`PentagonQNonVacuity.lean` for the regression that keeps the hypothesis set
+satisfiable, and the audit record in the development notes for the
+machine-checked refutation of the pointwise form. -/
+/-- **Item (a)**, formerly an axiom.  Discharged 2026-10-01 by
+`PentagonQAssembleA.basis_combinatorial_identity_step1`, which proves it from
+`(a1)` (the basis bridge), `(a2a)`/`(a2b)` (the fibre counts and the
+pentagon-visit identity) and `(a3)` (the asymptotics).
+
+The two statements differ only in naming the coloured class: this one uses
+`pentagonQ_seq_to_colouredGraphClass`, the proof uses `vColouredClass`, and the
+two are definitionally equal. -/
+theorem pentagonQ_basis_combinatorial_identity_step1
     (seq : ℕ → Σ (G : Flag emptyType), Fin G.size)
     (hΔ : StrictMono (fun k => maxDegree (seq k).1))
     (hTF : ∀ k, IsTriangleFree (seq k).1)
-    (hReg : ∀ k, IsRegular (seq k).1)
-    (k : ℕ) (_hΔpos : 0 < maxDegree (seq k).1) :
-    2 * (pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5) =
-      (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-        (fun j => O_Q_coef j *
-          genUnlabelledDensity CG2 (GenFlagType.empty CG2)
-            (Davey2024.PentagonQBasis.flagBasis j)
-            (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
-            brrbGenDelta)
+    (hReg : ∀ k, IsRegular (seq k).1) :
+    Filter.Tendsto
+      (fun k => 2 * (pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5) -
+        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+          (fun j => O_Q_coef j *
+            genUnlabelledDensity CG2 (GenFlagType.empty CG2)
+              (Davey2024.PentagonQBasis.flagBasis j)
+              (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
+              brrbGenDelta))
+      Filter.atTop (nhds 0) :=
+  Davey2024.PentagonQAssembleA.basis_combinatorial_identity_step1 seq hΔ hTF hReg
 
 /-- **Phase 3.5 sub-lemma C.1** (deferred): the finite-G combinatorial
 identity. Restated from the original docstring after Phase 1.E's
@@ -8847,21 +9676,23 @@ theorem pentagonQ_basis_combinatorial_identity
     (seq : ℕ → Σ (G : Flag emptyType), Fin G.size)
     (hΔ : StrictMono (fun k => maxDegree (seq k).1))
     (hTF : ∀ k, IsTriangleFree (seq k).1)
-    (hReg : ∀ k, IsRegular (seq k).1)
-    (k : ℕ) (_hΔpos : 0 < maxDegree (seq k).1) :
-    pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5 =
-      (1/2 : ℝ) *
-        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-          (fun j => O_Q_coef j *
-            genUnlabelledDensity CG2 (GenFlagType.empty CG2)
-              (Davey2024.PentagonQBasis.flagBasis j)
-              (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
-              brrbGenDelta) := by
-  -- Phase 1.E (2026-05-13): close from Step 1 scaffold via the (1/2)
-  -- rescaling. Step 1's body is sorry-bodied separately.
-  have hstep1 :=
-    pentagonQ_basis_combinatorial_identity_step1 seq hΔ hTF hReg k _hΔpos
-  linarith [hstep1]
+    (hReg : ∀ k, IsRegular (seq k).1) :
+    Filter.Tendsto
+      (fun k => pentagonQ (seq k).1 (seq k).2 / (maxDegree (seq k).1 : ℝ) ^ 5 -
+        (1/2 : ℝ) *
+          (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+            (fun j => O_Q_coef j *
+              genUnlabelledDensity CG2 (GenFlagType.empty CG2)
+                (Davey2024.PentagonQBasis.flagBasis j)
+                (pentagonQ_seq_to_colouredGraphClass seq hΔ hTF hReg k).toGenFlag
+                brrbGenDelta))
+      Filter.atTop (nhds 0) := by
+  -- The (1/2) rescaling of Step 1, now at the level of the error term:
+  -- `(1/2) * (2*A - S) = A - (1/2)*S`, and `(1/2) * 0 = 0`.
+  have hstep1 := pentagonQ_basis_combinatorial_identity_step1 seq hΔ hTF hReg
+  have hhalf := hstep1.const_mul (1/2 : ℝ)
+  rw [mul_zero] at hhalf
+  exact hhalf.congr (fun k => by ring)
 
 /-! ### Tier B helpers — `flagBasis_str_boundedDensity` decomposition (2026-05-11)
 
@@ -9044,7 +9875,7 @@ theorem flagBasis_nonzero_vertexOrderProp :
     Argument: process vertices `0, 1, ..., 7` in order. For each
     unlabelled vertex `v`:
       - if `v` is black: maps to a black vertex of `G`, ≤ Δ choices
-        (via the `blackCount ≤ Δ` invariant of `brrbGenGraphClass`).
+        (via the `blackCount = Δ` invariant of `brrbGenGraphClass`).
       - else: by the vertex-order property, `v` is adjacent in `F` to
         some `u : Fin 8` with `u.val < v.val`. Since `u` has been
         processed and pinned to `e.toFun u`, vertex `v` maps to a
@@ -9068,7 +9899,7 @@ private theorem cg2_size8_vertexOrderBound_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2)) with hB_def
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v) with hN_def
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   -- Destructure F, subst F.size = 8.
@@ -9402,7 +10233,8 @@ obligation for `flagBasis k` flags at any labelling layer.
 
 **Structural decomposition.** The proof composes:
 1. A per-flag vertex-order witness (`flagBasis_nonzero_vertexOrderProp`),
-   verified by `decide` over the 69 nonzero indices.
+   verified by `native_decide` over the 69 nonzero indices (so it carries
+   `Lean.ofReduceBool`/`Lean.trustCompiler`, as `pentagon_bound_full`'s guard shows).
 2. A generic size-8 IC bound (`cg2_size8_vertexOrderBound_IC_le_pow`),
    mirroring `brrbStr_IC_le_pow` at size 4. **The body of this generic
    lemma is the only remaining `sorry` in the chain** — pure
@@ -9410,11 +10242,18 @@ obligation for `flagBasis k` flags at any labelling layer.
 3. The arithmetic bound `Δ^k ≤ 8^8 · C(Δ,k)` from
    `cg2_size8_arithmetic_bound`.
 
-**Hypothesis `hk : k.val ∈ nonzeroTargetIndices`** (added 2026-05-11):
-the unrestricted statement is FALSE for some k — e.g., `k = 0` (the
-all-red empty 8-flag, `basisAdjArr_first_entry`) has unbounded density.
-The restriction to the 69 SDP-contributing flags excludes the trivial
-flags and keeps the statement mathematically honest. -/
+**Hypothesis `hk : k.val ∈ nonzeroTargetIndices`** (added 2026-05-11,
+rejustified 2026-09-27): the hypothesis was introduced because the
+unrestricted statement was FALSE — `k = 0` decoded as the all-red empty
+8-flag, whose eight vertices are unconstrained by `N(v)` and whose density is
+therefore unbounded. That reading was the colour inversion repaired in
+`PentagonQBasis.extractColour`; `k = 0` is in fact the all-**black** empty
+8-flag, of density at most 1, and under the corrected decode every one of the
+9295 basis flags is anchored (each component contains a black vertex), where
+before only 7905 were. So the counterexample that motivated this hypothesis
+does not exist. Whether the unrestricted statement is now true is not settled
+here; the hypothesis is retained because the proof and every consumer supply
+it. See the development notes. -/
 theorem flagBasis_str_boundedDensity (k : Fin Davey2024.PentagonQBasis.basisSize)
     (hk : k.val ∈ nonzeroTargetIndices)
     (σ : GenFlagType CG2) (F : GenFlag CG2 σ)
@@ -9498,9 +10337,14 @@ strong-induction-on-unlabelledSize skeleton (BRRB template, see
 here. The remaining sorry is exactly the per-flag IC bound, which is
 the **only** mathematical content left.
 
-**Hypothesis `hk : k.val ∈ nonzeroTargetIndices`** (added 2026-05-11):
-the unrestricted statement is FALSE — for the trivial flags (e.g., the
-all-red empty 8-flag at `k = 0`), bounded density fails. The 69 indices
+**Hypothesis `hk : k.val ∈ nonzeroTargetIndices`** (added 2026-05-11,
+rejustified 2026-09-27): the hypothesis was introduced because bounded
+density failed for the trivial flags — `k = 0` decoded as the all-red empty
+8-flag. That was the colour inversion repaired in
+`PentagonQBasis.extractColour`: `k = 0` is the all-black empty 8-flag, and
+under the corrected decode all 9295 basis flags are anchored, not 7905. The
+hypothesis is kept because the proof and consumers use it, not because a
+counterexample is known. The 69 indices
 in `nonzeroTargetIndices` are exactly the SDP-contributing flags used
 by the Q-objective; the downstream consumer
 `pentagonQ_density_identity_per_extension` only needs locality at these
@@ -9571,7 +10415,7 @@ graph sequence arising from triangle-free regular pentagons, the
 eval-level Q-objective sum equals the limit of pentagonQ densities
 scaled by 2.
 
-This is the analogue of `brrb_averaging_identity` (PentagonConjecture.lean:14758)
+This is the analogue of `brrb_averaging_identity` (PentagonConjecture.lean:14234)
 at size 8 over 69 extensions. Mathematical content:
 
   L = (1/2) · Σ_{k ∈ nonzeroTargetIndices}
@@ -9637,37 +10481,44 @@ theorem pentagonQ_density_identity_per_extension
       Filter.atTop (nhds L) :=
     htend.comp phi.sub_strictMono.tendsto_atTop
   -- Step B: For each `n`, eventually Δ > 0 along the composed subsequence.
+  -- The subsequence index tends to infinity; hoisted, since both the degree
+  -- divergence and the o(1) combinatorial identity are transported along it.
+  have hsubseq_atTop : Filter.Tendsto (fun n => sub (phi.sub n)) Filter.atTop Filter.atTop :=
+    (hsub.comp phi.sub_strictMono).tendsto_atTop
   have hΔ_atTop : Filter.Tendsto
-      (fun n => maxDegree (seq (sub (phi.sub n))).1) Filter.atTop Filter.atTop := by
-    have h₁ : Filter.Tendsto (fun k => maxDegree (seq k).1) Filter.atTop Filter.atTop :=
-      hΔ.tendsto_atTop
-    have h₂ : Filter.Tendsto (fun n => sub (phi.sub n)) Filter.atTop Filter.atTop :=
-      (hsub.comp phi.sub_strictMono).tendsto_atTop
-    exact h₁.comp h₂
-  have hΔ_pos : ∀ᶠ n in Filter.atTop, 0 < maxDegree (seq (sub (phi.sub n))).1 :=
-    (hΔ_atTop.eventually (Filter.eventually_ge_atTop 1)).mono (fun n h => by omega)
-  -- Step C: apply the combinatorial identity pointwise (eventually, when Δ > 0).
-  have hCombinIdent : ∀ᶠ n in Filter.atTop,
-      pentagonQ (seq (sub (phi.sub n))).1 (seq (sub (phi.sub n))).2 /
-        (maxDegree (seq (sub (phi.sub n))).1 : ℝ) ^ 5 =
-      (1/2 : ℝ) *
-        (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
-          (fun j => O_Q_coef j * uD_k j n) := by
-    apply hΔ_pos.mono
-    intro n hpos
-    -- Apply the combinatorial identity at the index `sub (phi.sub n)`.
-    have := pentagonQ_basis_combinatorial_identity seq hΔ hTF hReg (sub (phi.sub n)) hpos
-    -- The pentagonQ_seq_to_colouredGraphClass def has graph := (seq k).1, so the
-    -- toGenFlag = same construction used in uD_k. Direct rewrite.
-    exact this
+      (fun n => maxDegree (seq (sub (phi.sub n))).1) Filter.atTop Filter.atTop :=
+    hΔ.tendsto_atTop.comp hsubseq_atTop
+  -- Step C: transport the o(1) combinatorial identity along the subsequence.
+  --
+  -- 2026-09-20: the identity is asymptotic, matching the paper's basis
+  -- combinatorial identity lemma
+  -- (`2Q/Δ⁵ = Σ coefⱼ·ρ(basisⱼ) + o(1)`).  It was previously stated as an exact
+  -- pointwise equality, which is FALSE: the left side normalises by a power
+  -- `Δ⁵` and the right by a binomial `Nat.choose Δ 8`, and the coefficients are
+  -- Δ-independent constants, so the two sides agree only in the limit.  Below
+  -- degree 8 the binomial vanishes outright and the old form forced
+  -- `pentagonQ = 0`.  The limit form needs no degree guard: `hΔ` is `StrictMono`,
+  -- so only finitely many terms sit below any threshold and the tail is
+  -- unaffected.
+  have hdiff_tend : Filter.Tendsto
+      (fun n => pentagonQ (seq (sub (phi.sub n))).1 (seq (sub (phi.sub n))).2 /
+          (maxDegree (seq (sub (phi.sub n))).1 : ℝ) ^ 5 -
+        (1/2 : ℝ) *
+          (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
+            (fun j => O_Q_coef j * uD_k j n))
+      Filter.atTop (nhds 0) :=
+    (pentagonQ_basis_combinatorial_identity seq hΔ hTF hReg).comp hsubseq_atTop
   -- Step D: per-flag density convergence. With phi constructed from `cseq ∘ sub`,
   -- `phi.convergence` along phi.sub gives convergence of uD at (cseq (sub (phi.sub n))).toGenFlag,
   -- which is exactly `uD_k j n` by definition.
   --
   -- **2026-05-11**: `flagBasis_isLocalFlag` now requires
-  -- `j.val ∈ nonzeroTargetIndices` (the 69 SDP-contributing indices) —
-  -- the unrestricted version is FALSE (e.g., the all-red empty 8-flag
-  -- at `k = 0` has unbounded density). Hence `huD_k_tend` is only
+  -- `j.val ∈ nonzeroTargetIndices` (the 69 SDP-contributing indices).
+  -- The motivating counterexample — the "all-red empty 8-flag at `k = 0`"
+  -- with unbounded density — was an artefact of the colour inversion
+  -- repaired on 2026-09-27; `k = 0` is the all-black empty 8-flag and all
+  -- 9295 flags are now anchored. The restriction is retained, not
+  -- re-derived. Hence `huD_k_tend` is only
   -- available at nonzero indices; for zero-coef indices the term in
   -- the sum is identically `O_Q_coef j * uD_k j n = 0`, which yields
   -- the trivial Tendsto without locality. The sum aggregation below
@@ -9701,10 +10552,9 @@ theorem pentagonQ_density_identity_per_extension
     by_cases hj : j.val ∈ nonzeroTargetIndices
     · exact Or.inl hj
     · refine Or.inr ?_
-      -- For j.val ∉ nonzeroTargetIndices, targetArr[j.val]! = 0, so O_Q_coef j = 0.
-      unfold O_Q_coef
-      rw [h_target_zero_outside j hj]
-      simp
+      -- For j.val ∉ nonzeroTargetIndices, targetArr[j.val]! = 0, so the weight
+      -- rounds to 0 and O_Q_coef j = 0.
+      simp [O_Q_coef, O_Q_weight, h_target_zero_outside j hj]
   -- Step E: aggregate the per-flag limits via finite sum.
   have hSum_tend : Filter.Tendsto
       (fun n => (1/2 : ℝ) *
@@ -9732,8 +10582,10 @@ theorem pentagonQ_density_identity_per_extension
       (nhds ((1/2 : ℝ) *
         (Finset.univ : Finset (Fin Davey2024.PentagonQBasis.basisSize)).sum
           (fun j => O_Q_coef j * phi.eval (Davey2024.PentagonQBasis.flagBasis j)))) := by
-    apply hSum_tend.congr'
-    exact hCombinIdent.mono (fun n h => h.symm)
+    -- `LHS = (LHS - RHS) + RHS`, with the first summand vanishing in the limit.
+    have hadd := hdiff_tend.add hSum_tend
+    rw [zero_add] at hadd
+    exact hadd.congr (fun n => by ring)
   -- Step G: conclude L = RHS by uniqueness of limits.
   exact tendsto_nhds_unique htend_phi_sub htend_RHS
 
@@ -9744,7 +10596,7 @@ The cert was generated WITH the SDPA `Degree::regularity` constraint
 (`local-flags-certificates/examples/bounded_pentagon.rs:68`), which is
 NOT enforced by `brrbGenGraphClass` (it only carries
 {triangle-free, black-independent, black-count ≤ Δ}). Restricting the
-eval-level cert axiom to `QPhiRegular phi` makes it faithful to the
+eval-level cert axiom to `QPhiRegular phi` formerly made it faithful to the
 cert's actual hypotheses. Mirrors SEC's `secPhiRegular`. -/
 def QPhiRegular
     (phi : GenLimitFunctional CG2 (GenFlagType.empty CG2)
@@ -9864,18 +10716,29 @@ The natural Lean proof is the **upper-bound mirror** of
 2. Re-express the LHS as `phi.evalAlg O_Q_alg · linearScale`.
 3. Divide by `linearScale` and absorb the slack appropriately.
 
-Step 2 has the same blocker as `dual_feasibility_eval`: the per-block
-iso table mapping `cls.out.forget → flagBasis k` is missing. Phase 1.D
-spike (2026-05-13, `scratch/phase_1D_notes.md`) confirmed BRRB's
+Step 2 has the blocker that stopped the dual-feasibility step (a
+`sorry`'d `dual_feasibility_eval`, deleted 2026-05-13 as a dead chain):
+the per-block iso table mapping `cls.out.forget → flagBasis k` is missing. Phase 1.D
+spike (2026-05-13, the development notes) confirmed BRRB's
 pattern does NOT transfer:
 
 * **Size 5 (BRRB):** exact integer identity `linSum + cs0 + cs1 =
   target`, eval-level closure via `ring` + 12 iso rewrites + the
   normalisation `phi_eval_certF1_eq_one` (~350 LOC total).
-* **Size 8 (PentagonQ):** approximate cert; would need ~9114
-  flag-density normalisation identities (vs BRRB's 1) **plus** the
-  same iso table as `dual_feasibility_eval`. Both are infeasible at
-  hand-coded density per `scratch/per_block_iso_table_results.md`.
+* **Size 8 (PentagonQ):** approximate cert; would need one identity
+  per linear-constraint group, ~9114 of them, against the single
+  normalisation the size-5 route needed above, **plus** the iso table
+  that deleted step needed. Both are infeasible at hand-coded density
+  per the development notes. (The 9114 is the size-8 `.sdpa` header's
+  count of diagonal blocks; 18408 is the paper's row count, each of the
+  1398 equalities counted once where the header carries it as a `-2`
+  block, 19806 diagonal entries in all. Paper 1 §6 enumerates the 18408
+  rows in four families — 9295 flag non-negativity, 7715 regularity, 8
+  black-vertex normalisation, 1390 black-set cardinality — which
+  correspond to 1, 7715, 8 and 1390 groups. Only 8 of the 9114 groups
+  are normalisations, so earlier wording here, which called all 9114
+  normalisation identities, named them wrongly; the count and the
+  comparison were right.)
 
 Phase 1.D's verdict was NO, recommending Phase-3 axiomatisation.
 
@@ -9914,7 +10777,7 @@ constructive corroboration at a looser bound:
 3. **Per-block PSD witnesses.** Each block's contribution to the
    inequality is `Σ_k x_int[k] · ⟨F_k, Y_i + λI⟩`, non-negative because
    `Y_i + λI` is PSD by construction (per
-   `csBlock_alg_in_cone_axiom` and the `Block_i.ldl_witness`
+   the `Block_i.ldl_witness`
    native_decide-verified LDL decompositions). This is the weak-duality
    content lifted to the algebra cone, and is fully verified by the
    Lean cert's PSD-witness theorems regardless of bound tightness.
@@ -9937,24 +10800,28 @@ The underlying SDP solution is identical; the constant tightening
 just shrinks the budget extracted from it.
 
 The size-5 BRRB peer `brrb_certificate_arithmetic_eval`
-(`SdpEvaluation.lean:9934`) is the fully-proved structural template
+(`SdpEvaluation.lean:9633`) is the fully-proved structural template
 demonstrating the same conceptual pattern (cert + cone → upper bound)
 at smaller scale (~350 LOC, 0 sorries, all axioms standard).
 
-**Regularity hypothesis (2026-06-19 faithfulness restriction).** The
-hypothesis `hreg : QPhiRegular phi` restricts this bound to functionals
-that arise from `pentagonQ_phi_construction` on a Δ-regular (triangle-free)
-sequence. The BRRB SDPA cert was generated WITH the `Degree::regularity`
-constraint (`local-flags-certificates/examples/bounded_pentagon.rs:68`),
-which is NOT enforced by `brrbGenGraphClass` (it carries only
-{triangle-free, black-independent, black-count ≤ Δ}). The axiom is
-faithful only for regularly-constructed functionals; the consumer only
-ever applies it to such a φ (supplied by
-`pentagonQ_density_bridge_strong`). Mirrors SEC's `secPhiRegular`. -/
+**Ungated since the class fix.** The BRRB SDPA cert was generated WITH
+the `Degree::regularity` constraint
+(`local-flags-certificates/examples/bounded_pentagon.rs:68`), and with the
+black-set normalisation (R3) and cardinality (R4) families, which need
+`|B(G)| = Δ(G)`. `brrbGenGraphClass` now enforces all three — it is the
+paper's class `𝒢` — so the earlier `hreg : QPhiRegular phi` gate is
+unnecessary and has been removed. This statement is now exactly the
+paper's Lemma (localpentagon.tex, `lem:O-Q-bound`): a bound on `φ(O_Q)`
+for every `φ ∈ Φ^∅`, where `Φ^∅` is itself defined over `𝒢`.
+
+Since 2026-09-26 `O_Q_alg` carries the exact coefficients `μ_j/6720`. The
+bound is established by the exact 16-digit verification of the published
+certificate (safe value `0.41458941…`, margin `1.06·10⁻⁵`), whose decimal
+objective differs from the exact one by at most `2·10⁻¹⁹` per coefficient,
+a change of `φ(O_Q)` below `10⁻¹²`. -/
 axiom phi_evalAlg_O_Q_alg_le_bound
     (phi : GenLimitFunctional CG2 (GenFlagType.empty CG2)
-      brrbGenGraphClass brrbGenDelta)
-    (hreg : QPhiRegular phi) :
+      brrbGenGraphClass brrbGenDelta) :
     phi.evalAlg O_Q_alg ≤ 0.4146
 
 
@@ -9985,11 +10852,14 @@ theorem pentagon_Q_sdp_limit_bound_thm
       Filter.atTop (nhds L)) :
     L ≤ 0.2073 := by
   -- Step 1: Use density bridge to express L via phi.evalAlg O_Q_alg.
-  obtain ⟨phi, hL, hreg⟩ :=
+  obtain ⟨phi, hL, _hreg⟩ :=
     pentagonQ_density_bridge_strong seq hΔ hTF hReg sub L hsub htend
   -- Step 2: invoke the dual-feasibility upper bound on phi.evalAlg O_Q_alg.
+  -- No gate: `brrbGenGraphClass` is the paper's class, so the bound is the
+  -- ungated `lem:O-Q-bound`. `pentagonQ_density_bridge_strong` still produces
+  -- `QPhiRegular phi`, which the σ-cone consumers need elsewhere.
   have hUB : phi.evalAlg O_Q_alg ≤ 0.4146 :=
-    phi_evalAlg_O_Q_alg_le_bound phi hreg
+    phi_evalAlg_O_Q_alg_le_bound phi
   -- Step 3: L = phi.evalAlg O_Q_alg / 2 ≤ 0.4146 / 2 = 0.2073.
   rw [hL]
   linarith
@@ -10121,8 +10991,8 @@ theorem flagBasis_class_ne_of_iso_check_false
     this Finset has `card ≤ 9295`; the converse (`card = 9295`) is the
     pairwise-distinctness claim and is **not currently established** —
     see the §3.10 docstring for the rationale (no downstream consumer
-    requires it; the future `dual_feasibility_eval` iso table is a
-    different, per-block construction).
+    requires it; the per-block iso table the deleted dual-feasibility
+    step would have needed is a different construction).
 
     Kept as a public definition because it cleanly names "the support
     set of basis-flag iso classes" and is useful for any future
@@ -10176,7 +11046,8 @@ theorem genFlagIso_of_cgraph_bijection {n : ℕ} (G₁ G₂ : CGraph n)
     `phi.eval_iso` (the `evalAlg` linearity tactic that rewrites
     `phi.eval cls.out.forget` to `phi.eval (flagBasis k)`).
 
-    **Usage pattern** (from BRRB analogue at `SdpEvaluation.lean:9946`):
+    **Usage pattern** (the BRRB analogue is used this way throughout
+    `SdpEvaluation.lean`, e.g. at line 529):
     ```lean
     have hcls_iso := phi.eval_iso cls.out.forget (flagBasis k)
       (cls_emp_forget_iso_flagBasis cls k hadj hcol)

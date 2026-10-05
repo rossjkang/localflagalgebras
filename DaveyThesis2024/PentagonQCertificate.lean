@@ -408,10 +408,22 @@ def tightSlackBudget : Int := 10000000000000000000  -- 10^19
 
 The cert's measured aggregate slack `total_slack_abs` is bounded above
 by `tightSlackBudget = 10^19`, the integer slack budget implied by the
-thesis-tight pair `(boundNumer, boundDenom) = (2073, 10000)`. This
-provides direct constructive `native_decide` support for the bound
-`phi.evalAlg O_Q_alg ≤ 0.4146 = 2 · 0.2073` carried by
-`phi_evalAlg_O_Q_alg_le_bound` in `PentagonQBridge.lean`.
+thesis-tight pair `(boundNumer, boundDenom) = (2073, 10000)`.
+
+**This does not support `phi_evalAlg_O_Q_alg_le_bound`, and an earlier
+version of this docstring wrongly claimed it did.** The slack is
+aggregated at the certificate's *own primal point* — the solver's
+rounded iterate, which is not even primal-feasible. Weak duality needs a
+residual bound valid at *every* feasible point, and that is a different
+quantity: at coarser rationalisations it runs to order `10^-4`, against
+a headroom of `1.5e-5` between the certificate value and `0.4146`. Only
+the 16-digit rationalisation, with its 5,176 multipliers and residual
+bound `T = 4.783e-6`, clears the target, and that is verified outside
+Lean. See the development notes and the provenance record
+`certificates/bounded_pentagon_alt.provenance.json`.
+
+What the theorem below *is*: a genuine finite check that the cert's own
+arithmetic is internally consistent at its stated budget.
 
 Compared to the prior `208/1000` (= 0.208) bound, the safety ratio
 shrinks from 128× to ~1.8× (L-space) / ~3.6× (O_Q_alg-space) over

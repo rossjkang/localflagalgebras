@@ -7748,7 +7748,8 @@ the product of two local-support elements has local support.
 `genProduct_closure` is proved by well-founded induction on `H.unlabelledSize`,
 mirroring `product_closure_aux` for `simpleGraphUniverse`.  The two counting
 sub-lemmas (`genBounded_density_of_joint_pos`, `genDecomposition_at_extension`)
-are sorry'd pending translation of the ~600-line embedding construction.
+were sorry'd pending translation of the ~600-line embedding construction;
+that translation landed and the project is sorry-free.
 The two support lemmas follow from `genProduct_closure` by Finsupp analysis. -/
 
 /-- Counting inequality: if `genJointInducedDensity > 0`, then
@@ -9170,7 +9171,7 @@ theorem genProduct_limit (R : RelUniverse) (σ : GenFlagType R)
       ∃ Δ₀ : ℕ, ∀ G : GenFlag R σ, 𝒢 G.forget → Δ₀ ≤ Δ G.forget →
         |genUnlabelledEvalDensity f G Δ * genUnlabelledEvalDensity g G Δ -
          genUnlabelledEvalDensity (f.mul g) G Δ| ≤ ε := by
-  -- Bilinear extension from genProduct_limit_basis (sorry'd).
+  -- Bilinear extension from genProduct_limit_basis.
   have genProduct_limit_basis : ∀ (F F' : GenFlag R σ),
       GenIsLocalFlag σ F 𝒢 Δ → GenIsLocalFlag σ F' 𝒢 Δ →
       ∀ ε : ℝ, 0 < ε → ∃ Δ₀ : ℕ, ∀ G : GenFlag R σ, 𝒢 G.forget → Δ₀ ≤ Δ G.forget →

@@ -7,14 +7,15 @@
 This repository contains the code accompanying two papers:
 
 - **Paper 1.** E. Davey, E. Hurley, R. de Joannis de Verclos, R. J. Kang, J. Volec.
-  *Local flag algebras.* In preparation, 2026.
+  *Local flag algebras.* [arXiv:2607.12461](https://arxiv.org/abs/2607.12461), 2026.
 - **Paper 2.** E. Davey, E. Hurley, R. de Joannis de Verclos, R. J. Kang, J. Volec.
-  *Strong edge-colouring via local flag algebras.* In preparation, 2026.
+  *Strong edge-colouring via local flag algebras.* [arXiv:2607.17421](https://arxiv.org/abs/2607.17421), 2026.
 
 It has three parts:
 
 1. a **Lean 4 formalisation** (`DaveyThesis2024/`) that machine-verifies the papers' main
-   theorems, including the semidefinite-programming (SDP) certificates;
+   theorems, with the semidefinite-programming (SDP) certificates' numerical output entering
+   through named, catalogued axioms (see [`RESULTS.md`](RESULTS.md) §5);
 2. a **Rust certificate generator** (`local-flags-certificates/`, built on `rust-flag-algebra`)
    that produces the SDP certificates the formalisation consumes; and
 3. **exhaustive-search scripts** (`local-flags-certificates/{pentagon_search,sec_search}/`,
@@ -27,29 +28,38 @@ The work partially originates in E. Davey's MSc thesis *Local Flag Algebras* (Un
 | Paper result | Lean name | Statement | Beyond-standard axioms |
 |---|---|---|---|
 | Paper 1, Thm 1.1 | `pentagon_bound_simple` | P(G) ≤ \|G\|·Δ⁴/40, G triangle-free | none |
-| Paper 1, Thm 1.2 | `pentagon_bound_full` | P(G) ≤ 0.02073·\|G\|·Δ⁴, G triangle-free | 2 (pentagon-Q bridge) |
-| Paper 1, Lem 1.4 | `clebsch_blowup_tight` | Clebsch blow-ups attain ratio 12/625 at every Δ=5k | none |
-| Paper 1, Δ=5 | `pentagon_delta5_tight`, `pentagon_delta5_extremal_iff` | per-vertex bound + Clebsch extremal characterisation | none |
-| Paper 1, Δ=3 | `pentagon_bound_delta3`, `pentagon_delta3_extremal_iff` | P(G) ≤ 6·\|G\|/5 (Δ≤3), Petersen unique extremal | none |
-| Paper 1, Δ=4 | `pentagon_bound_delta4`, `pentagon_delta4_witness`, `pentagonCountAt_le_24_tight` | P(G) ≤ 24·\|G\|/5 (Δ≤4); C₁₂(2,3) attains ratio 1/64; per-vertex bound tight | none |
+| Paper 1, Thm 1.2 | `pentagon_bound_full` | P(G) ≤ 0.02073·\|G\|·Δ⁴, G triangle-free | 1 (pentagon-Q output bound) |
+| Paper 1, Lem 7.3 | `clebsch_blowup_tight` | Clebsch blow-ups attain ratio 12/625 at every Δ=5k | none |
+| Paper 1, Thm 1.4 | `pentagon_delta5_tight`, `pentagon_delta5_extremal_iff` | P(G) ≤ 12·\|G\| (Δ≤5) + Clebsch extremal characterisation | none |
+| Paper 1, Thm B.1(i) | `pentagon_bound_delta3`, `pentagon_delta3_extremal_iff` | P(G) ≤ 6·\|G\|/5 (Δ≤3), Petersen unique extremal | none |
+| Paper 1, Thm B.1(ii) | `pentagon_bound_delta4`, `pentagon_delta4_witness`, `pentagonCountAt_le_24_tight` | P(G) ≤ 24·\|G\|/5 (Δ≤4); C₁₂(2,3) attains ratio 1/64; per-vertex bound tight | none |
+| Paper 1, Thm B.2 | `pentagon_bound_delta4_sharp` | P(G) ≤ 4·\|G\| (Δ≤4), sharp — C₁₂(2,3) attains it (C₁₃(2,3) too, in prose) | none |
 | Paper 2, Thm 1.1 | `strong_chromatic_index_bound[_thesis_tight]` | χ'ₛ(G) ≤ 1.74·Δ² (tight form 1.73·Δ²) | 4 (Hurley + 3 SEC cert) |
 | Paper 2, Thm 1.2 | `strong_chromatic_index_bipartite[_thesis_tight]` | χ'ₛ(G) ≤ 1.63·Δ² bipartite (tight 1.6255·Δ²) | 4 |
 | Paper 2, Thm 1.3 | `strong_chromatic_index_asymmetric_bipartite[_thesis_tight]` | χ'ₛ(G) ≤ 1.6633·Δ_A·Δ_B (per-p form 1.6632·p·Δ²) | 4 (Hurley + 3 SEC cert) |
-| Paper 2, Thm 1.4 | `omega_lineGraphSq_le_mul_bipartite` | ω(L(G)²) ≤ Δ_A·Δ_B, bipartite | none |
-| Paper 2, Thm 1.5 | `edges_le_nu_s_mul_mul_bipartite` | ν_s(G) ≥ \|E(G)\|/(Δ_A·Δ_B), bipartite | none |
-| Paper 2, Thm 1.6 | `secRandomBipartite_aas` | Brualdi–Quinn Massey holds a.a.s. for G(n_A,n_B,p) | 2 (verbatim Kim–Vu / Pippenger–Spencer) |
+| Paper 2, Thm 1.4 | `secRandomBipartite_aas` | Brualdi–Quinn Massey holds a.a.s. for G(n_A,n_B,p) | 2 (verbatim Kim–Vu / Pippenger–Spencer) |
+| Paper 2, Prop 8.1(a) | `omega_lineGraphSq_le_mul_bipartite` | ω(L(G)²) ≤ Δ_A·Δ_B, bipartite | none |
+| Paper 2, Prop 8.1(b) | `edges_le_nu_s_mul_mul_bipartite` | ν_s(G) ≥ \|E(G)\|/(Δ_A·Δ_B), bipartite | none |
 
 See **[`RESULTS.md`](RESULTS.md)** for the full side-by-side correspondence: every
 result above with its exact Lean statement, the user-defined definitions it rests
 on, and every user-defined axiom (with the mathematical statement each encodes).
 
 `DaveyThesis2024/AxiomCheck.lean` is the authoritative, build-enforced (`#guard_msgs`) record of
-the exact axiom set of every headline. Beyond the standard Lean kernel axioms (`propext`,
+the exact axiom set of every headline in the default build (Paper 1 Thm B.2 excepted, as RESULTS.md records). Beyond the standard Lean kernel axioms (`propext`,
 `Classical.choice`, `Quot.sound`, and `Lean.ofReduceBool`/`Lean.trustCompiler` for the
 `native_decide` certificates), the named domain assumptions are the SDP cert upper bounds and
-bridge identities (each carrying a Statement / Why-needed / Why-correct docstring and gated by a
-regularity hypothesis matching the certificate's degree-regularity constraint), plus the
-sparse-colouring lemma of Hurley–de Joannis de Verclos–Kang (2022). Paper 2's SEC assumptions are
+bridge identities, plus the sparse-colouring lemma of Hurley–de Joannis de Verclos–Kang (2022).
+Five of the thirteen — all three SEC bridge identities and two of
+the three SEC output bounds — are gated by a genuine `IsRegular` hypothesis (the general and bipartite SEC
+identities and output bounds additionally by a per-F-edge minimum-strong-degree
+gate; the asymmetric pair carries none). The asymmetric output bound is gated only
+on the *semiregular* `IsAsymmetricBipartite 1` (high side exactly Δ, low side at most Δ),
+deliberately, because that is what the blow-up construction it serves satisfies. The remaining
+seven take no structural hypothesis: the pentagon output bound (its class already encodes
+regularity), the three basis-locality axioms, and the three literature axioms. The cert axioms carry a Statement / Why-needed / Why-correct docstring; the
+three literature axioms carry ordinary docstrings; two are stated verbatim from their sources, and
+the Kim–Vu axiom states the robust absolute-effect form, which its docstring justifies. Paper 2's SEC assumptions are
 the F-faithful (`_F`) certificate axioms (see [`RESULTS.md`](RESULTS.md) §5). The
 project is **sorry-free**.
 
@@ -59,7 +69,11 @@ project is **sorry-free**.
 DaveyThesis2024/            Lean 4 formalisation
 ├── Basic, FlagIso, LocalFlagAlgebra, Extensions, CG22   core flag-algebra framework
 ├── Pentagon*               Thms 1.1/1.2, Δ=3/4/5 per-degree bounds + extremal graphs (Petersen, C₁₂(2,3), Clebsch)
+├── Delta4/                 Thm B.2, the sharp Δ=4 bound: finite model + assembly (hand-written)
+│   └── Generated/          the finite check, machine-written (88 modules) + its generator; NOT in the default build
 ├── PentagonQCertificate/   auto-generated size-8 SDP cert (278 native_decide blocks)
+├── certificates/           archived SDP certificates behind Thm 1.2 and Thm C.3, with an
+│                           exact-rational verifier and a four-second multiplier check
 ├── StrongEdgeColouring, StrongChromaticIndex, Sec*       SEC headlines, F-faithful SDP bridges, WLOG-biregular reduction
 ├── Sec{,Bipartite}Certificate/, AsymSecCertificate/   auto-generated SEC cert blocks (general / bipartite / asymmetric CG4)
 ├── SECRandomBipartite, SecRandomBipartite/              Brualdi–Quinn Massey a.a.s.
@@ -85,6 +99,32 @@ lake build             # builds + verifies everything, including AxiomCheck
 The certificate blocks are large machine-generated Lean (≈300 MB of source); a full build
 compiles them in parallel and may take a while on first run. `lake build DaveyThesis2024.AxiomCheck`
 re-checks the headline axiom sets.
+
+One result sits outside that build. Theorem B.2 (the sharp Δ = 4 bound) is carried
+by a finite check whose 88 generated modules under
+`DaveyThesis2024/Delta4/Generated/` cost about two hours to compile, so the root
+module does not import them and their oleans are not tracked. The sources are.
+`lake build` does not produce those oleans either: they come from
+`python3 gen_layer.py build <n>` for each layer n = 0…12, run from
+`DaveyThesis2024/Delta4/Generated/generator/` after `cc -O2 -o model_b model_b.c`
+there (about two hours, up to 6 GB; see that directory's README). After those,
+and `lake build`:
+
+```bash
+lake env sh -c 'LEAN_PATH=$LEAN_PATH:$PWD/.lake/build/lib/lean \
+  lean -o .lake/build/lib/lean/DaveyThesis2024/Delta4/Generated/CheckAll.olean \
+       DaveyThesis2024/Delta4/Generated/CheckAll.lean'
+```
+
+`CheckAll.lean` ends with `#print axioms`, so this prints
+
+```
+'Delta4Gen.checkAll_true' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Delta4Gen.pentagon_bound_delta4_sharp' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+`DaveyThesis2024/Delta4/Generated/generator/README.md` documents the generator and
+how to regenerate the modules from scratch.
 
 ## Tooling and methodology
 
@@ -125,7 +165,9 @@ no submodule to initialise.
 Generate certificates with the example binaries:
 
 ```bash
-cargo run --release --example bounded_pentagon                  # pentagon density
+cargo run --release --example bounded_pentagon                  # pentagon density (size-5)
+# NB both of the next two write bounded_pentagon.sdpa; run the size-8 one second, or
+# rename its output. The archived size-8 problem is DaveyThesis2024/certificates/.
 cargo run --release --example bounded_pentagon_alt_approach     # Paper 1 Thm 1.2 size-8 cert
 cargo run --release --example bruhn_joos                        # Paper 1 §8 Bruhn–Joos sparsity 3/2
 cargo run --release --example strong_edge_colouring             # Paper 2 Thm 1.1
@@ -157,20 +199,24 @@ source: `cc -O2 local-flags-certificates/sec_search/fast_check.c -o fast_check`.
 ## Citing
 
 ```bibtex
-@unpublished{daveyPentagonLocalFlags2026,
+@misc{daveyPentagonLocalFlags2026,
   title  = {Local Flag Algebras},
   author = {Davey, Eoin and Hurley, Eoin and de Joannis de Verclos, R\'emi
             and Kang, Ross J. and Volec, Jan},
   year   = {2026},
-  note   = {In preparation}
+  eprint = {2607.12461},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO}
 }
 
-@unpublished{daveySECLocalFlags2026,
+@misc{daveySECLocalFlags2026,
   title  = {Strong Edge-Colouring via Local Flag Algebras},
   author = {Davey, Eoin and Hurley, Eoin and de Joannis de Verclos, R\'emi
             and Kang, Ross J. and Volec, Jan},
   year   = {2026},
-  note   = {In preparation}
+  eprint = {2607.17421},
+  archivePrefix = {arXiv},
+  primaryClass = {math.CO}
 }
 ```
 

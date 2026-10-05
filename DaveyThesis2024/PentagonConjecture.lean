@@ -2986,8 +2986,13 @@ private noncomputable def brrbSdpObjective : GenFlagAlg CG2 (GenFlagType.empty C
   (1/60 : ℝ) • Finsupp.single (GenFlagClass.mk sdpFlag55) 1
 
 /-- The graph class for the BRRB SDP: 2-coloured graphs that are triangle-free
-    with independent black vertices and at most Δ black vertices. Uses colour 1 = black,
-    matching `ColouredGraphClass` and `brrbCount`. -/
+    and regular, with independent black vertices and exactly Δ black vertices.
+    Uses colour 1 = black, matching `ColouredGraphClass` and `brrbCount`.
+
+    This is the class `𝒢` of the paper (localpentagon.tex, "A reduction to a
+    coloured 4-path count"). Regularity and the exact black count are what the
+    linear families (R2), (R3) and (R4) of the size-8 program require; without
+    them the certificate output bound has to be gated per functional. -/
 def brrbGenGraphClass : GenGraphClass CG2 :=
   fun G =>
     let graph := G.str.1
@@ -2996,9 +3001,12 @@ def brrbGenGraphClass : GenGraphClass CG2 :=
     (∀ u v w : Fin G.size, graph.Adj u v → graph.Adj v w → graph.Adj u w → False) ∧
     -- Black (colour 1) vertices are independent
     (∀ u v : Fin G.size, colour u = 1 → colour v = 1 → ¬graph.Adj u v) ∧
-    -- At most Δ black vertices (needed for bounded density / GenIsLocalFlag)
-    (Finset.univ.filter (fun v : Fin G.size => colour v = 1)).card ≤
-      Finset.sup Finset.univ (fun v => (Finset.univ.filter (graph.Adj v)).card)
+    -- Exactly Δ black vertices ((R3), (R4); also gives bounded density)
+    ((Finset.univ.filter (fun v : Fin G.size => colour v = 1)).card =
+      Finset.sup Finset.univ (fun v => (Finset.univ.filter (graph.Adj v)).card)) ∧
+    -- Regular ((R2))
+    (∀ v : Fin G.size, (Finset.univ.filter (graph.Adj v)).card =
+      Finset.sup Finset.univ (fun w => (Finset.univ.filter (graph.Adj w)).card))
 
 /-- The degree parameter for the BRRB SDP: maximum degree of the underlying graph. -/
 noncomputable def brrbGenDelta : GenGraphParam CG2 :=
@@ -3026,7 +3034,8 @@ theorem toGenFlag_in_brrbClass (G : ColouredGraphClass) :
     brrbGenGraphClass G.toGenFlag.forget :=
   ⟨fun u v w huv huw hvw => G.triangleFree u v w huv huw hvw,
    fun u v hu hv hadj => G.blackIndependent u v hu hv hadj,
-   le_of_eq G.blackCount⟩
+   G.blackCount,
+   G.regular⟩
 
 /-- Wrap a `ColouredGraphClass` sequence as a `GenDeltaIncreasingSeq`. -/
 noncomputable def toGenDeltaSeq
@@ -4221,7 +4230,7 @@ private theorem csStr_IC_le_pow (refStr : CG2.Str 3)
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   obtain ⟨fsize, s, femb, hind, hsz⟩ := F
@@ -5011,7 +5020,7 @@ private theorem brrbStarType_isLocalType
                 rw [e.isInduced]
               simp only [colouredGraphUniverse, Function.comp] at he_col
               rw [he_col, hw1_col])
-            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
     · -- Extensions: use IH (smaller unlabelled size).
       intro ext
       apply ih ext.extendedType ext.extendedFlag hG
@@ -8351,7 +8360,7 @@ theorem brrbStr_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   -- Destructure F, subst F.size = 4, convert HEq to Eq
@@ -8622,7 +8631,7 @@ private theorem linSumType3_str_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   -- Destructure F, subst F.size = 4, convert HEq to Eq
@@ -8970,7 +8979,7 @@ theorem linSumType3_isLocalType :
                     rw [e.isInduced]
                   simp only [colouredGraphUniverse, Function.comp] at he_col
                   rw [he_col, hG_col3])
-                (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+                (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
         · -- v2 not labelled: v2 is black → ≤ Δ.
           by_cases hm2 : G.size - τ.size ≤ m
           · exact (ih τ G hG (show G.unlabelledSize ≤ m by
@@ -8988,7 +8997,7 @@ theorem linSumType3_isLocalType :
                   rw [e.isInduced]
                 simp only [colouredGraphUniverse, Function.comp] at he_col
                 rw [he_col, hG_col2])
-              (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+              (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
       · -- v0 not labelled: v0 is black → ≤ Δ.
         by_cases hm0 : G.size - τ.size ≤ m
         · exact (ih τ G hG (show G.unlabelledSize ≤ m by
@@ -9006,7 +9015,7 @@ theorem linSumType3_isLocalType :
                 rw [e.isInduced]
               simp only [colouredGraphUniverse, Function.comp] at he_col
               rw [he_col, hG_col0])
-            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
     · -- Extensions: use IH (smaller unlabelled size).
       intro ext
       apply ih ext.extendedType ext.extendedFlag hG
@@ -9038,7 +9047,7 @@ private theorem linSumType10_str_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   -- Destructure F, subst F.size = 4, convert HEq to Eq
@@ -9248,7 +9257,7 @@ private theorem thesisType2_str_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   have hFsize : F.size = 4 := hsize
@@ -9645,7 +9654,7 @@ theorem thesisType2_isLocalType :
                 rw [e.isInduced]
               simp only [colouredGraphUniverse, Function.comp] at he_col
               rw [he_col, hG_col0])
-            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
     · -- Extensions: use IH (smaller unlabelled size).
       intro ext
       apply ih ext.extendedType ext.extendedFlag hG
@@ -9677,7 +9686,7 @@ private theorem thesisType3_str_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   have hFsize : F.size = 4 := hsize
@@ -10065,7 +10074,7 @@ theorem thesisType3_isLocalType :
                 rw [e.isInduced]
               simp only [colouredGraphUniverse, Function.comp] at he_col
               rw [he_col, hG_col0])
-            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
     · intro ext
       apply ih ext.extendedType ext.extendedFlag hG
       unfold GenFlag.unlabelledSize at hm ⊢
@@ -10093,7 +10102,7 @@ private theorem thesisType4_str_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   have hFsize : F.size = 4 := hsize
@@ -10466,7 +10475,7 @@ theorem thesisType4_isLocalType :
                 rw [e.isInduced]
               simp only [colouredGraphUniverse, Function.comp] at he_col
               rw [he_col, hG_col0])
-            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
     · intro ext
       apply ih ext.extendedType ext.extendedFlag hG
       unfold GenFlag.unlabelledSize at hm ⊢
@@ -10498,7 +10507,7 @@ private theorem thesisType5_str_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   have hFsize : F.size = 4 := hsize
@@ -10859,7 +10868,7 @@ theorem thesisType5_isLocalType :
                   rw [e.isInduced]
                 simp only [colouredGraphUniverse, Function.comp] at he_col
                 rw [he_col, hG_col3])
-              (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+              (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
       · -- v2 unlabelled (black) → decompose at w2 via blackCount filter
         by_cases hm2 : G.size - τ.size ≤ m
         · exact (ih τ G hG (show G.unlabelledSize ≤ m by
@@ -10877,7 +10886,7 @@ theorem thesisType5_isLocalType :
                 rw [e.isInduced]
               simp only [colouredGraphUniverse, Function.comp] at he_col
               rw [he_col, hG_col2])
-            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
     · intro ext
       apply ih ext.extendedType ext.extendedFlag hG
       unfold GenFlag.unlabelledSize at hm ⊢
@@ -10910,7 +10919,7 @@ private theorem thesisType1_str_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   have hFsize : F.size = 4 := hsize
@@ -11298,7 +11307,7 @@ theorem thesisType1_isLocalType :
                 rw [e.isInduced]
               simp only [colouredGraphUniverse, Function.comp] at he_col
               rw [he_col, hG_col1])
-            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact hBC)
+            (fun H hH => by obtain ⟨_, _, hBC⟩ := hH; exact le_of_eq hBC.1)
     · intro ext
       apply ih ext.extendedType ext.extendedFlag hG
       unfold GenFlag.unlabelledSize at hm ⊢
@@ -12675,7 +12684,7 @@ private theorem sdpFlag5_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card) (Finset.mem_univ w)
   have hFsize : F.size = 5 := hsize
@@ -12968,7 +12977,7 @@ private theorem certF1_IC_le_pow
   change brrbGenGraphClass ⟨G.size, G.str, ⟨Fin.elim0, _⟩, _, _⟩ at hG
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hFsize : F.size = 5 := hsize
   obtain ⟨fsize, s, femb, hind, hsz⟩ := F
   simp only at hFsize hstr hB_card ⊢
@@ -13145,7 +13154,7 @@ private theorem certF6_IC_le_pow
   obtain ⟨_, _, hBC⟩ := hG
   set B := Finset.univ.filter (fun v : Fin G.size => G.str.2 v = (1 : Fin 2))
   set N := fun w : Fin G.size => Finset.univ.filter (fun v => G.str.1.Adj w v)
-  have hB_card : B.card ≤ Δ := hBC
+  have hB_card : B.card ≤ Δ := le_of_eq hBC.1
   have hN_card : ∀ w, (N w).card ≤ Δ := fun w =>
     Finset.le_sup (f := fun v => (Finset.univ.filter (G.str.1.Adj v)).card)
       (Finset.mem_univ w)
@@ -15166,7 +15175,7 @@ private lemma fin5_offsets_distinct (i : Fin 5) :
   fin_cases i <;> simp
 
 -- Helper: map a pentagon set containing v to a BRRB 4-tuple
-private noncomputable def pentagonToTuple (G : Flag emptyType) (v : Fin G.size)
+noncomputable def pentagonToTuple (G : Flag emptyType) (v : Fin G.size)
     (S : Finset (Fin G.size)) : Fin G.size × Fin G.size × Fin G.size × Fin G.size :=
   if h : IsPentagon G S ∧ v ∈ S then
     let f := h.1.choose
@@ -15180,7 +15189,7 @@ private noncomputable def pentagonToTuple (G : Flag emptyType) (v : Fin G.size)
   else (v, v, v, v)
 
 -- Each component of pentagonToTuple S lies in S (when S is a pentagon containing v)
-private lemma pentagonToTuple_mem (G : Flag emptyType) (v : Fin G.size)
+lemma pentagonToTuple_mem (G : Flag emptyType) (v : Fin G.size)
     (S : Finset (Fin G.size)) (hpS : IsPentagon G S) (hvS : v ∈ S) :
     (pentagonToTuple G v S).1 ∈ S ∧ (pentagonToTuple G v S).2.1 ∈ S ∧
     (pentagonToTuple G v S).2.2.1 ∈ S ∧ (pentagonToTuple G v S).2.2.2 ∈ S := by
@@ -15195,7 +15204,7 @@ private lemma pentagonToTuple_mem (G : Flag emptyType) (v : Fin G.size)
   · exact absurd ⟨hpS, hvS⟩ hcond
 
 -- Every element of S is either v or a pentagonToTuple component
-private lemma pentagonToTuple_cover (G : Flag emptyType) (v : Fin G.size)
+lemma pentagonToTuple_cover (G : Flag emptyType) (v : Fin G.size)
     (S : Finset (Fin G.size)) (hpS : IsPentagon G S) (hvS : v ∈ S)
     (x : Fin G.size) (hxS : x ∈ S) :
     x = v ∨ x = (pentagonToTuple G v S).1 ∨ x = (pentagonToTuple G v S).2.1 ∨
@@ -15698,7 +15707,7 @@ noncomputable def pentagonQ (G : Flag emptyType) (v : Fin G.size) : ℝ :=
 
 /-- The `pentagonToTuple` map sends each pentagon through `v` to a 4-walk tuple
     `(a,b,c,d)` satisfying `Adj v a ∧ Adj a b ∧ Adj b c ∧ Adj c d`. -/
-private lemma pentagonToTuple_adj (G : Flag emptyType) (v : Fin G.size)
+lemma pentagonToTuple_adj (G : Flag emptyType) (v : Fin G.size)
     (S : Finset (Fin G.size)) (hpS : IsPentagon G S) (hvS : v ∈ S) :
     G.graph.Adj v (pentagonToTuple G v S).1 ∧
     G.graph.Adj (pentagonToTuple G v S).1 (pentagonToTuple G v S).2.1 ∧
@@ -15738,9 +15747,157 @@ private lemma pentagonToTuple_adj (G : Flag emptyType) (v : Fin G.size)
   rw [hiw] at h_va
   exact ⟨h_va, h_ab, h_bc, h_cd⟩
 
+/-- The four components of `pentagonToTuple` are pairwise distinct, and none is
+`v`.  Immediate from injectivity of the C₅ labelling, the five indices
+`iw, iw+1, …, iw+4` being distinct mod 5 — but needed explicitly by `(a2a)`'s
+surjection, which reads the tuple off the pentagon's structure and must know it
+is not degenerate. -/
+lemma pentagonToTuple_distinct (G : Flag emptyType) (v : Fin G.size)
+    (S : Finset (Fin G.size)) (hpS : IsPentagon G S) (hvS : v ∈ S) :
+    v ≠ (pentagonToTuple G v S).1 ∧ v ≠ (pentagonToTuple G v S).2.1 ∧
+    v ≠ (pentagonToTuple G v S).2.2.1 ∧ v ≠ (pentagonToTuple G v S).2.2.2 ∧
+    (pentagonToTuple G v S).1 ≠ (pentagonToTuple G v S).2.1 ∧
+    (pentagonToTuple G v S).1 ≠ (pentagonToTuple G v S).2.2.1 ∧
+    (pentagonToTuple G v S).1 ≠ (pentagonToTuple G v S).2.2.2 ∧
+    (pentagonToTuple G v S).2.1 ≠ (pentagonToTuple G v S).2.2.1 ∧
+    (pentagonToTuple G v S).2.1 ≠ (pentagonToTuple G v S).2.2.2 ∧
+    (pentagonToTuple G v S).2.2.1 ≠ (pentagonToTuple G v S).2.2.2 := by
+  let f := hpS.choose
+  have hf_inj : Function.Injective f := hpS.choose_spec.1
+  have hf_img : Finset.image f Finset.univ = S := hpS.choose_spec.2.1
+  have hv_mem_img : v ∈ Finset.image f Finset.univ := by rw [hf_img]; exact hvS
+  let iw := (Finset.mem_image.mp hv_mem_img).choose
+  have hiw : f iw = v := (Finset.mem_image.mp hv_mem_img).choose_spec.2
+  have htoTuple : pentagonToTuple G v S =
+      (f ⟨(iw.val + 1) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 2) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 3) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 4) % 5, Nat.mod_lt _ (by omega)⟩) := by
+    unfold pentagonToTuple
+    simp only [dif_pos (show IsPentagon G S ∧ v ∈ S from ⟨hpS, hvS⟩)]
+    rfl
+  have hlt : iw.val < 5 := iw.isLt
+  -- every pair of the five indices is distinct mod 5
+  have key : ∀ a b : ℕ, a < 5 → b < 5 → a ≠ b →
+      (⟨(iw.val + a) % 5, Nat.mod_lt _ (by omega)⟩ : Fin 5) ≠
+      ⟨(iw.val + b) % 5, Nat.mod_lt _ (by omega)⟩ := by
+    intro a b ha hb hab h
+    exact hab (by have := Fin.mk.inj_iff.mp h; omega)
+  -- distinct indices give distinct vertices, `f` being injective
+  have hfne : ∀ a b : ℕ, ∀ ha : a < 5, ∀ hb : b < 5, a ≠ b →
+      f ⟨(iw.val + a) % 5, Nat.mod_lt _ (by omega)⟩ ≠
+      f ⟨(iw.val + b) % 5, Nat.mod_lt _ (by omega)⟩ :=
+    fun a b ha hb hab h => key a b ha hb hab (hf_inj h)
+  -- `v = f iw`, so a `v`-inequality is an index inequality against `iw` itself.
+  -- Rewriting `v` in the goal is not an option: `v` occurs in `pentagonToTuple G v S`
+  -- and in `iw`'s own definition, so the motive is ill-typed.
+  have hv_ne : ∀ a : ℕ, ∀ ha : a < 5, a ≠ 0 →
+      v ≠ f ⟨(iw.val + a) % 5, Nat.mod_lt _ (by omega)⟩ := by
+    intro a ha ha0 h
+    have hfi : f iw = f ⟨(iw.val + a) % 5, Nat.mod_lt _ (by omega)⟩ := by rw [hiw]; exact h
+    have h2 : iw.val = (iw.val + a) % 5 := congrArg Fin.val (hf_inj hfi)
+    omega
+  rw [htoTuple]
+  exact ⟨hv_ne 1 (by omega) (by omega), hv_ne 2 (by omega) (by omega),
+    hv_ne 3 (by omega) (by omega), hv_ne 4 (by omega) (by omega),
+    hfne 1 2 (by omega) (by omega) (by omega), hfne 1 3 (by omega) (by omega) (by omega),
+    hfne 1 4 (by omega) (by omega) (by omega), hfne 2 3 (by omega) (by omega) (by omega),
+    hfne 2 4 (by omega) (by omega) (by omega), hfne 3 4 (by omega) (by omega) (by omega)⟩
+
+
+/-- The five **non**-edges of the pentagon, in tuple coordinates.  `..._adj`
+gives the cycle's edges; the forward injection also needs its non-edges, since
+that is what makes the two middle components red — `¬G.graph.Adj v ·` is exactly
+`col · = 0` at the `v`-colouring. -/
+lemma pentagonToTuple_nonadj (G : Flag emptyType) (v : Fin G.size)
+    (S : Finset (Fin G.size)) (hpS : IsPentagon G S) (hvS : v ∈ S) :
+    ¬G.graph.Adj v (pentagonToTuple G v S).2.1 ∧
+    ¬G.graph.Adj v (pentagonToTuple G v S).2.2.1 ∧
+    ¬G.graph.Adj (pentagonToTuple G v S).1 (pentagonToTuple G v S).2.2.1 ∧
+    ¬G.graph.Adj (pentagonToTuple G v S).1 (pentagonToTuple G v S).2.2.2 ∧
+    ¬G.graph.Adj (pentagonToTuple G v S).2.1 (pentagonToTuple G v S).2.2.2 := by
+  let f := hpS.choose
+  have hf_adj : ∀ i j : Fin 5, cycleGraph5.Adj i j ↔ G.graph.Adj (f i) (f j) :=
+    hpS.choose_spec.2.2
+  have hf_img : Finset.image f Finset.univ = S := hpS.choose_spec.2.1
+  have hv_mem_img : v ∈ Finset.image f Finset.univ := by rw [hf_img]; exact hvS
+  let iw := (Finset.mem_image.mp hv_mem_img).choose
+  have hiw : f iw = v := (Finset.mem_image.mp hv_mem_img).choose_spec.2
+  have htoTuple : pentagonToTuple G v S =
+      (f ⟨(iw.val + 1) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 2) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 3) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 4) % 5, Nat.mod_lt _ (by omega)⟩) := by
+    unfold pentagonToTuple
+    simp only [dif_pos (show IsPentagon G S ∧ v ∈ S from ⟨hpS, hvS⟩)]
+    rfl
+  have hlt : iw.val < 5 := iw.isLt
+  -- a C₅ non-edge between two offsets from `iw`, read off the `fromRel` unfolding
+  have key : ∀ a b : ℕ, ∀ ha : a < 5, ∀ hb : b < 5,
+      ((iw.val + a) % 5 + 1) % 5 ≠ (iw.val + b) % 5 →
+      ((iw.val + b) % 5 + 1) % 5 ≠ (iw.val + a) % 5 →
+      ¬G.graph.Adj (f ⟨(iw.val + a) % 5, Nat.mod_lt _ (by omega)⟩)
+        (f ⟨(iw.val + b) % 5, Nat.mod_lt _ (by omega)⟩) := by
+    intro a b ha hb hab hba hadj
+    have hc := (hf_adj _ _).mpr hadj
+    simp only [cycleGraph5, SimpleGraph.fromRel_adj, ne_eq] at hc
+    rcases hc.2 with h | h
+    · exact hab h
+    · exact hba h
+  -- `v` is the offset-0 vertex.  Rewrite the `f`-term into `v`, never `v` into the
+  -- `f`-term: `iw` is *defined* from `v`, so that direction has no valid motive.
+  have hidx : (⟨(iw.val + 0) % 5, Nat.mod_lt _ (by omega)⟩ : Fin 5) = iw := by
+    apply Fin.ext; simp [Nat.mod_eq_of_lt hlt]
+  have hv0 : f ⟨(iw.val + 0) % 5, Nat.mod_lt _ (by omega)⟩ = v := by rw [hidx]; exact hiw
+  rw [htoTuple]
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · have h := key 0 2 (by omega) (by omega) (by omega) (by omega); rwa [hv0] at h
+  · have h := key 0 3 (by omega) (by omega) (by omega) (by omega); rwa [hv0] at h
+  · exact key 1 3 (by omega) (by omega) (by omega) (by omega)
+  · exact key 1 4 (by omega) (by omega) (by omega) (by omega)
+  · exact key 2 4 (by omega) (by omega) (by omega) (by omega)
+
+
+/-- The pentagon's **fifth** edge, back from the last tuple component to `v`.
+`..._adj` walks the cycle forwards and stops after four edges; the injection
+needs the closing one, since it is what makes the last component black. -/
+lemma pentagonToTuple_adj_closing (G : Flag emptyType) (v : Fin G.size)
+    (S : Finset (Fin G.size)) (hpS : IsPentagon G S) (hvS : v ∈ S) :
+    G.graph.Adj (pentagonToTuple G v S).2.2.2 v := by
+  let f := hpS.choose
+  have hf_adj : ∀ i j : Fin 5, cycleGraph5.Adj i j ↔ G.graph.Adj (f i) (f j) :=
+    hpS.choose_spec.2.2
+  have hf_img : Finset.image f Finset.univ = S := hpS.choose_spec.2.1
+  have hv_mem_img : v ∈ Finset.image f Finset.univ := by rw [hf_img]; exact hvS
+  let iw := (Finset.mem_image.mp hv_mem_img).choose
+  have hiw : f iw = v := (Finset.mem_image.mp hv_mem_img).choose_spec.2
+  have htoTuple : pentagonToTuple G v S =
+      (f ⟨(iw.val + 1) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 2) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 3) % 5, Nat.mod_lt _ (by omega)⟩,
+       f ⟨(iw.val + 4) % 5, Nat.mod_lt _ (by omega)⟩) := by
+    unfold pentagonToTuple
+    simp only [dif_pos (show IsPentagon G S ∧ v ∈ S from ⟨hpS, hvS⟩)]
+    rfl
+  have hlt : iw.val < 5 := iw.isLt
+  have hidx : (⟨(iw.val + 0) % 5, Nat.mod_lt _ (by omega)⟩ : Fin 5) = iw := by
+    apply Fin.ext; simp [Nat.mod_eq_of_lt hlt]
+  have hv0 : f ⟨(iw.val + 0) % 5, Nat.mod_lt _ (by omega)⟩ = v := by rw [hidx]; exact hiw
+  have hadj5 : cycleGraph5.Adj ⟨(iw.val + 4) % 5, Nat.mod_lt _ (by omega)⟩
+      ⟨(iw.val + 0) % 5, Nat.mod_lt _ (by omega)⟩ := by
+    simp only [cycleGraph5, SimpleGraph.fromRel_adj, ne_eq]
+    refine ⟨fun h => ?_, Or.inl (by omega)⟩
+    have := congrArg Fin.val h
+    simp only at this
+    omega
+  have h := (hf_adj _ _).mp hadj5
+  rw [htoTuple]
+  rwa [hv0] at h
+
+
 /-- Injectivity of `pentagonToTuple`: distinct pentagon sets through `v` map to
     distinct 4-tuples. -/
-private lemma pentagonToTuple_injOn (G : Flag emptyType) (v : Fin G.size) :
+lemma pentagonToTuple_injOn (G : Flag emptyType) (v : Fin G.size) :
     Set.InjOn (pentagonToTuple G v)
       ↑((Finset.univ : Finset (Finset (Fin G.size))).filter
         (fun S => IsPentagon G S ∧ v ∈ S)) := by

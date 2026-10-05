@@ -571,7 +571,8 @@ target is a constant-scale offset (the development notes §1.2).
    the tolerance.
 3. The pentagon peer `pentagonQ_basis_combinatorial_identity_step1`
    (`PentagonQBridge.lean`) packages the same tuple-classification content at
-   size 8 where it IS exact (its LHS is an exact tuple count); the SEC
+   size 8 where it too is now asymptotic (a `Tendsto ... (nhds 0)` since the
+   2026-09-20 repair; its LHS is an exact tuple count); the SEC
    differences (corrections (i)–(ii), rounding) are precisely what the `∀ᶠ` +
    tolerance weakening accounts for.
 4. A0.2/L1 evidence: the objective support (7,794 nonzero targets) consists
@@ -696,7 +697,7 @@ the Rust basis enumeration generates exactly the local flags. The class
 change (black-vertex count `≤ Δ` → `≤ 2Δ`) only doubles the anchor budget in
 the `IC ≤ (2Δ)^c·Δ^(5−c)` bound — bounded density is preserved (the claim is
 monotone in the anchor budget). Pentagon Q's proved analog
-(`PentagonQBridge.lean:9518`, strong induction on unlabelled size + per-flag
+(`PentagonQBridge.lean`'s `flagBasis_isLocalFlag`, strong induction on unlabelled size + per-flag
 `native_decide` witness) is the structural template. -/
 axiom flagBasis_sec_isLocalFlag_F (k : Fin secBasisSize) :
     GenIsLocalFlag (GenFlagType.empty CG22) (SecBasis.flagBasis_sec k)

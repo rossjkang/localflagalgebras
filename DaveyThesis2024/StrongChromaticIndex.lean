@@ -115,7 +115,7 @@ theorem strong_neighbourhood_density_improved (eta : ℝ)
     add edges between low-degree vertex pairs to raise `δ(G)` to `Δ(G)`
     while preserving `Δ(G)` and not decreasing `χ'_s`; iterate. The
     Pentagon-Q analog of this is formalised as `pentagon_regular_suffices`
-    in `PentagonConjecture.lean:1368`.
+    in `PentagonConjecture.lean:2244`.
 
     **Closure status (Phase 3, 2026-05-20).** This was previously an
     axiom; it has been closed as a theorem by the Molloy–Reed iterated
@@ -138,7 +138,7 @@ theorem strong_neighbourhood_density_improved (eta : ℝ)
       colouring graphs of bounded local density", JCTB 2022 (§1.6) —
       reduction at the thesis's working constant 1.73.
     * Pentagon-Q Lean analog: `pentagon_regular_suffices`
-      (`DaveyThesis2024/PentagonConjecture.lean:1368`). -/
+      (`DaveyThesis2024/PentagonConjecture.lean:2244`). -/
 theorem strong_chromatic_index_Reg_suffices (c : ℝ) :
     (∃ D₀ : ℕ, ∀ G : Flag emptyType, IsRegular G →
        D₀ ≤ maxDegree G →

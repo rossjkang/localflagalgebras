@@ -176,7 +176,7 @@ the nominal bound `(boundNumer, boundDenom) = (4093, 1000) = 4.093`.
 This mirrors Pentagon Q's `cert_slack_within_tight_budget` structural
 pattern (`PentagonQCertificate.lean:422`) and provides direct
 constructive `native_decide` support for the bound carried by
-`phi_evalAlg_O_sec_bip_alg_le_bound` in `SecBipartiteBridge.lean`.
+`phi_evalAlg_O_sec_bip_alg_le_bound_F` in `SecBipartiteBridge.lean`.
 
 Measured `total_slack_abs ≈ 4.189 × 10²²`; safety ratio ~2.4×. The
 cert is structurally faithful at the loose bound. Strict-bound

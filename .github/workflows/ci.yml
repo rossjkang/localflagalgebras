@@ -18,7 +18,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    # 360 is the GitHub-hosted maximum.  Raised from 180 after the
+    # 2026-09-29 run was cancelled at the limit having not finished; see
+    # the cache note below for why that build was so much slower than the
+    # 44-minute one a week earlier.
+    timeout-minutes: 360
 
     steps:
       - name: Checkout
@@ -49,8 +53,34 @@ jobs:
             .lake/packages/*/.lake/build
           # Bust the cache when mathlib pin moves OR when the toolchain
           # changes; otherwise reuse it across pushes for speed.
-          key: lake-${{ runner.os }}-${{ hashFiles('lake-manifest.json', 'lean-toolchain') }}
+          #
+          # The `v2` marker is deliberate, and fixes a deadlock.  Neither
+          # keyed file has changed since 2026-07-14, so the key hit on
+          # every run; actions/cache restores on a hit and then *skips the
+          # save*, leaving the cache frozen at its July contents.  Each
+          # later run therefore rebuilt three months of accumulated
+          # modules from a stale base — 44 min on 2026-09-22, past the
+          # 180-minute timeout on 2026-09-29.  The cache could not recover
+          # on its own, because it only saves at the end of a run that
+          # completes, and no run completed.
+          #
+          # Changing the prefix forces one fresh save.  The old prefix is
+          # kept in restore-keys so that first run still starts from the
+          # July cache rather than from nothing.
+          #
+          # 2026-10-04: the key now hashes the Lean sources too.  With only the
+          # manifest and toolchain in it the key never changed, so an exact hit
+          # meant actions/cache skipped the save and the cache froze -- which is
+          # the deadlock the `v2` bump fixed once by hand.  Hashing the sources
+          # makes every content change key itself, so it always saves and always
+          # restores the nearest prior cache.  No further manual bumps.
+          #
+          # `lake-v2-` must stay ahead of the bare prefix in restore-keys: the
+          # only fresh cache was saved under `lake-v2-Linux-...`, which does NOT
+          # begin with `lake-Linux-`.
+          key: lake-v2-${{ runner.os }}-${{ hashFiles('lake-manifest.json', 'lean-toolchain', 'lakefile.toml', 'DaveyThesis2024.lean', 'DaveyThesis2024/**/*.lean') }}
           restore-keys: |
+            lake-v2-${{ runner.os }}-
             lake-${{ runner.os }}-
 
       - name: Fetch mathlib cache

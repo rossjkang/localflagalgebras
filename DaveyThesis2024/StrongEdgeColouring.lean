@@ -359,7 +359,8 @@ noncomputable def strongNeighbourhoodDensityBound : ℝ := 10.644 / 8
 -- - H = L(G)² (the squared line graph), X = Δ(H) ≈ 2Δ(G)²
 -- - σ = secSparsity = 1 - secDensityBound/16 ≈ 0.33475, ε(σ) ≈ 0.13510
 -- This gives χ(H) ≤ (1 - ε(σ) + ι)·2Δ² ≈ (1.72981 + ι)Δ² for any ι > 0.
--- The all-vertex sparsity hypothesis is supplied by `sec_vertex_sparsity`.
+-- The all-vertex sparsity hypothesis was supplied by `sec_vertex_sparsity`,
+-- part of the consumer chain the 2026-07-11 F-faithful repair retired.
 -- See `hurley_colouring_lemma`.
 
 /-! ## §4.3: Reduction to Coloured Graphs
@@ -461,7 +462,8 @@ The SDP certificates (verified by `certificates/verify_sdp.py`) give:
 - General: φ(O) ≤ 10.644 (`certificates/strong_edge_colouring.{sdpa,cert}`, m=17950)
 - Bipartite: φ(O_bip) ≤ 4.093 (`certificates/bipartite_strong_edge_colouring.{sdpa,cert}`, m=3808)
 
-The per-vertex sparsity bounds (`sec_vertex_sparsity`, `sec_vertex_sparsity_bipartite`)
+The per-vertex sparsity bounds (`sec_vertex_sparsity`, `sec_vertex_sparsity_bipartite`),
+retired with that chain,
 encapsulate the full SDP-to-counting bridge. The SDP value λ determines the
 sparsity parameter σ = 1 - λ/16 (general) or σ_bip = 1 - λ/8 (bipartite). -/
 
@@ -1213,8 +1215,9 @@ The SDP+averaging bridge axiom `sec_sdp_limit_bound` and its downstream consumer
 `DaveyThesis2024/StrongChromaticIndex.lean` (Phase S3.H, 2026-05-14). That file
 sits *above* both `StrongEdgeColouring` and the cert-driven bridges
 (`SecBridge`, `SecBipartiteBridge`) in the import graph, allowing the literal
-axiom to be replaced by a theorem aliased to
-`Davey2024.SecBridge.sec_sdp_limit_bound_via_bridge`. -/
+axiom to be replaced by a theorem drawn from `SecBridge`. (That plan was
+superseded: the 2026-07-11 F-faithful repair retired this consumer chain, and
+no such alias was ever created.) -/
 
 /-! ## §4.5: Bipartite Case -/
 
@@ -1418,8 +1421,9 @@ downstream consumers (`sec_vertex_sparsity_bipartite`,
 `sec_line_graph_sq_sparsity_bipartite`,
 `sec_combined_bound_bipartite`, `strong_chromatic_index_bipartite`) have
 been moved to `DaveyThesis2024/StrongChromaticIndex.lean` (Phase S3.H,
-2026-05-14). The literal axiom is replaced there by a theorem aliased to
-`Davey2024.SecBipartiteBridge.sec_sdp_limit_bound_bipartite_via_bridge`. -/
+2026-05-14). The literal axiom is replaced there by a theorem drawn from
+`SecBipartiteBridge`. (That plan was superseded: the 2026-07-11 F-faithful
+repair retired this consumer chain, and no such alias was ever created.) -/
 
 end Davey2024
 

@@ -1,0 +1,94 @@
+{
+ "layer": 12,
+ "masks": 1,
+ "nodes": 1,
+ "chunk_ceiling": 3000,
+ "module_node_cap": 60000,
+ "module_decl_cap": 120,
+ "per_mask": [
+  {
+   "index": 0,
+   "K": 150101660147985,
+   "nodes": 1,
+   "cut": false,
+   "depth": null,
+   "frontier": null,
+   "internal": null,
+   "chunks": 0
+  }
+ ],
+ "slices": [
+  {
+   "id": 0,
+   "kind": "light",
+   "first": 0,
+   "width": 1,
+   "nodes": 1
+  }
+ ],
+ "modules": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L12Masks",
+   "file": "L12Masks.lean",
+   "decls": [
+    "Delta4Gen.L12.M_eq",
+    "Delta4Gen.L12.M_residual",
+    "Delta4Gen.L12.stepM"
+   ],
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L12S00",
+   "file": "L12S00.lean",
+   "decls": [
+    "Delta4Gen.L12.slice_0"
+   ],
+   "nodes": 1
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L12",
+   "file": "L12.lean",
+   "decls": [
+    "Delta4Gen.L12.layer_count",
+    "Delta4Gen.L12.layer_ok"
+   ],
+   "nodes": 0
+  }
+ ],
+ "builds": [
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L12Masks",
+   "path": "DaveyThesis2024/Delta4/Generated/L12Masks.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 9.4,
+   "rss_gb": 5.93,
+   "returncode": 0,
+   "stderr_tail": "        9.44 real         8.16 user         1.22 sys\n          6369165312  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              541046  page reclaims\n                 918  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  42  voluntary context switches\n                6148  involuntary context switches\n          3298114052  instructions retired\n          1066985294  cycles elapsed\n           139760096  peak memory footprint\n",
+   "nodes": 0
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L12S00",
+   "path": "DaveyThesis2024/Delta4/Generated/L12S00.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 2.1,
+   "rss_gb": 2.87,
+   "returncode": 0,
+   "stderr_tail": "        2.09 real         0.99 user         0.88 sys\n          3086598144  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              299545  page reclaims\n                4390  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  54  voluntary context switches\n                4462  involuntary context switches\n          3570948448  instructions retired\n          1117439604  cycles elapsed\n           139481568  peak memory footprint\n",
+   "nodes": 1
+  },
+  {
+   "module": "DaveyThesis2024.Delta4.Generated.L12",
+   "path": "DaveyThesis2024/Delta4/Generated/L12.lean",
+   "ok": true,
+   "why": "ok",
+   "wall": 1.8,
+   "rss_gb": 2.87,
+   "returncode": 0,
+   "stderr_tail": "        1.83 real         1.02 user         0.85 sys\n          3078275072  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n              303260  page reclaims\n                 148  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  40  voluntary context switches\n                5569  involuntary context switches\n          3299157624  instructions retired\n          1073061780  cycles elapsed\n           139579872  peak memory footprint\n",
+   "nodes": 0
+  }
+ ],
+ "build_ok": true
+}

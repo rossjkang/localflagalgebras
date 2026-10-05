@@ -1821,7 +1821,7 @@ theorem brrbGenGraphClass_black_le_delta
     (G : GenFlag CG2 (GenFlagType.empty CG2))
     (hG : brrbGenGraphClass G) :
     (Finset.univ.filter (fun v : Fin G.size => G.str.2 v = 1)).card ≤
-      brrbGenDelta G := hG.2.2
+      brrbGenDelta G := le_of_eq hG.2.2.1
 
 /-- **BRRB graph class extraction**: black-independence. -/
 theorem brrbGenGraphClass_blackIndep

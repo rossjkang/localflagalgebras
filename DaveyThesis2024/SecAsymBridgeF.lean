@@ -451,7 +451,8 @@ noncomputable def secAsymF_phi_construction
     (fun k => asymF_seq_to_genFlag_mem_class4 1 cseq hΔ' hAsym' k)
 
 /-- The bound-axiom gate: `phi` arises from `secAsymF_phi_construction` on an
-**`IsAsymmetricBipartite 1`** (regular-bipartite) Δ-increasing sequence. Restricted
+**`IsAsymmetricBipartite 1`** (SEMIregular-bipartite: high side exactly Δ,
+low side ≤ Δ) Δ-increasing sequence. Restricted
 to `p = 1` (the CG4 cert is only exact there — see `secAsymF_phi_construction`). The
 spurious `(2−η)Δ²` min-degree prose is DROPPED (L5C_design §3.5: the class has no
 min-degree family — the only structural gate is `IsAsymmetricBipartite 1`, carried
@@ -517,7 +518,7 @@ CG4 cert is exact (no `1/P` coordinate scaling). The RHS is genuinely non-vacuou
 (the F-free 334-flag cert evaluated in an F-free host with matching palette —
 `SecAsymGates.g_vacuity`); the historic refuter K_{Δ,Δ} gives 0.25 ≤ 0.5687
 (L5C_design §2.4). The per-vertex p=1 form was adversarially probe-confirmed across
-8 regular-bipartite families (the development notes: worst 0.47723
+8 semiregular-bipartite families (the development notes: worst 0.47723
 ≪ 0.5687, saturating; `L5C_probe/VERDICT.md`: the p=1 pipeline reproduces the known
 K_{m,m} → 0.25 values with ≤ holding). The target-integerisation residue over 334
 flags at the 1/8 prescale is ≈ 3.5×10⁻⁹ ≪ `secAsymIdentityTol = 10⁻⁵`. -/

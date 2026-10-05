@@ -20,6 +20,10 @@ namespace Davey2024
 
 open Finset
 
+-- Kernel `decide` (replacing `native_decide` in the witness bridges below) needs a
+-- deeper stack for the size-5 induced-count and joint-count enumerations.
+set_option maxRecDepth 1000000
+
 /-! ## Computable coloured graph -/
 
 /-- A computable 2-coloured graph on `Fin n` vertices. -/
@@ -248,6 +252,59 @@ def tcJointCount (k : Nat) {n₁ n₂ n₃ : Nat}
     (∀ i : Fin n₂, i.val < k → (p.2 i).val = i.val) ∧
     (∀ i : Fin n₃, ((∃ a : Fin n₁, p.1 a = i) ∧ (∃ b : Fin n₂, p.2 b = i)) ↔ i.val < k) ∧
     (∀ i : Fin n₃, (∃ a : Fin n₁, p.1 a = i) ∨ (∃ b : Fin n₂, p.2 b = i))) |>.card
+
+/-- Filtering a product by a predicate that splits as `C₁` on the first
+    coordinate and `C₂` on both, then counting, equals summing over the
+    first-coordinate values passing `C₁` the count of second-coordinate
+    values passing `C₂`. This lets the kernel avoid materialising the whole
+    `|α|·|β|` product `Finset` when reducing `tcJointCount` by `decide`. -/
+theorem card_filter_product_split
+    {α β : Type*} [Fintype α] [Fintype β]
+    (C₁ : α → Prop) (C₂ : α → β → Prop)
+    [DecidablePred C₁] [∀ a, DecidablePred (C₂ a)] :
+    (((univ : Finset α) ×ˢ (univ : Finset β)).filter
+        (fun p => C₁ p.1 ∧ C₂ p.1 p.2)).card
+      = ∑ a ∈ (univ : Finset α).filter C₁, ((univ : Finset β).filter (C₂ a)).card := by
+  rw [Finset.card_filter, Finset.sum_product, Finset.sum_filter]
+  refine Finset.sum_congr rfl (fun a _ => ?_)
+  by_cases h : C₁ a
+  · simp only [h, true_and, if_true, Finset.card_filter]
+  · simp only [h, false_and, if_false, Finset.sum_const_zero]
+
+/-- Kernel-tractable reformulation of `tcJointCount`: a nested sum over the
+    computable function-`univ`. The outer filter keeps only the (few) valid
+    injective first maps, so the inner enumeration runs a handful of times
+    instead of over the full `|Fin n₁ → Fin n₃|·|Fin n₂ → Fin n₃|` product.
+    Equal to `tcJointCount` by `tcJointCount_eq_fast`. -/
+def tcJointCountFast (k : Nat) {n₁ n₂ n₃ : Nat}
+    (F₁ : CGraph n₁) (F₂ : CGraph n₂) (G : CGraph n₃) : Nat :=
+  ((univ : Finset (Fin n₁ → Fin n₃)).filter (fun p1 =>
+      (∀ i j : Fin n₁, p1 i = p1 j → i = j) ∧
+      (∀ i : Fin n₁, F₁.col i = G.col (p1 i)) ∧
+      (∀ i j : Fin n₁, F₁.adj i j = G.adj (p1 i) (p1 j)) ∧
+      (∀ i : Fin n₁, i.val < k → (p1 i).val = i.val))).sum (fun p1 =>
+    ((univ : Finset (Fin n₂ → Fin n₃)).filter (fun p2 =>
+      (∀ i j : Fin n₂, p2 i = p2 j → i = j) ∧
+      (∀ i : Fin n₂, F₂.col i = G.col (p2 i)) ∧
+      (∀ i j : Fin n₂, F₂.adj i j = G.adj (p2 i) (p2 j)) ∧
+      (∀ i : Fin n₂, i.val < k → (p2 i).val = i.val) ∧
+      (∀ i : Fin n₃, ((∃ a : Fin n₁, p1 a = i) ∧ (∃ b : Fin n₂, p2 b = i)) ↔ i.val < k) ∧
+      (∀ i : Fin n₃, (∃ a : Fin n₁, p1 a = i) ∨ (∃ b : Fin n₂, p2 b = i)))).card)
+
+/-- `tcJointCount` agrees with its kernel-tractable form `tcJointCountFast`;
+    the predicate splits as clauses 1–4 (on the first map) and clauses 5–10
+    (on both maps). -/
+theorem tcJointCount_eq_fast (k : Nat) {n₁ n₂ n₃ : Nat}
+    (F₁ : CGraph n₁) (F₂ : CGraph n₂) (G : CGraph n₃) :
+    tcJointCount k F₁ F₂ G = tcJointCountFast k F₁ F₂ G := by
+  rw [tcJointCountFast, ← card_filter_product_split]
+  unfold tcJointCount
+  congr 1
+  apply Finset.filter_congr
+  intro p _
+  constructor
+  · rintro ⟨a, b, c, d, e, f, g, h, i, j⟩; exact ⟨⟨a, b, c, d⟩, e, f, g, h, i, j⟩
+  · rintro ⟨⟨a, b, c, d⟩, e, f, g, h, i, j⟩; exact ⟨a, b, c, d, e, f, g, h, i, j⟩
 
 /-- Concrete CGraph for csType7 (σ₇): 3 vertices, edges 0-1, 0-2, col [R,B,R]. -/
 def cType7 : CGraph 3 where
@@ -912,13 +969,13 @@ private theorem F77_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F77_witness, CGraph.toGenFlag, tcGraph, cF7]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F77_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F77_witness.forget = 6 := by
   rw [F77_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF7 cF7 false) (tcGraph cF7 cF7 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem cs1Flag7_eq_cF7_toTypedGenFlag :
     cs1Flag7 = cF7.toTypedGenFlag csType7 (by decide) (by
@@ -942,14 +999,14 @@ private theorem F77_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F77_witness_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag7 cs1Flag7 F77_witness = 2 := by
   rw [cs1Flag7_eq_cF7_toTypedGenFlag, F77_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cF7 cF7 (tcGraph cF7 cF7 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF7 cF7 (tcGraph cF7 cF7 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for cs1Flag4 and cs1Flag5 -/
 
@@ -984,13 +1041,13 @@ private theorem F44_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F44_witness, CGraph.toGenFlag, tcGraph, cF4]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F44_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F44_witness.forget = 2 := by
   rw [F44_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF4 cF4 false) (tcGraph cF4 cF4 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F44_witness_eq_tcGraph_toTypedGenFlag :
     F44_witness = (tcGraph cF4 cF4 false).toTypedGenFlag csType7 (by decide) (by
@@ -1003,14 +1060,14 @@ private theorem F44_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F44_witness_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag4 cs1Flag4 F44_witness = 2 := by
   rw [cs1Flag4_eq_cF4_toTypedGenFlag, F44_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cF4 cF4 (tcGraph cF4 cF4 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF4 cF4 (tcGraph cF4 cF4 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F47_witness -/
 
@@ -1021,13 +1078,13 @@ private theorem F47_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F47_witness, CGraph.toGenFlag, tcGraph, cF4, cF7]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F47_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F47_witness.forget = 2 := by
   rw [F47_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF4 cF7 false) (tcGraph cF4 cF7 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F47_witness_eq_tcGraph_toTypedGenFlag :
     F47_witness = (tcGraph cF4 cF7 false).toTypedGenFlag csType7 (by decide) (by
@@ -1040,7 +1097,7 @@ private theorem F47_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F47_witness_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag4 cs1Flag7 F47_witness = 1 := by
   rw [cs1Flag4_eq_cF4_toTypedGenFlag, cs1Flag7_eq_cF7_toTypedGenFlag,
@@ -1048,7 +1105,7 @@ theorem F47_witness_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF4 cF7 (tcGraph cF4 cF7 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF4 cF7 (tcGraph cF4 cF7 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F55_witness -/
 
@@ -1059,13 +1116,13 @@ private theorem F55_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F55_witness, CGraph.toGenFlag, tcGraph, cF5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F55_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F55_witness.forget = 2 := by
   rw [F55_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF5 cF5 false) (tcGraph cF5 cF5 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F55_witness_eq_tcGraph_toTypedGenFlag :
     F55_witness = (tcGraph cF5 cF5 false).toTypedGenFlag csType7 (by decide) (by
@@ -1078,14 +1135,14 @@ private theorem F55_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F55_witness_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag5 cs1Flag5 F55_witness = 2 := by
   rw [cs1Flag5_eq_cF5_toTypedGenFlag, F55_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cF5 cF5 (tcGraph cF5 cF5 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF5 cF5 (tcGraph cF5 cF5 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F57_witness -/
 
@@ -1096,13 +1153,13 @@ private theorem F57_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F57_witness, CGraph.toGenFlag, tcGraph, cF5, cF7]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F57_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F57_witness.forget = 2 := by
   rw [F57_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF5 cF7 false) (tcGraph cF5 cF7 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F57_witness_eq_tcGraph_toTypedGenFlag :
     F57_witness = (tcGraph cF5 cF7 false).toTypedGenFlag csType7 (by decide) (by
@@ -1115,7 +1172,7 @@ private theorem F57_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F57_witness_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag5 cs1Flag7 F57_witness = 1 := by
   rw [cs1Flag5_eq_cF5_toTypedGenFlag, cs1Flag7_eq_cF7_toTypedGenFlag,
@@ -1123,7 +1180,7 @@ theorem F57_witness_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF5 cF7 (tcGraph cF5 cF7 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF5 cF7 (tcGraph cF5 cF7 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F45_witness_false -/
 
@@ -1134,13 +1191,13 @@ private theorem F45_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F45_witness_false, CGraph.toGenFlag, tcGraph, cF4, cF5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F45_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F45_witness_false.forget = 1 := by
   rw [F45_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF4 cF5 false) (tcGraph cF4 cF5 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F45_witness_false_eq_tcGraph_toTypedGenFlag :
     F45_witness_false = (tcGraph cF4 cF5 false).toTypedGenFlag csType7 (by decide) (by
@@ -1153,7 +1210,7 @@ private theorem F45_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F45_witness_false_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag4 cs1Flag5 F45_witness_false = 1 := by
   rw [cs1Flag4_eq_cF4_toTypedGenFlag, cs1Flag5_eq_cF5_toTypedGenFlag,
@@ -1161,7 +1218,7 @@ theorem F45_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF4 cF5 (tcGraph cF4 cF5 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF4 cF5 (tcGraph cF4 cF5 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F45_witness_true -/
 
@@ -1172,13 +1229,13 @@ private theorem F45_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F45_witness_true, CGraph.toGenFlag, tcGraph, cF4, cF5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F45_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F45_witness_true.forget = 2 := by
   rw [F45_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF4 cF5 true) (tcGraph cF4 cF5 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F45_witness_true_eq_tcGraph_toTypedGenFlag :
     F45_witness_true = (tcGraph cF4 cF5 true).toTypedGenFlag csType7 (by decide) (by
@@ -1191,7 +1248,7 @@ private theorem F45_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F45_witness_true_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag4 cs1Flag5 F45_witness_true = 1 := by
   rw [cs1Flag4_eq_cF4_toTypedGenFlag, cs1Flag5_eq_cF5_toTypedGenFlag,
@@ -1199,7 +1256,7 @@ theorem F45_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF4 cF5 (tcGraph cF4 cF5 true) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF4 cF5 (tcGraph cF4 cF5 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### cs1Flag3 CGraph and ℓ² product data -/
 
@@ -1384,13 +1441,13 @@ private theorem F33_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F33_witness, CGraph.toGenFlag, tcGraph, cF3]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F33_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F33_witness.forget = 6 := by
   rw [F33_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF3 cF3 false) (tcGraph cF3 cF3 false)
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F33_witness_eq_tcGraph_toTypedGenFlag :
     F33_witness = (tcGraph cF3 cF3 false).toTypedGenFlag csType7 (by decide) (by
@@ -1403,14 +1460,14 @@ private theorem F33_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F33_witness_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag3 cs1Flag3 F33_witness = 2 := by
   rw [cs1Flag3_eq_cF3_toTypedGenFlag, F33_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cF3 cF3 (tcGraph cF3 cF3 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF3 cF3 (tcGraph cF3 cF3 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F34_witness_false -/
 
@@ -1421,13 +1478,13 @@ private theorem F34_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F34_witness_false, CGraph.toGenFlag, tcGraph, cF3, cF4]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F34_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F34_witness_false.forget = 2 := by
   rw [F34_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF3 cF4 false) (tcGraph cF3 cF4 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F34_witness_false_eq_tcGraph_toTypedGenFlag :
     F34_witness_false = (tcGraph cF3 cF4 false).toTypedGenFlag csType7 (by decide) (by
@@ -1440,7 +1497,7 @@ private theorem F34_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F34_witness_false_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag3 cs1Flag4 F34_witness_false = 1 := by
   rw [cs1Flag3_eq_cF3_toTypedGenFlag, cs1Flag4_eq_cF4_toTypedGenFlag,
@@ -1448,7 +1505,7 @@ theorem F34_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF3 cF4 (tcGraph cF3 cF4 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF3 cF4 (tcGraph cF3 cF4 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F34_witness_true -/
 
@@ -1459,13 +1516,13 @@ private theorem F34_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F34_witness_true, CGraph.toGenFlag, tcGraph, cF3, cF4]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F34_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F34_witness_true.forget = 1 := by
   rw [F34_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF3 cF4 true) (tcGraph cF3 cF4 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F34_witness_true_eq_tcGraph_toTypedGenFlag :
     F34_witness_true = (tcGraph cF3 cF4 true).toTypedGenFlag csType7 (by decide) (by
@@ -1478,7 +1535,7 @@ private theorem F34_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F34_witness_true_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag3 cs1Flag4 F34_witness_true = 1 := by
   rw [cs1Flag3_eq_cF3_toTypedGenFlag, cs1Flag4_eq_cF4_toTypedGenFlag,
@@ -1486,7 +1543,7 @@ theorem F34_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF3 cF4 (tcGraph cF3 cF4 true) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF3 cF4 (tcGraph cF3 cF4 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F35_witness_false -/
 
@@ -1497,13 +1554,13 @@ private theorem F35_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F35_witness_false, CGraph.toGenFlag, tcGraph, cF3, cF5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F35_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F35_witness_false.forget = 1 := by
   rw [F35_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF3 cF5 false) (tcGraph cF3 cF5 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F35_witness_false_eq_tcGraph_toTypedGenFlag :
     F35_witness_false = (tcGraph cF3 cF5 false).toTypedGenFlag csType7 (by decide) (by
@@ -1516,7 +1573,7 @@ private theorem F35_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F35_witness_false_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag3 cs1Flag5 F35_witness_false = 1 := by
   rw [cs1Flag3_eq_cF3_toTypedGenFlag, cs1Flag5_eq_cF5_toTypedGenFlag,
@@ -1524,7 +1581,7 @@ theorem F35_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF3 cF5 (tcGraph cF3 cF5 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF3 cF5 (tcGraph cF3 cF5 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F35_witness_true -/
 
@@ -1535,13 +1592,13 @@ private theorem F35_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F35_witness_true, CGraph.toGenFlag, tcGraph, cF3, cF5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F35_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F35_witness_true.forget = 2 := by
   rw [F35_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF3 cF5 true) (tcGraph cF3 cF5 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F35_witness_true_eq_tcGraph_toTypedGenFlag :
     F35_witness_true = (tcGraph cF3 cF5 true).toTypedGenFlag csType7 (by decide) (by
@@ -1554,7 +1611,7 @@ private theorem F35_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F35_witness_true_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag3 cs1Flag5 F35_witness_true = 1 := by
   rw [cs1Flag3_eq_cF3_toTypedGenFlag, cs1Flag5_eq_cF5_toTypedGenFlag,
@@ -1562,7 +1619,7 @@ theorem F35_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF3 cF5 (tcGraph cF3 cF5 true) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF3 cF5 (tcGraph cF3 cF5 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F37_witness_false -/
 
@@ -1573,13 +1630,13 @@ private theorem F37_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F37_witness_false, CGraph.toGenFlag, tcGraph, cF3, cF7]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F37_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F37_witness_false.forget = 1 := by
   rw [F37_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF3 cF7 false) (tcGraph cF3 cF7 false) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F37_witness_false_eq_tcGraph_toTypedGenFlag :
     F37_witness_false = (tcGraph cF3 cF7 false).toTypedGenFlag csType7 (by decide) (by
@@ -1592,7 +1649,7 @@ private theorem F37_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F37_witness_false_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag3 cs1Flag7 F37_witness_false = 1 := by
   rw [cs1Flag3_eq_cF3_toTypedGenFlag, cs1Flag7_eq_cF7_toTypedGenFlag,
@@ -1600,7 +1657,7 @@ theorem F37_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF3 cF7 (tcGraph cF3 cF7 false) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF3 cF7 (tcGraph cF3 cF7 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### Bridge proofs for F37_witness_true -/
 
@@ -1611,13 +1668,13 @@ private theorem F37_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, F37_witness_true, CGraph.toGenFlag, tcGraph, cF3, cF7]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem F37_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) F37_witness_true.forget = 4 := by
   rw [F37_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cF3 cF7 true) (tcGraph cF3 cF7 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem F37_witness_true_eq_tcGraph_toTypedGenFlag :
     F37_witness_true = (tcGraph cF3 cF7 true).toTypedGenFlag csType7 (by decide) (by
@@ -1630,7 +1687,7 @@ private theorem F37_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem F37_witness_true_jointCount_bridge :
     genJointCount CG2 csType7 cs1Flag3 cs1Flag7 F37_witness_true = 1 := by
   rw [cs1Flag3_eq_cF3_toTypedGenFlag, cs1Flag7_eq_cF7_toTypedGenFlag,
@@ -1638,7 +1695,7 @@ theorem F37_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cF3 cF7 (tcGraph cF3 cF7 true) (by decide) (by decide) (by decide) (by decide)
     (by decide) (by decide)]
   change tcJointCount 3 cF3 cF7 (tcGraph cF3 cF7 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### csType6 (σ₆) CGraph and cs0 flag products -/
 
@@ -1966,13 +2023,13 @@ private theorem S0F33_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F33_witness, CGraph.toGenFlag, tcGraph, cS0F3]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F33_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F33_witness.forget = 4 := by
   rw [S0F33_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F3 cS0F3 false) (tcGraph cS0F3 cS0F3 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F33_witness_eq_tcGraph_toTypedGenFlag :
     S0F33_witness = (tcGraph cS0F3 cS0F3 false).toTypedGenFlag csType6 (by decide) (by
@@ -1985,14 +2042,14 @@ private theorem S0F33_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F33_witness_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag3 cs0Flag3 S0F33_witness = 2 := by
   rw [cs0Flag3_eq_cS0F3_toTypedGenFlag, S0F33_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cS0F3 cS0F3 (tcGraph cS0F3 cS0F3 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F3 cS0F3 (tcGraph cS0F3 cS0F3 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F34 bridge (dual) -/
 
@@ -2003,13 +2060,13 @@ private theorem S0F34_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F34_witness_false, CGraph.toGenFlag, tcGraph, cS0F3, cS0F4]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F34_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F34_witness_false.forget = 1 := by
   rw [S0F34_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F3 cS0F4 false) (tcGraph cS0F3 cS0F4 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F34_witness_false_eq_tcGraph_toTypedGenFlag :
     S0F34_witness_false = (tcGraph cS0F3 cS0F4 false).toTypedGenFlag csType6 (by decide) (by
@@ -2022,7 +2079,7 @@ private theorem S0F34_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F34_witness_false_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag3 cs0Flag4 S0F34_witness_false = 1 := by
   rw [cs0Flag3_eq_cS0F3_toTypedGenFlag, cs0Flag4_eq_cS0F4_toTypedGenFlag,
@@ -2030,7 +2087,7 @@ theorem S0F34_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F3 cS0F4 (tcGraph cS0F3 cS0F4 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F3 cS0F4 (tcGraph cS0F3 cS0F4 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 private theorem S0F34_witness_true_forget_eq_toGenFlag :
     S0F34_witness_true.forget = (tcGraph cS0F3 cS0F4 true).toGenFlag :=
@@ -2039,13 +2096,13 @@ private theorem S0F34_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F34_witness_true, CGraph.toGenFlag, tcGraph, cS0F3, cS0F4]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F34_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F34_witness_true.forget = 1 := by
   rw [S0F34_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F3 cS0F4 true) (tcGraph cS0F3 cS0F4 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F34_witness_true_eq_tcGraph_toTypedGenFlag :
     S0F34_witness_true = (tcGraph cS0F3 cS0F4 true).toTypedGenFlag csType6 (by decide) (by
@@ -2058,7 +2115,7 @@ private theorem S0F34_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F34_witness_true_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag3 cs0Flag4 S0F34_witness_true = 1 := by
   rw [cs0Flag3_eq_cS0F3_toTypedGenFlag, cs0Flag4_eq_cS0F4_toTypedGenFlag,
@@ -2066,7 +2123,7 @@ theorem S0F34_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F3 cS0F4 (tcGraph cS0F3 cS0F4 true) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F3 cS0F4 (tcGraph cS0F3 cS0F4 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F35 bridge (dual) -/
 
@@ -2077,13 +2134,13 @@ private theorem S0F35_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F35_witness_false, CGraph.toGenFlag, tcGraph, cS0F3, cS0F5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F35_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F35_witness_false.forget = 1 := by
   rw [S0F35_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F3 cS0F5 false) (tcGraph cS0F3 cS0F5 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F35_witness_false_eq_tcGraph_toTypedGenFlag :
     S0F35_witness_false = (tcGraph cS0F3 cS0F5 false).toTypedGenFlag csType6 (by decide) (by
@@ -2096,7 +2153,7 @@ private theorem S0F35_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F35_witness_false_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag3 cs0Flag5 S0F35_witness_false = 1 := by
   rw [cs0Flag3_eq_cS0F3_toTypedGenFlag, cs0Flag5_eq_cS0F5_toTypedGenFlag,
@@ -2104,7 +2161,7 @@ theorem S0F35_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F3 cS0F5 (tcGraph cS0F3 cS0F5 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F3 cS0F5 (tcGraph cS0F3 cS0F5 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 private theorem S0F35_witness_true_forget_eq_toGenFlag :
     S0F35_witness_true.forget = (tcGraph cS0F3 cS0F5 true).toGenFlag :=
@@ -2113,13 +2170,13 @@ private theorem S0F35_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F35_witness_true, CGraph.toGenFlag, tcGraph, cS0F3, cS0F5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F35_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F35_witness_true.forget = 1 := by
   rw [S0F35_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F3 cS0F5 true) (tcGraph cS0F3 cS0F5 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F35_witness_true_eq_tcGraph_toTypedGenFlag :
     S0F35_witness_true = (tcGraph cS0F3 cS0F5 true).toTypedGenFlag csType6 (by decide) (by
@@ -2132,7 +2189,7 @@ private theorem S0F35_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F35_witness_true_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag3 cs0Flag5 S0F35_witness_true = 1 := by
   rw [cs0Flag3_eq_cS0F3_toTypedGenFlag, cs0Flag5_eq_cS0F5_toTypedGenFlag,
@@ -2140,7 +2197,7 @@ theorem S0F35_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F3 cS0F5 (tcGraph cS0F3 cS0F5 true) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F3 cS0F5 (tcGraph cS0F3 cS0F5 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F36 bridge (dual) -/
 
@@ -2151,13 +2208,13 @@ private theorem S0F36_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F36_witness_false, CGraph.toGenFlag, tcGraph, cS0F3, cS0F6]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F36_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F36_witness_false.forget = 2 := by
   rw [S0F36_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F3 cS0F6 false) (tcGraph cS0F3 cS0F6 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F36_witness_false_eq_tcGraph_toTypedGenFlag :
     S0F36_witness_false = (tcGraph cS0F3 cS0F6 false).toTypedGenFlag csType6 (by decide) (by
@@ -2170,7 +2227,7 @@ private theorem S0F36_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F36_witness_false_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag3 cs0Flag6 S0F36_witness_false = 1 := by
   rw [cs0Flag3_eq_cS0F3_toTypedGenFlag, cs0Flag6_eq_cS0F6_toTypedGenFlag,
@@ -2178,7 +2235,7 @@ theorem S0F36_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F3 cS0F6 (tcGraph cS0F3 cS0F6 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F3 cS0F6 (tcGraph cS0F3 cS0F6 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 private theorem S0F36_witness_true_forget_eq_toGenFlag :
     S0F36_witness_true.forget = (tcGraph cS0F3 cS0F6 true).toGenFlag :=
@@ -2187,13 +2244,13 @@ private theorem S0F36_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F36_witness_true, CGraph.toGenFlag, tcGraph, cS0F3, cS0F6]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F36_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F36_witness_true.forget = 4 := by
   rw [S0F36_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F3 cS0F6 true) (tcGraph cS0F3 cS0F6 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F36_witness_true_eq_tcGraph_toTypedGenFlag :
     S0F36_witness_true = (tcGraph cS0F3 cS0F6 true).toTypedGenFlag csType6 (by decide) (by
@@ -2206,7 +2263,7 @@ private theorem S0F36_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F36_witness_true_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag3 cs0Flag6 S0F36_witness_true = 1 := by
   rw [cs0Flag3_eq_cS0F3_toTypedGenFlag, cs0Flag6_eq_cS0F6_toTypedGenFlag,
@@ -2214,7 +2271,7 @@ theorem S0F36_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F3 cS0F6 (tcGraph cS0F3 cS0F6 true) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F3 cS0F6 (tcGraph cS0F3 cS0F6 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F44 bridge -/
 
@@ -2225,13 +2282,13 @@ private theorem S0F44_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F44_witness, CGraph.toGenFlag, tcGraph, cS0F4]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F44_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F44_witness.forget = 2 := by
   rw [S0F44_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F4 cS0F4 false) (tcGraph cS0F4 cS0F4 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F44_witness_eq_tcGraph_toTypedGenFlag :
     S0F44_witness = (tcGraph cS0F4 cS0F4 false).toTypedGenFlag csType6 (by decide) (by
@@ -2244,14 +2301,14 @@ private theorem S0F44_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F44_witness_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag4 cs0Flag4 S0F44_witness = 2 := by
   rw [cs0Flag4_eq_cS0F4_toTypedGenFlag, S0F44_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cS0F4 cS0F4 (tcGraph cS0F4 cS0F4 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F4 cS0F4 (tcGraph cS0F4 cS0F4 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F45 bridge (dual) -/
 
@@ -2262,13 +2319,13 @@ private theorem S0F45_witness_false_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F45_witness_false, CGraph.toGenFlag, tcGraph, cS0F4, cS0F5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F45_witness_false_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F45_witness_false.forget = 2 := by
   rw [S0F45_witness_false_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F4 cS0F5 false) (tcGraph cS0F4 cS0F5 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F45_witness_false_eq_tcGraph_toTypedGenFlag :
     S0F45_witness_false = (tcGraph cS0F4 cS0F5 false).toTypedGenFlag csType6 (by decide) (by
@@ -2281,7 +2338,7 @@ private theorem S0F45_witness_false_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F45_witness_false_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag4 cs0Flag5 S0F45_witness_false = 1 := by
   rw [cs0Flag4_eq_cS0F4_toTypedGenFlag, cs0Flag5_eq_cS0F5_toTypedGenFlag,
@@ -2289,7 +2346,7 @@ theorem S0F45_witness_false_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F4 cS0F5 (tcGraph cS0F4 cS0F5 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F4 cS0F5 (tcGraph cS0F4 cS0F5 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 private theorem S0F45_witness_true_forget_eq_toGenFlag :
     S0F45_witness_true.forget = (tcGraph cS0F4 cS0F5 true).toGenFlag :=
@@ -2298,13 +2355,13 @@ private theorem S0F45_witness_true_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F45_witness_true, CGraph.toGenFlag, tcGraph, cS0F4, cS0F5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F45_witness_true_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F45_witness_true.forget = 2 := by
   rw [S0F45_witness_true_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F4 cS0F5 true) (tcGraph cS0F4 cS0F5 true) (by decide) (by decide)
     (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F45_witness_true_eq_tcGraph_toTypedGenFlag :
     S0F45_witness_true = (tcGraph cS0F4 cS0F5 true).toTypedGenFlag csType6 (by decide) (by
@@ -2317,7 +2374,7 @@ private theorem S0F45_witness_true_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F45_witness_true_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag4 cs0Flag5 S0F45_witness_true = 1 := by
   rw [cs0Flag4_eq_cS0F4_toTypedGenFlag, cs0Flag5_eq_cS0F5_toTypedGenFlag,
@@ -2325,7 +2382,7 @@ theorem S0F45_witness_true_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F4 cS0F5 (tcGraph cS0F4 cS0F5 true) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F4 cS0F5 (tcGraph cS0F4 cS0F5 true) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F46 bridge -/
 
@@ -2336,13 +2393,13 @@ private theorem S0F46_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F46_witness, CGraph.toGenFlag, tcGraph, cS0F4, cS0F6]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F46_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F46_witness.forget = 2 := by
   rw [S0F46_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F4 cS0F6 false) (tcGraph cS0F4 cS0F6 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F46_witness_eq_tcGraph_toTypedGenFlag :
     S0F46_witness = (tcGraph cS0F4 cS0F6 false).toTypedGenFlag csType6 (by decide) (by
@@ -2355,7 +2412,7 @@ private theorem S0F46_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F46_witness_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag4 cs0Flag6 S0F46_witness = 1 := by
   rw [cs0Flag4_eq_cS0F4_toTypedGenFlag, cs0Flag6_eq_cS0F6_toTypedGenFlag,
@@ -2363,7 +2420,7 @@ theorem S0F46_witness_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F4 cS0F6 (tcGraph cS0F4 cS0F6 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F4 cS0F6 (tcGraph cS0F4 cS0F6 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F55 bridge -/
 
@@ -2374,13 +2431,13 @@ private theorem S0F55_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F55_witness, CGraph.toGenFlag, tcGraph, cS0F5]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F55_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F55_witness.forget = 2 := by
   rw [S0F55_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F5 cS0F5 false) (tcGraph cS0F5 cS0F5 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F55_witness_eq_tcGraph_toTypedGenFlag :
     S0F55_witness = (tcGraph cS0F5 cS0F5 false).toTypedGenFlag csType6 (by decide) (by
@@ -2393,14 +2450,14 @@ private theorem S0F55_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F55_witness_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag5 cs0Flag5 S0F55_witness = 2 := by
   rw [cs0Flag5_eq_cS0F5_toTypedGenFlag, S0F55_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cS0F5 cS0F5 (tcGraph cS0F5 cS0F5 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F5 cS0F5 (tcGraph cS0F5 cS0F5 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F56 bridge -/
 
@@ -2411,13 +2468,13 @@ private theorem S0F56_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F56_witness, CGraph.toGenFlag, tcGraph, cS0F5, cS0F6]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F56_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F56_witness.forget = 2 := by
   rw [S0F56_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F5 cS0F6 false) (tcGraph cS0F5 cS0F6 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F56_witness_eq_tcGraph_toTypedGenFlag :
     S0F56_witness = (tcGraph cS0F5 cS0F6 false).toTypedGenFlag csType6 (by decide) (by
@@ -2430,7 +2487,7 @@ private theorem S0F56_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F56_witness_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag5 cs0Flag6 S0F56_witness = 1 := by
   rw [cs0Flag5_eq_cS0F5_toTypedGenFlag, cs0Flag6_eq_cS0F6_toTypedGenFlag,
@@ -2438,7 +2495,7 @@ theorem S0F56_witness_jointCount_bridge :
   rw [← tcJointCount_eq_genJointCount cS0F5 cS0F6 (tcGraph cS0F5 cS0F6 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F5 cS0F6 (tcGraph cS0F5 cS0F6 false) = 1
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ### S0F66 bridge -/
 
@@ -2449,13 +2506,13 @@ private theorem S0F66_witness_forget_eq_toGenFlag :
     simp only [GenFlag.forget, S0F66_witness, CGraph.toGenFlag, tcGraph, cS0F6]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F66_witness_emptyAutCount_bridge :
     genFlagAutCount CG2 (GenFlagType.empty CG2) S0F66_witness.forget = 12 := by
   rw [S0F66_witness_forget_eq_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' (tcGraph cS0F6 cS0F6 false) (tcGraph cS0F6 cS0F6 false) (by decide)
     (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 private theorem S0F66_witness_eq_tcGraph_toTypedGenFlag :
     S0F66_witness = (tcGraph cS0F6 cS0F6 false).toTypedGenFlag csType6 (by decide) (by
@@ -2468,14 +2525,14 @@ private theorem S0F66_witness_eq_tcGraph_toTypedGenFlag :
   ext u v; simp only [SimpleGraph.fromRel_adj]
   fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 8000000 in
 theorem S0F66_witness_jointCount_bridge :
     genJointCount CG2 csType6 cs0Flag6 cs0Flag6 S0F66_witness = 2 := by
   rw [cs0Flag6_eq_cS0F6_toTypedGenFlag, S0F66_witness_eq_tcGraph_toTypedGenFlag]
   rw [← tcJointCount_eq_genJointCount cS0F6 cS0F6 (tcGraph cS0F6 cS0F6 false) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide)]
   change tcJointCount 3 cS0F6 cS0F6 (tcGraph cS0F6 cS0F6 false) = 2
-  native_decide
+  rw [tcJointCount_eq_fast]; decide
 
 /-! ## certF1, certF6 automorphism counts (Phase 2 of `b1_nonneg` discharge)
 
@@ -2510,23 +2567,23 @@ private theorem certF6_eq_cCertF6_toGenFlag :
     simp only [certF6, CGraph.toGenFlag, cCertF6]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(certF1) = 120 = 5!: all 5 black vertices permute freely. -/
 theorem certF1_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) certF1 = 120 := by
   rw [certF1_eq_cCertF1_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cCertF1 cCertF1
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(certF6) = 24 = 4!: 4 red leaves permute freely; centre fixed. -/
 theorem certF6_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) certF6 = 24 := by
   rw [certF6_eq_cCertF6_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cCertF6 cCertF6
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 /-! ## σ₁-4-B: aut counts for 5 named flags (certF4, flag5, flag12, flag24, flag32)
 
@@ -2609,7 +2666,7 @@ private theorem flag32_eq_cFlag32_toGenFlag :
     simp only [flag32, CGraph.toGenFlag, cFlag32]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(certF4) = 4: K_{1,4} with two colour-X leaves {v0,v1} and two colour-Y
     leaves {v2,v3}; centre fixed; (2!)·(2!) = 4. -/
 theorem certF4_aut :
@@ -2617,9 +2674,9 @@ theorem certF4_aut :
   rw [certF4_eq_cCertF4_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cCertF4 cCertF4
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag5) = 6 = 3!: K_{1,4}, centre v4 fixed, distinguished red leaf v3 fixed,
     other 3 leaves {v0,v1,v2} permute freely. -/
 theorem flag5_aut :
@@ -2627,9 +2684,9 @@ theorem flag5_aut :
   rw [flag5_eq_cFlag5_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag5 cFlag5
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag12) = 1: all vertices have unique invariants (degree+colour
     distinguishes each, no swap preserves edges). -/
 theorem flag12_aut :
@@ -2637,9 +2694,9 @@ theorem flag12_aut :
   rw [flag12_eq_cFlag12_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag12 cFlag12
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag24) = 2: v3 (col 1) and v0,v4 (degree-distinguished) all fixed;
     {v1,v2} both have only nbr v4, swappable. -/
 theorem flag24_aut :
@@ -2647,9 +2704,9 @@ theorem flag24_aut :
   rw [flag24_eq_cFlag24_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag24 cFlag24
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag32) = 4: K_{3,2}; v2 (col 1) fixed; {v0,v1} swappable, {v3,v4}
     swappable; (2!)·(2!) = 4. -/
 theorem flag32_aut :
@@ -2657,7 +2714,7 @@ theorem flag32_aut :
   rw [flag32_eq_cFlag32_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag32 cFlag32
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 /-! ## σ₅-1: aut counts for 4 named flags (flag16, flag17, sdpFlag37, sdpFlag55)
 
@@ -2734,7 +2791,7 @@ private theorem sdpFlag55_eq_cSdpFlag55_toGenFlag :
     simp only [sdpFlag55, CGraph.toGenFlag, cSdpFlag55]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag16) = 4: K_{1,4}-like graph on B vertices {v0,v1,v2}, R vertices
     {v3,v4}; v3 fixed (degree 2 to v0,v4 makes it the only deg-2 R), v4 fixed
     (centre to {v1,v2,v3}); {v1,v2} swappable (both deg-1 B-leaves of v4);
@@ -2744,9 +2801,9 @@ theorem flag16_aut :
   rw [flag16_eq_cFlag16_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag16 cFlag16
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag17): same edges as flag16 but col [B,R,B,R,R].
     Verified by native_decide. -/
 theorem flag17_aut :
@@ -2754,9 +2811,9 @@ theorem flag17_aut :
   rw [flag17_eq_cFlag17_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag17 cFlag17
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(sdpFlag37) = 1: edges {0-2, 1-3, 2-4, 3-4}, col [R,B,B,R,R];
     every vertex degree-distinguished + colour-distinguished, no swap.
     Verified by native_decide. -/
@@ -2765,9 +2822,9 @@ theorem sdpFlag37_aut :
   rw [sdpFlag37_eq_cSdpFlag37_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cSdpFlag37 cSdpFlag37
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(sdpFlag55) = 2: 5-cycle 0-1-3-4-2-0 with col [R,R,B,B,R];
     swap (v0↔v1, v2↔v3, v4 fixed) preserves edges + colours.
     Verified by native_decide. -/
@@ -2776,7 +2833,7 @@ theorem sdpFlag55_aut :
   rw [sdpFlag55_eq_cSdpFlag55_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cSdpFlag55 cSdpFlag55
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 /-! ### σ₂-1: CGraph bridges for the 6 σ₂ named flags
 
@@ -2887,59 +2944,59 @@ private theorem flag34_eq_cFlag34_toGenFlag :
     simp only [flag34, CGraph.toGenFlag, cFlag34]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(sdpF7) = 2: v1 ↔ v2 swap (both R deg 2 with nbrs {v3, v4}). -/
 theorem sdpF7_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) sdpF7 = 2 := by
   rw [sdpF7_eq_cSdpF7_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cSdpF7 cSdpF7
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag15) = 2: v1 ↔ v2 swap (both R deg 2 with nbrs {v3, v4}). -/
 theorem flag15_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) flag15 = 2 := by
   rw [flag15_eq_cFlag15_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag15 cFlag15
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(sdpF20) = 2: v1 ↔ v2 swap (both R deg 1 with nbr v4). -/
 theorem sdpF20_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) sdpF20 = 2 := by
   rw [sdpF20_eq_cSdpF20_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cSdpF20 cSdpF20
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag25) = 2: v1 ↔ v2 swap (both R deg 1 with nbr v4). -/
 theorem flag25_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) flag25 = 2 := by
   rw [flag25_eq_cFlag25_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag25 cFlag25
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(sdpF30) = 12: K_{3,2} with R-side {v0,v1,v2} (S₃) + B-side {v3,v4} (S₂). -/
 theorem sdpF30_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) sdpF30 = 12 := by
   rw [sdpF30_eq_cSdpF30_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cSdpF30 cSdpF30
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(flag34) = 6: K_{3,2} with R-side {v0,v1,v2} (S₃); v3 R deg 3, v4 B deg 3. -/
 theorem flag34_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) flag34 = 6 := by
   rw [flag34_eq_cFlag34_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cFlag34 cFlag34
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 /-! ### σ₃-1: CGraph bridges for σ₃-only named flags (certF11, certF22) -/
 
@@ -2976,23 +3033,23 @@ private theorem certF22_eq_cCertF22_toGenFlag :
     simp only [certF22, CGraph.toGenFlag, cCertF22]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(certF11) = 2: v1↔v2 swap (both B deg 2 with nbrs {v3, v4}). -/
 theorem certF11_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) certF11 = 2 := by
   rw [certF11_eq_cCertF11_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cCertF11 cCertF11
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(certF22) = 1: every vertex distinguished. -/
 theorem certF22_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) certF22 = 1 := by
   rw [certF22_eq_cCertF22_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cCertF22 cCertF22
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 /-! ### σ₄-1: CGraph bridges for σ₄-only named flags (certF8, certF31) -/
 
@@ -3032,16 +3089,16 @@ private theorem certF31_eq_cCertF31_toGenFlag :
     simp only [certF31, CGraph.toGenFlag, cCertF31]
     ext u v; fin_cases u <;> fin_cases v <;> simp (config := { decide := true })
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(certF8) = 1: every vertex distinguished by colour/degree. -/
 theorem certF8_aut :
     genFlagAutCount CG2 (GenFlagType.empty CG2) certF8 = 1 := by
   rw [certF8_eq_cCertF8_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cCertF8 cCertF8
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 8000000 in
 /-- aut(certF31) = 4: K_{3,2} with R-side {3,4} swappable, B-side {1,2}
     swappable; v0=R distinguished from v1=v2=B. (2!)·(2!) = 4. -/
 theorem certF31_aut :
@@ -3049,6 +3106,6 @@ theorem certF31_aut :
   rw [certF31_eq_cCertF31_toGenFlag]; unfold genFlagAutCount
   rw [← cInducedCount_eq_genInducedCount' cCertF31 cCertF31
     (by decide) (by decide) (by decide) (by decide)]
-  native_decide
+  decide
 
 end Davey2024
