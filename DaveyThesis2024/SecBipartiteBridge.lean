@@ -241,7 +241,9 @@ min-strong-degree at η = 0.3746. Mirrors
 `Davey2024.SecBridge.secPhiRegularF`; the gates are conjuncts, not
 construction arguments. Satisfiability: bipartite Δ-regular girth-≥6 graphs
 with F = E(G) pass the gate for Δ ≥ 6
-(the development notes §5.3). -/
+(the development notes §5.3); `SecGenBipNonVacuity` proves
+`secBipPhiRegularF_satisfiable` outright, on the three standard kernel axioms,
+over the affine-plane incidence family of `AffinePlaneFamily`. -/
 def secBipPhiRegularF
     (phi : GenLimitFunctional CG22 (GenFlagType.empty CG22)
       secBipGenGraphClassF secBipGenDelta) : Prop :=

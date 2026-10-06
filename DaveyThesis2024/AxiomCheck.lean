@@ -1,7 +1,10 @@
 import DaveyThesis2024.PentagonBound
 import DaveyThesis2024.PentagonQNonVacuity
+import DaveyThesis2024.SecAsymBasisAnchored
 import DaveyThesis2024.BasisDataIntegrity
 import DaveyThesis2024.PentagonQWeights
+import DaveyThesis2024.SecAsymNonVacuity
+import DaveyThesis2024.SecGenBipNonVacuity
 import DaveyThesis2024.PentagonDelta3
 import DaveyThesis2024.PentagonDelta3Unique
 import DaveyThesis2024.PentagonDelta4
@@ -149,6 +152,27 @@ info: 'Davey2024.PentagonQWeights.O_Q_weight_eq_combinatorial' depends on axioms
 /-- info: 'Davey2024.PentagonQNonVacuity.O_Q_coef_exact' depends on axioms: [propext, Classical.choice, Quot.sound] -/
 #guard_msgs in
 #print axioms PentagonQNonVacuity.O_Q_coef_exact
+
+-- STRUCTURAL REGRESSION for the asymmetric locality axiom (added 2026-09-20).
+-- `flagBasis_asym_isLocalFlag_F` takes no hypothesis, so non-vacuity is
+-- meaningless for it; its risk is falsity.  The pentagon analogue shows the risk
+-- is real: `flagBasis_isLocalFlag` is a THEOREM restricted to the 69
+-- objective-contributing indices.  The counterexample that motivated the
+-- restriction was an artefact of the colour inversion and no longer exists;
+-- whether the unrestricted claim holds is unproved.  The asymmetric axiom is defensible
+-- because its basis is generated local by construction -- a premise that lived
+-- only in a docstring until this regression checked it.  All 334 flags have an
+-- anchor (colour 0 or 1) in every connected component, including the six
+-- edgeless ones.  `native_decide`, since the basis is string-parsed and does not
+-- reduce in the kernel.
+
+/-- info: 'Davey2024.SecAsymBasisAnchored.all_basis_flags_anchored' depends on axioms: [propext,
+ Classical.choice,
+ Lean.ofReduceBool,
+ Lean.trustCompiler,
+ Quot.sound] -/
+#guard_msgs in
+#print axioms SecAsymBasisAnchored.all_basis_flags_anchored
 
 /-- info: 'Davey2024.strong_chromatic_index_bound' depends on axioms: [propext,
  Classical.choice,
@@ -736,3 +760,43 @@ info: 'SECRandomBipartite.secRandomBipartite_aas' depends on axioms: [propext,
  Quot.sound] -/
 #guard_msgs in
 #print axioms Davey2024.BasisDataIntegrity.sec_basis_rawVertexColours_lt_two
+
+--- Non-vacuity of the two asymmetric SEC domain axioms (Group 3, 2026-09-21).
+--- `sec_combinatorial_identity_asymmetric_F` carries no F-degree gate, only
+--- `IsAsymmetricBipartite 1` + `IsRegular` + strictly increasing degree, and
+--- `K_{n,n}` satisfies all three.  That axiom was FALSE once already (2026-07,
+--- refutable on (Δ, Δ/2)-semiregular hosts, repaired by adding the genuine
+--- `IsRegular` gate), so a vacuous gate would hide exactly that error.  Both
+--- witnesses are proved outright, on the three standard kernel axioms.
+
+/-- info: 'Davey2024.SecAsymNonVacuity.asymSeq_exists' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.SecAsymNonVacuity.asymSeq_exists
+
+/-- info: 'Davey2024.SecAsymNonVacuity.secAsymPhiRegular4_satisfiable' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.SecAsymNonVacuity.secAsymPhiRegular4_satisfiable
+
+--- Non-vacuity of the general and bipartite SEC domain axioms (Group 3, 2026-09-21),
+--- completing the group. Their gates demand every F-edge to have strong F-degree
+--- at least 1.7297 D^2 (general) or 1.6254 D^2 (bipartite). K_{n,n} cannot serve --
+--- its edges at distance one lie in 4-cycles, leaving only about D^2. The witness is
+--- the affine-plane incidence family over ZMod p (`AffinePlaneFamily`), which is
+--- p-regular, bipartite and 4-cycle-free, so an edge has 2(p-1)^2 strong neighbours.
+--- All four are proved outright, on the three standard kernel axioms.
+
+/-- info: 'Davey2024.SecGenBipNonVacuity.affSeq_exists' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.SecGenBipNonVacuity.affSeq_exists
+
+/-- info: 'Davey2024.SecGenBipNonVacuity.affSeq_exists_bip' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.SecGenBipNonVacuity.affSeq_exists_bip
+
+/-- info: 'Davey2024.SecGenBipNonVacuity.secPhiRegularF_satisfiable' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.SecGenBipNonVacuity.secPhiRegularF_satisfiable
+
+/-- info: 'Davey2024.SecGenBipNonVacuity.secBipPhiRegularF_satisfiable' depends on axioms: [propext, Classical.choice, Quot.sound] -/
+#guard_msgs in
+#print axioms Davey2024.SecGenBipNonVacuity.secBipPhiRegularF_satisfiable

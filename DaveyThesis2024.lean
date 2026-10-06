@@ -15,6 +15,7 @@ import DaveyThesis2024.SdpEvaluation
 import DaveyThesis2024.PentagonQBasis
 import DaveyThesis2024.PentagonQSigmaBasis
 import DaveyThesis2024.PentagonQBridge
+import DaveyThesis2024.SecAsymBasisAnchored
 import DaveyThesis2024.PentagonBound
 import DaveyThesis2024.PentagonQWeights
 import DaveyThesis2024.PentagonQNonVacuity

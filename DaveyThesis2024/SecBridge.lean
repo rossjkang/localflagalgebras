@@ -498,7 +498,10 @@ plus the R3 min-degree constraint, `strong_edge_colouring.rs:161`, emitted as
 are conjuncts of the predicate (not construction arguments), so nothing is
 discharged by a degenerate construction input; satisfiability: Δ-regular
 girth-≥5 graphs with F = E(G) have `strongFDegree = 2Δ(Δ−1)`, which passes
-the gate for Δ ≥ 8 (the development notes §5.3). -/
+the gate for Δ ≥ 8 (the development notes §5.3). That is no
+longer only an argument: `SecGenBipNonVacuity` proves
+`secPhiRegularF_satisfiable` outright, on the three standard kernel axioms,
+over the affine-plane incidence family of `AffinePlaneFamily`. -/
 def secPhiRegularF
     (phi : GenLimitFunctional CG22 (GenFlagType.empty CG22)
       secGenGraphClassF secGenDelta) : Prop :=

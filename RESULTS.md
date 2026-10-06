@@ -159,7 +159,7 @@ to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
   `PentagonQBridge.phi_evalAlg_O_Q_alg_le_bound` (§5.1).
   `PentagonQBridge.pentagonQ_basis_combinatorial_identity_step1` was a second
   such axiom until 2026-10-01; it is now a theorem (§5.3).
-- **Also checked, outside this theorem's dependency chain:**
+- **Also checked, and since 2026-10-01 inside this theorem's dependency chain:**
   `PentagonQWeights.O_Q_weight_eq_combinatorial` — at each of the 9295 basis
   flags the integer weight the certificate carries is `4n₁ + n₂ + 2n₃`, the
   identification **Paper 1 §5.2** asserts. Standard axioms incl. `native_decide`,
@@ -167,9 +167,12 @@ to every graph via blow-ups, since P/(nΔ⁴) is blow-up invariant.
   the `nᵢ` come from an enumerator whose agreement with that definition is settled
   by reading it rather than by proof, and the weights are identified with the
   shipped target vector, whose being the program's objective row rests on the
-  emitter. A consequence worth recording here: the theorem therefore does **not**
-  yet connect the weights to `genInducedCount`, the development's own embedding
-  count — a prerequisite before the asymptotic identity could consume it.
+  emitter. This entry used to add that the theorem did not yet connect the
+  weights to `genInducedCount`, the development's own embedding count, and so
+  could not be consumed by the asymptotic identity. That ceased to be true on
+  2026-10-01: `PentagonQCompleteFlag.weight_div_eq_coef` rewrites through this
+  theorem, and `PentagonQAssembleA.basis_combinatorial_identity_step1` consumes
+  the result.
 - **Colour convention:** the packed size-8 basis is in the Rust enumeration's
   convention (`0` = black, the vertices of `N(v)`); `CG2` uses the opposite, so
   `PentagonQBasis.extractColour` inverts the bit. Until 2026-09-27 it did not,

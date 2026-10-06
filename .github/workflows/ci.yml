@@ -14,10 +14,28 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # Keep-alive.  actions/cache evicts any entry not read for 7 days, and this
+  # repository's entry is ~2 GB of lake artifacts that a cold build would have
+  # to regenerate inside `timeout-minutes` below -- a duration never measured,
+  # since every run so far has restored something.  A run that times out saves
+  # no cache (`post-if: success()`), so one eviction can cost several runs.
+  # A weekly no-op run reads the cache and resets its clock in about two
+  # minutes.  Note GitHub disables scheduled workflows after 60 days with no
+  # repository activity, so this protects against quiet weeks, not dormancy.
+  schedule:
+    - cron: '17 4 * * 1'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pinned, not `ubuntu-latest`.  That label migrates to Ubuntu 26 from
+    # 2026-10-19, and the cache key below interpolates `runner.os`, which is
+    # only ever "Linux" -- it carries no image version.  A migration would
+    # therefore restore artifacts built on 24.04 under a key that still
+    # matches, instead of rebuilding cleanly, and the failure would surface as
+    # something other than an image change.  ANYONE BUMPING THIS IMAGE MUST
+    # ALSO BUMP THE `lake-v2-` KEY PREFIX, so the new image starts from an
+    # empty cache rather than inheriting the old one's.
+    runs-on: ubuntu-24.04
     # 360 is the GitHub-hosted maximum.  Raised from 180 after the
     # 2026-09-29 run was cancelled at the limit having not finished; see
     # the cache note below for why that build was so much slower than the
